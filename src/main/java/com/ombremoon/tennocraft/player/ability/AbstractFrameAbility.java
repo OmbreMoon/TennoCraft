@@ -1,18 +1,28 @@
 package com.ombremoon.tennocraft.player.ability;
 
+import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
+import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.util.FrameUtil;
+import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
 public abstract class AbstractFrameAbility {
+    private String descriptionId;
 
     public final AbilityType<?> abilityType;
     public final int energyRequired;
@@ -23,7 +33,7 @@ public abstract class AbstractFrameAbility {
     public UUID userID;
     public UUID targetID;
     public Entity targetEntity;
-
+    public int durationInTicks;
     protected long ticks = 0;
     public boolean isNotActive = false;
     public boolean isStarting = false;
@@ -43,6 +53,7 @@ public abstract class AbstractFrameAbility {
         nbt.putInt("z", blockPos.getZ());
         nbt.putUUID("user", userID);
         if (targetID != null) nbt.putUUID("target", targetID);
+        nbt.putInt("duration", durationInTicks);
         nbt.putLong("ticks", ticks);
         nbt.putBoolean("isActive", isNotActive);
 
@@ -55,10 +66,30 @@ public abstract class AbstractFrameAbility {
         setBlockPos(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")));
         userID = nbt.getUUID("user");
         if (nbt.contains("target")) targetID = nbt.getUUID("target");
+        durationInTicks = nbt.getInt("duration");
         ticks = nbt.getLong("ticks");
         isNotActive = nbt.getBoolean("isActive");
 
         return loadAdditionalData(nbt, level);
+    }
+
+    public int getEnergyRequired() {
+        return this.energyRequired;
+    }
+
+    protected String getOrCreateDescriptionId() {
+        if (this.descriptionId == null) {
+            this.descriptionId = Util.makeDescriptionId("ability", FrameAbilities.FRAME_ABILITY.getRegistryName());
+        }
+        return this.descriptionId;
+    }
+
+    public String getDescriptionId() {
+        return this.getOrCreateDescriptionId();
+    }
+
+    public Component getDisplayName() {
+        return Component.translatable(this.getDescriptionId());
     }
 
     /*
@@ -103,13 +134,14 @@ public abstract class AbstractFrameAbility {
         if (!level.isClientSide()) {
             ticks++;
             if (isStarting) {
-                System.out.println("Test");
-                if (ticks % 20 == 0) {
+                if (ticks % 10 == 0) {
                     castAbility();
                 }
             } else if (!isNotActive) {
-                System.out.println(ticks);
                 onTick();
+                if (ticks % getDurationInTicks() == 0) {
+                    endAbility();
+                }
             }
         }
     }
@@ -140,8 +172,28 @@ public abstract class AbstractFrameAbility {
         return null;
     }
 
+    protected void addModifier(LivingEntity livingEntity, Attribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation operation) {
+        AttributeInstance attributeInstance = getAttributeInstance(livingEntity, attribute);
+        AttributeModifier attributeModifier = new AttributeModifier(uuid, name, amount, operation);
+        if (!attributeInstance.hasModifier(attributeModifier))
+            attributeInstance.addPermanentModifier(attributeModifier);
+    }
+
+    protected void removeModifier(LivingEntity livingEntity, Attribute attribute, UUID uuid) {
+        AttributeInstance attributeInstance = getAttributeInstance(livingEntity, attribute);
+        attributeInstance.removePermanentModifier(uuid);
+    }
+
     public AbilityType<?> getAbilityType() {
         return this.abilityType;
+    }
+
+    public int getDurationInTicks() {
+        return this.durationInTicks;
+    }
+
+    public void setDurationInTicks(FrameArmorItem<?> frameArmorItem, int durationInTicks) {
+        this.durationInTicks = Math.round(durationInTicks * frameArmorItem.getTotalDurationModifier());
     }
 
     public void setLevel(ServerLevel level) {
@@ -158,9 +210,15 @@ public abstract class AbstractFrameAbility {
 
     public void start() {
         this.isStarting = true;
+        setDurationInTicks(FrameUtil.getFrameFromAbility(abilityType), durationInTicks);
     }
 
     public boolean isStarting() {
         return  this.isStarting;
+    }
+
+    private AttributeInstance getAttributeInstance(LivingEntity livingEntity, Attribute attribute) {
+        AttributeInstance attributeInstance = livingEntity.getAttributes().getInstance(attribute);
+        return attributeInstance;
     }
 }

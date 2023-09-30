@@ -1,5 +1,6 @@
-package com.ombremoon.tennocraft.common.network.packet;
+package com.ombremoon.tennocraft.common.network.packet.server;
 
+import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
@@ -11,7 +12,7 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-public class ServerboundAbilityThreePacket {
+public class ServerboundAbilityThreePacket implements IAbstractMessage {
     public ServerboundAbilityThreePacket() {
 
     }

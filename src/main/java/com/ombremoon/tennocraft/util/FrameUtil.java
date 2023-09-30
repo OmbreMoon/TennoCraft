@@ -1,22 +1,16 @@
 package com.ombremoon.tennocraft.util;
 
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
-import com.ombremoon.tennocraft.object.item.mineframe.VoltFrameItem;
 import com.ombremoon.tennocraft.player.ability.AbilityManager;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.LazyOptional;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -44,6 +38,10 @@ public class FrameUtil {
         return (FrameArmorItem<?>) frameType.getFrameArmorItem();
     }
 
+    public static FrameArmorItem<?> getFrameFromAbility(AbilityType<?> ability) {
+        return (FrameArmorItem<?>) ability.getFrameType().getFrameArmorItem();
+    }
+
     public static void initFrameAbility(Player player, Level level, BlockPos blockPos, AbilityType<?> abilityType) {
         if (!level.isClientSide()) {
             AbstractFrameAbility frameAbility = abilityType.create();
@@ -53,6 +51,7 @@ public class FrameUtil {
                 frameAbility.setBlockPos(blockPos);
                 AbilityManager.addAbility(frameAbility);
                 frameAbility.start();
+                System.out.println(frameAbility.getDurationInTicks());
             }
         }
     }

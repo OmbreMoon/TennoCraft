@@ -1,5 +1,6 @@
-package com.ombremoon.tennocraft.common.network.packet;
+package com.ombremoon.tennocraft.common.network.packet.server;
 
+import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
@@ -11,12 +12,12 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-public class ServerboundAbilityTwoPacket {
-    public ServerboundAbilityTwoPacket() {
+public class ServerboundAbilityFourPacket implements IAbstractMessage {
+    public ServerboundAbilityFourPacket() {
 
     }
 
-    public ServerboundAbilityTwoPacket(FriendlyByteBuf buf) {
+    public ServerboundAbilityFourPacket(FriendlyByteBuf buf) {
 
     }
 
@@ -37,8 +38,8 @@ public class ServerboundAbilityTwoPacket {
                 FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>) StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
                 FrameArmorItem<?> frameArmorItem = FrameUtil.getFrameFromType(frameType);
 
-                //Gets 2nd ability from ability list
-                AbilityType<?> frameAbility = FrameUtil.getSecondAbility(frameArmorItem);
+                //Gets ultimate ability from ability list
+                AbilityType<?> frameAbility = FrameUtil.getUltimateAbility(frameArmorItem);
                 if (frameArmorItem.getFrameEnergy() > frameAbility.create().energyRequired)
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
             }

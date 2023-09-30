@@ -2,10 +2,10 @@ package com.ombremoon.tennocraft.client;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.network.TCMessages;
-import com.ombremoon.tennocraft.common.network.packet.ServerboundAbilityFourPacket;
-import com.ombremoon.tennocraft.common.network.packet.ServerboundAbilityOnePacket;
-import com.ombremoon.tennocraft.common.network.packet.ServerboundAbilityThreePacket;
-import com.ombremoon.tennocraft.common.network.packet.ServerboundAbilityTwoPacket;
+import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityFourPacket;
+import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityOnePacket;
+import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityThreePacket;
+import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityTwoPacket;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;

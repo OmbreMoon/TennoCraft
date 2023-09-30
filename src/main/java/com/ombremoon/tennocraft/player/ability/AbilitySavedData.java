@@ -39,7 +39,6 @@ public class AbilitySavedData extends SavedData {
         for (AbstractFrameAbility ability : ACTIVE_ABILITIES) {
             if (!ability.isNotActive && !ability.isStarting()) {
                 abilityList.add(ability.save());
-                System.out.println("Saved");
             }
         }
 

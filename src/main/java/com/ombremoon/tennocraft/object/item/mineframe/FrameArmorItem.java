@@ -18,6 +18,9 @@ public abstract class FrameArmorItem<T extends FrameArmorItem<T>> extends ArmorI
     public float frameEnergy;
     public float frameSpeed;
 
+    //TEMPORARY FOR TESTING
+    public float durationModifiers[] = {0.2F, 0.05F, 0.5F};
+
     public FrameArmorItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
         super(pMaterial, pType, pProperties);
     }
@@ -28,6 +31,14 @@ public abstract class FrameArmorItem<T extends FrameArmorItem<T>> extends ArmorI
 
     public float getFrameEnergy() {
         return this.frameEnergy;
+    }
+
+    public float getTotalDurationModifier() {
+        float totalDurationModifier = 0;
+        for (float durationModifier : durationModifiers) {
+            totalDurationModifier += durationModifier;
+        }
+        return totalDurationModifier;
     }
 
     public Supplier<List<AbilityType<?>>> getAbilityList() {

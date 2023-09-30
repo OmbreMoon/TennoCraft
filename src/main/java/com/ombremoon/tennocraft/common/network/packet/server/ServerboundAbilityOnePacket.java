@@ -1,18 +1,21 @@
-package com.ombremoon.tennocraft.common.network.packet;
+package com.ombremoon.tennocraft.common.network.packet.server;
 
+import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
+import com.ombremoon.tennocraft.common.network.packet.client.ClientboundMovementPacket;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 import java.util.stream.StreamSupport;
 
-public class ServerboundAbilityOnePacket {
+public class ServerboundAbilityOnePacket implements IAbstractMessage {
     public ServerboundAbilityOnePacket() {
 
     }
@@ -40,8 +43,9 @@ public class ServerboundAbilityOnePacket {
 
                 //Gets 1st ability from ability list
                 AbilityType<?> frameAbility = FrameUtil.getFirstAbility(frameArmorItem);
-                if (frameArmorItem.getFrameEnergy() > frameAbility.create().energyRequired)
+                if (frameArmorItem.getFrameEnergy() > frameAbility.create().getEnergyRequired()) {
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
+                }
             }
         });
         return true;

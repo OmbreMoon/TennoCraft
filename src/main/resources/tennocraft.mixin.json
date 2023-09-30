@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.ombremoon.tennocraft.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "tennocraft.refmap.json",
+  "mixins": [
+    "PlayerMovementMixin"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}
