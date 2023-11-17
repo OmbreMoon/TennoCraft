@@ -2,7 +2,9 @@ package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
+import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,16 +36,22 @@ public class ServerboundAbilityTwoPacket implements IAbstractMessage {
 
             //Check to see if full Frame is on
             if (FrameUtil.hasOnFrame(player)) {
+                ItemStack frameStack = FrameUtil.getFrameStack(player);
                 Iterable<ItemStack> armorSlots = player.getArmorSlots();
                 FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>) StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
-                FrameArmorItem<?> frameArmorItem = FrameUtil.getFrameFromType(frameType);
+                FrameHelmetItem<?> frameHelmetItem = FrameUtil.getFrameFromType(frameType);
 
-                //Gets 2nd ability from ability list
-                AbilityType<?> frameAbility = FrameUtil.getSecondAbility(frameArmorItem);
-                if (frameArmorItem.getFrameEnergy() > frameAbility.create().energyRequired)
+                //Gets 1st ability from ability list
+                AbilityType<?> frameAbility = FrameUtil.getSecondAbility(frameHelmetItem);
+                if (hasEnoughEnergy(frameStack, frameType, frameAbility.getSupplier())) {
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
+                }
             }
         });
         return true;
+    }
+
+    private boolean hasEnoughEnergy(ItemStack itemStack, FrameArmorItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
+        return frameType.getFrameEnergy() * (1 + FrameUtil.getFrameEnergy(itemStack)) > abstractFrameAbility.getEnergyRequired();
     }
 }

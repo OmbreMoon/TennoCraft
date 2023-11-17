@@ -1,10 +1,16 @@
 package com.ombremoon.tennocraft.player.ability;
 
 import com.ombremoon.tennocraft.TennoCraft;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = TennoCraft.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AbilityManager {
@@ -27,6 +33,20 @@ public class AbilityManager {
                 ability.tick();
             }
             data.setDirty();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLoggedOut(final PlayerEvent.PlayerLoggedOutEvent event) {
+        if (!event.getEntity().level().isClientSide()) {
+            Player player = event.getEntity();
+            AbilitySavedData data = AbilitySavedData.get(event.getEntity().level());
+            for (AbstractFrameAbility ability : data.ACTIVE_ABILITIES) {
+                if (ability.userID.equals(player.getUUID())) {
+                    ability.endAbility();
+                }
+            }
+            data.ACTIVE_ABILITIES.removeIf(ability -> ability.userID.equals(player.getUUID()));
         }
     }
 }

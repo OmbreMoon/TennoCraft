@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,12 +37,13 @@ public class ServerboundAbilityThreePacket implements IAbstractMessage {
             if (FrameUtil.hasOnFrame(player)) {
                 Iterable<ItemStack> armorSlots = player.getArmorSlots();
                 FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>) StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
-                FrameArmorItem<?> frameArmorItem = FrameUtil.getFrameFromType(frameType);
+                FrameHelmetItem<?> frameHelmetItem = FrameUtil.getFrameFromType(frameType);
 
-                //Gets 3rd ability from ability list
-                AbilityType<?> frameAbility = FrameUtil.getThirdAbility(frameArmorItem);
-                if (frameArmorItem.getFrameEnergy() > frameAbility.create().energyRequired)
+                //Gets 1st ability from ability list
+                AbilityType<?> frameAbility = FrameUtil.getThirdAbility(frameHelmetItem);
+                if (frameHelmetItem.getFrameEnergy() > frameAbility.getSupplier().getEnergyRequired()) {
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
+                }
             }
         });
         return true;

@@ -1,3 +1,4 @@
+/*
 package com.ombremoon.tennocraft.player.ability.excalibur;
 
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
@@ -13,3 +14,4 @@ public class RadialBlindAbility extends AbstractFrameAbility {
         this(FrameAbilities.RADIAL_BLIND_ABILITY.get(), 50);
     }
 }
+*/

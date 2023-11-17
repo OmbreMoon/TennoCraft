@@ -2,8 +2,11 @@ package com.ombremoon.tennocraft;
 
 import com.mojang.logging.LogUtils;
 import com.ombremoon.tennocraft.common.init.TCCreativeModeTabs;
+import com.ombremoon.tennocraft.common.init.TCMenuTypes;
+import com.ombremoon.tennocraft.common.init.block.TCBlockEntities;
 import com.ombremoon.tennocraft.common.init.block.TCBlocks;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
+import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
 import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import net.minecraft.client.Minecraft;
@@ -44,10 +47,12 @@ public class TennoCraft {
         MinecraftForge.EVENT_BUS.register(this);
 
         TCBlocks.register(modEventBus);
+        TCBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         TCItems.register(modEventBus);
-//        TCCreativeModeTabs.init(modEventBus);
         TCCreativeModeTabs.register(modEventBus);
+        TCMenuTypes.register(modEventBus);
         FrameAbilities.register(modEventBus);
+        FrameAttributes.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

@@ -22,7 +22,6 @@ public class PlayerMovementMixin {
             } else if (!justJumped && jumpCount > 0 && player.getDeltaMovement().y < 0) {
                 if (player.input.jumping && !player.getAbilities().flying) {
                     if (canJump(player)) {
-                        System.out.println("Jumped");
                         jumpCount--;
                         player.jumpFromGround();
                     }

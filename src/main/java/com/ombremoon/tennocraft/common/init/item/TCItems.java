@@ -20,6 +20,7 @@ public class TCItems {
 
     public static void register(IEventBus modEventBus) {
         TCFrames.init();
+        TCMods.init();
         ITEMS.register(modEventBus);
     }
 }

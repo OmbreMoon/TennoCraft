@@ -1,15 +1,27 @@
 {
   "creativemodetab.tc_frames_tab": "TennoCraft Frames",
+  "creativemodetab.tc_blocks_tab": "TennoCraft Blocks",
 
   "item.tennocraft.volt_helmet": "Volt Helmet",
   "item.tennocraft.volt_chassis": "Volt Chassis",
   "item.tennocraft.volt_leggings": "Volt Leggings",
   "item.tennocraft.volt_boots": "Volt Boots",
   "item.tennocraft.excalibur_helmet": "Excalibur Helmet",
+  "item.tennocraft.excalibur_chassis": "Excalibur Chassis",
 
   "key.category.tennocraft.tc": "TennoCraft",
   "key.category.tennocraft.ability_one": "Ability 1",
   "key.category.tennocraft.ability_two": "Ability 2",
   "key.category.tennocraft.ability_three": "Ability 3",
-  "key.category.tennocraft.ability_four": "Ultimate Ability"
+  "key.category.tennocraft.ability_four": "Ultimate Ability",
+
+  "tennocraft.frame_attribute.frame.health": "Health",
+  "tennocraft.frame_attribute.frame.shield": "Shield",
+  "tennocraft.frame_attribute.frame.armor": "Armor",
+  "tennocraft.frame_attribute.frame.energy": "Energy",
+  "tennocraft.frame_attribute.frame.rank": "Rank",
+  "tennocraft.frame_attribute.frame.strength": "Ability Strength",
+  "tennocraft.frame_attribute.frame.range": "Ability Range",
+  "tennocraft.frame_attribute.frame.efficiency": "Ability Efficiency",
+  "tennocraft.frame_attribute.frame.duration": "Ability Duration"
 }

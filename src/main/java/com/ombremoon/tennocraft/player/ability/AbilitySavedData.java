@@ -57,7 +57,7 @@ public class AbilitySavedData extends SavedData {
             AbilityType<?> abilityType = FrameAbilities.REGISTRY.get().getValue(new ResourceLocation(registryName));
 
             if (abilityType != null) {
-                AbstractFrameAbility ability = abilityType.create();
+                AbstractFrameAbility ability = abilityType.getSupplier();
 
                 if (ability.load(compoundTag, data.level)) {
                     data.ACTIVE_ABILITIES.add(ability);

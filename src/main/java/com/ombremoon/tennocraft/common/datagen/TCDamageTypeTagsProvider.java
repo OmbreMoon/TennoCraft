@@ -1,10 +1,12 @@
 package com.ombremoon.tennocraft.common.datagen;
 
 import com.ombremoon.tennocraft.TennoCraft;
+import com.ombremoon.tennocraft.common.init.entity.TCDamageTypes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -17,6 +19,7 @@ public class TCDamageTypeTagsProvider extends TagsProvider<DamageType> {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
-
+        tag(DamageTypeTags.BYPASSES_ARMOR)
+                .add(TCDamageTypes.MALFUNCTION);
     }
 }

@@ -17,7 +17,7 @@ public class TCBlockLootTables extends BlockLootSubProvider {
 
     @Override
     protected void generate() {
-
+this.dropSelf(TCBlocks.ARSENAL_BLOCK.get());
     }
 
     private void naturalBlockLootTables() {

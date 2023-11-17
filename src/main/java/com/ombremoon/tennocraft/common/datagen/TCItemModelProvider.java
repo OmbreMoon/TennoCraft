@@ -3,6 +3,7 @@ package com.ombremoon.tennocraft.common.datagen;
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.init.item.TCFrames;
 import com.ombremoon.tennocraft.common.init.item.TCItems;
+import com.ombremoon.tennocraft.common.init.item.TCMods;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -21,6 +22,7 @@ public class TCItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         registerMineframeModels();
+        registerModModels();
     }
 
     private void registerMineframeModels() {
@@ -29,6 +31,7 @@ public class TCItemModelProvider extends ItemModelProvider {
         tempItem(TCFrames.VOLT_LEGGINGS);
         tempItem(TCFrames.VOLT_BOOTS);
         tempItem(TCFrames.EXCALIBUR_HELMET);
+        tempItem(TCFrames.EXCALIBUR_CHASSIS);
     }
 
     private void registerPrimaryWeaponModels() {
@@ -41,6 +44,11 @@ public class TCItemModelProvider extends ItemModelProvider {
 
     private void registerMeleeWeaponModels() {
 
+    }
+
+    private void registerModModels() {
+        tempItem(TCMods.CONTINUITY);
+        tempItem(TCMods.NARROW_MINDED);
     }
 
     private void registerSpawnEggs() {

@@ -1,7 +1,10 @@
 package com.ombremoon.tennocraft.player.ability;
 
+import com.google.common.collect.Multimap;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
-import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
+import com.ombremoon.tennocraft.object.entity.projectile.FrameProjectile;
+import com.ombremoon.tennocraft.player.attribute.FrameAttribute;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -17,31 +20,38 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import java.util.Map;
 import java.util.UUID;
 
 public abstract class AbstractFrameAbility {
     private String descriptionId;
+    private float abilityDuration;
+    private float moddedDuration = 0;
 
-    public final AbilityType<?> abilityType;
-    public final int energyRequired;
-    public final int energyPerSecond;
+    private final AbilityType<?> abilityType;
+    private final int energyRequired;
+    private final int energyPerSecond;
+    private final int durationInTicks;
+    private final float initialRange;
 
     public ServerLevel level;
     public BlockPos blockPos;
     public UUID userID;
     public UUID targetID;
     public Entity targetEntity;
-    public int durationInTicks;
     protected long ticks = 0;
     public boolean isNotActive = false;
     public boolean isStarting = false;
 
-    public AbstractFrameAbility(AbilityType<?> abilityType, int energyRequired, int energyPerSecond) {
+    public AbstractFrameAbility(AbilityType<?> abilityType, int energyRequired, int energyPerSecond, int durationInTicks, float initialRange) {
         this.abilityType = abilityType;
         this.energyRequired = energyRequired;
         this.energyPerSecond = energyPerSecond;
+        this.durationInTicks = durationInTicks;
+        this.initialRange = initialRange;
     }
 
     public CompoundTag save() {
@@ -53,7 +63,6 @@ public abstract class AbstractFrameAbility {
         nbt.putInt("z", blockPos.getZ());
         nbt.putUUID("user", userID);
         if (targetID != null) nbt.putUUID("target", targetID);
-        nbt.putInt("duration", durationInTicks);
         nbt.putLong("ticks", ticks);
         nbt.putBoolean("isActive", isNotActive);
 
@@ -66,7 +75,6 @@ public abstract class AbstractFrameAbility {
         setBlockPos(new BlockPos(nbt.getInt("x"), nbt.getInt("y"), nbt.getInt("z")));
         userID = nbt.getUUID("user");
         if (nbt.contains("target")) targetID = nbt.getUUID("target");
-        durationInTicks = nbt.getInt("duration");
         ticks = nbt.getLong("ticks");
         isNotActive = nbt.getBoolean("isActive");
 
@@ -139,7 +147,10 @@ public abstract class AbstractFrameAbility {
                 }
             } else if (!isNotActive) {
                 onTick();
-                if (ticks % getDurationInTicks() == 0) {
+                if (ticks % getAbilityDuration() == 0
+                        || (level.getPlayerByUUID(userID) != null && !FrameUtil.hasOnFrame(level.getPlayerByUUID(userID)))
+                        || (level.getPlayerByUUID(userID) != null && !level.getPlayerByUUID(userID).isAlive())) {
+                    System.out.println(ticks);
                     endAbility();
                 }
             }
@@ -175,8 +186,9 @@ public abstract class AbstractFrameAbility {
     protected void addModifier(LivingEntity livingEntity, Attribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation operation) {
         AttributeInstance attributeInstance = getAttributeInstance(livingEntity, attribute);
         AttributeModifier attributeModifier = new AttributeModifier(uuid, name, amount, operation);
-        if (!attributeInstance.hasModifier(attributeModifier))
+        if (!attributeInstance.hasModifier(attributeModifier)) {
             attributeInstance.addPermanentModifier(attributeModifier);
+        }
     }
 
     protected void removeModifier(LivingEntity livingEntity, Attribute attribute, UUID uuid) {
@@ -184,16 +196,20 @@ public abstract class AbstractFrameAbility {
         attributeInstance.removePermanentModifier(uuid);
     }
 
+    protected void shootAbstractProjectile(FrameProjectile<?> frameProjectile) {
+
+    }
+
     public AbilityType<?> getAbilityType() {
         return this.abilityType;
     }
 
-    public int getDurationInTicks() {
-        return this.durationInTicks;
+    public UUID getUserID() {
+        return this.userID;
     }
 
-    public void setDurationInTicks(FrameArmorItem<?> frameArmorItem, int durationInTicks) {
-        this.durationInTicks = Math.round(durationInTicks * frameArmorItem.getTotalDurationModifier());
+    public void setUser(Player player) {
+        this.userID = player.getUUID();
     }
 
     public void setLevel(ServerLevel level) {
@@ -204,21 +220,49 @@ public abstract class AbstractFrameAbility {
         this.blockPos = blockPos;
     }
 
-    public void setUser(Player player) {
-        this.userID = player.getUUID();
-    }
-
     public void start() {
+        initModifiers();
+
         this.isStarting = true;
-        setDurationInTicks(FrameUtil.getFrameFromAbility(abilityType), durationInTicks);
     }
 
     public boolean isStarting() {
-        return  this.isStarting;
+        return this.isStarting;
     }
 
     private AttributeInstance getAttributeInstance(LivingEntity livingEntity, Attribute attribute) {
         AttributeInstance attributeInstance = livingEntity.getAttributes().getInstance(attribute);
         return attributeInstance;
+    }
+
+    private void setAbilityDuration(int durationInTicks) {
+        if (level.getPlayerByUUID(userID) != null) {
+            Player player = level.getPlayerByUUID(userID);
+            ItemStack frameStack = FrameUtil.getFrameStack(player);
+            this.abilityDuration = Math.round((durationInTicks * (1 + getModdedDuration(frameStack))));
+        }
+    }
+
+    public float getAbilityDuration() {
+        return this.abilityDuration;
+    }
+
+    private void initModifiers() {
+        setAbilityDuration(this.durationInTicks);
+    }
+
+    //Attributes
+
+    public float getModdedDuration(ItemStack itemStack) {
+        Multimap<FrameAttribute, Float> frameAttributes = FrameUtil.getFrameAttributes(itemStack);
+        for (Map.Entry<FrameAttribute, Float> entry : frameAttributes.entries()) {
+            FrameAttribute frameAttribute = entry.getKey();
+            float attributeModifier = entry.getValue();
+            if (frameAttribute == FrameAttributes.DURATION.get()) {
+                moddedDuration += attributeModifier;
+                System.out.println(moddedDuration);
+            }
+        }
+        return moddedDuration;
     }
 }

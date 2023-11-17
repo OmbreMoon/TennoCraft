@@ -8,17 +8,17 @@ import java.util.function.Supplier;
 
 public class AbilityType<T extends AbstractFrameAbility> {
 
-    private final Supplier<AbstractFrameAbility> supplier;
+    private final Supplier<T> supplier;
     private final FrameArmorItem.FrameType frameType;
     private final ResourceLocation resourceLocation;
 
-    public AbilityType(ResourceLocation resourceLocation, FrameArmorItem.FrameType frameType, Supplier<AbstractFrameAbility> supplier) {
+    public AbilityType(ResourceLocation resourceLocation, FrameArmorItem.FrameType frameType, Supplier<T> supplier) {
         this.supplier = supplier;
         this.resourceLocation = resourceLocation;
         this.frameType = frameType;
     }
 
-    public AbstractFrameAbility create() {
+    public AbstractFrameAbility getSupplier() {
         return this.supplier.get();
     }
 

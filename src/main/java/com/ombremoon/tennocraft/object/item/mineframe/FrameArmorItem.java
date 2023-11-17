@@ -1,67 +1,103 @@
 package com.ombremoon.tennocraft.object.item.mineframe;
 
+import com.ombremoon.tennocraft.common.init.entity.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.item.TCFrames;
-import com.ombremoon.tennocraft.common.init.item.TCItems;
-import com.ombremoon.tennocraft.player.ability.AbilityType;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Item;
+import com.ombremoon.tennocraft.util.FrameUtil;
+import net.minecraft.advancements.FrameType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
-public abstract class FrameArmorItem<T extends FrameArmorItem<T>> extends ArmorItem {
-    protected Supplier<List<AbilityType<?>>> abilityList = ArrayList::new;
-    public int frameShield;
-    public int frameArmor;
-    public float frameEnergy;
-    public float frameSpeed;
+public class FrameArmorItem<T extends FrameArmorItem<T>> extends Item implements Equipable {
+    private final EquipmentSlot equipmentSlot;
 
-    //TEMPORARY FOR TESTING
-    public float durationModifiers[] = {0.2F, 0.05F, 0.5F};
-
-    public FrameArmorItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
-        super(pMaterial, pType, pProperties);
+    public FrameArmorItem(EquipmentSlot equipmentSlot, Properties pProperties) {
+        super(pProperties);
+        this.equipmentSlot = equipmentSlot;
     }
 
-    public void setFrameEnergy(float frameEnergy) {
-        this.frameEnergy = frameEnergy;
+    @Override
+    public @Nullable EquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return this.equipmentSlot;
     }
 
-    public float getFrameEnergy() {
-        return this.frameEnergy;
-    }
-
-    public float getTotalDurationModifier() {
-        float totalDurationModifier = 0;
-        for (float durationModifier : durationModifiers) {
-            totalDurationModifier += durationModifier;
+    @Override
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
+        if (!pLevel.isClientSide()) {
+            Player player = (Player) pEntity;
+            if (FrameUtil.hasOnFrame(player)) {
+                if (player.isInWater()) {
+                    DamageSource damageSource = new DamageSource(player.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(TCDamageTypes.MALFUNCTION));
+                    player.hurt(/*player.damageSources().generic()*/ damageSource, 1.0F);
+                }
+            }
         }
-        return totalDurationModifier;
-    }
-
-    public Supplier<List<AbilityType<?>>> getAbilityList() {
-        return this.abilityList;
+        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
 
     public FrameType getFrameType() {
         return FrameType.NONE;
     }
 
+    //For Equipable Interface
+    @Override
+    public EquipmentSlot getEquipmentSlot() {
+        return this.equipmentSlot;
+    }
+
     public enum FrameType {
-        NONE(null),
-        EXCALIBUR(TCFrames.EXCALIBUR_HELMET.get()),
-        VOLT(TCFrames.VOLT_HELMET.get());
+        NONE(null, 0, 0, 0, 0),
+        VOLT(TCFrames.VOLT_HELMET, 270, 255, 105, 100),
+        EXCALIBUR(TCFrames.EXCALIBUR_HELMET, 270, 270, 240, 100);
 
-        private final Item frameArmorItem;
+        private final Supplier<Item> frameArmorItem;
+        private final int frameHealth;
+        private final int frameShield;
+        private final int frameArmor;
+        private final int frameEnergy;
 
-        FrameType(Item frameArmorItem) {
+        FrameType(Supplier<Item> frameArmorItem, int frameHealth, int frameShield, int frameArmor, int frameEnergy) {
             this.frameArmorItem = frameArmorItem;
+            this.frameHealth = frameHealth;
+            this.frameShield = frameShield;
+            this.frameArmor = frameArmor;
+            this.frameEnergy = frameEnergy;
         }
 
-        public Item getFrameArmorItem() {
+        public Supplier<Item> getFrameArmorItem() {
             return frameArmorItem;
+        }
+
+        public int getFrameHealth() {
+            return this.frameHealth;
+        }
+
+        public int getFrameShield() {
+            return this.frameShield;
+        }
+
+        public int getFrameArmor() {
+            return this.frameArmor;
+        }
+
+        public int getFrameEnergy() {
+            return this.frameEnergy;
         }
     }
 }
