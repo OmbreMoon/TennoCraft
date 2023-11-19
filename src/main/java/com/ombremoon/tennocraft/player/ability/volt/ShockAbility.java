@@ -7,7 +7,7 @@ import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 public class ShockAbility extends AbstractFrameAbility {
 
     public ShockAbility(AbilityType<?> abilityType, int energyRequired, float abilityRange) {
-        super(abilityType, energyRequired, 0, 0, abilityRange);
+        super(abilityType, energyRequired, 0, 1, abilityRange);
     }
 
     public ShockAbility() {

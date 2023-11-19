@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceTokenItem;
 import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
 import com.ombremoon.tennocraft.player.ability.AbilityManager;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
@@ -21,15 +22,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.RegistryObject;
+import top.theillusivec4.curios.api.CuriosCapability;
 
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class FrameUtil {
+    public static final String CURIO_SLOT = "tenno";
+    public static final String TRANSFERENCE = "transference";
     public static final String FRAME_ATTR = "Frame Attributes";
     private static int moddedEnergy;
 
+/*
     public static boolean hasOnFrame(LivingEntity entity) {
         Iterable<ItemStack> armorSlots = entity.getArmorSlots();
         Stream<ItemStack> frameSlots = StreamSupport.stream(armorSlots.spliterator(), false);
@@ -47,6 +52,11 @@ public class FrameUtil {
         }
         return true;
     }
+*/
+
+    public static boolean hasOnFrame(LivingEntity livingEntity) {
+        return livingEntity.getTags().contains(TRANSFERENCE);
+    }
 
     public static FrameHelmetItem<?> getFrameFromType(FrameArmorItem.FrameType frameType) {
         return (FrameHelmetItem<?>) frameType.getFrameArmorItem().get();
@@ -57,7 +67,7 @@ public class FrameUtil {
     }
 
     public static ItemStack getFrameStack(Player player) {
-        return !hasOnFrame(player) ? ItemStack.EMPTY : player.getItemBySlot(EquipmentSlot.HEAD);
+        return player.getCapability(CuriosCapability.INVENTORY).orElseThrow(NullPointerException::new).getStacksHandler(CURIO_SLOT).get().getStacks().getStackInSlot(0);
     }
 
     public static AbstractFrameAbility getAbilityByName(ResourceLocation location) {
@@ -163,10 +173,6 @@ public class FrameUtil {
         return moddedEnergy;
     }
 
-    public static AbilityType<?> getFirstAbility(FrameHelmetItem<?> frameHelmetItem) {
-        return hasAbility(frameHelmetItem, 1) ? frameHelmetItem.getAbilityList().get().get(0) : FrameAbilities.EMPTY.get();
-    }
-
     public static AbilityType<?> getSecondAbility(FrameHelmetItem<?> frameHelmetItem) {
         return hasAbility(frameHelmetItem, 2) ? frameHelmetItem.getAbilityList().get().get(1) : FrameAbilities.EMPTY.get();
     }
@@ -177,6 +183,26 @@ public class FrameUtil {
 
     public static AbilityType<?> getUltimateAbility(FrameHelmetItem<?> frameHelmetItem) {
         return hasAbility(frameHelmetItem, 4) ? frameHelmetItem.getAbilityList().get().get(3) : FrameAbilities.EMPTY.get();
+    }
+
+    public static AbilityType<?> getFirstAbility(TransferenceTokenItem tokenItem) {
+        return hasAbility(tokenItem, 1) ? tokenItem.getAbilityList().get().get(0) : FrameAbilities.EMPTY.get();
+    }
+
+    public static AbilityType<?> getSecondAbility(TransferenceTokenItem tokenItem) {
+        return hasAbility(tokenItem, 2) ? tokenItem.getAbilityList().get().get(1) : FrameAbilities.EMPTY.get();
+    }
+
+    public static AbilityType<?> getThirdAbility(TransferenceTokenItem tokenItem) {
+        return hasAbility(tokenItem, 3) ? tokenItem.getAbilityList().get().get(2) : FrameAbilities.EMPTY.get();
+    }
+
+    public static AbilityType<?> getUltimateAbility(TransferenceTokenItem tokenItem) {
+        return hasAbility(tokenItem, 4) ? tokenItem.getAbilityList().get().get(3) : FrameAbilities.EMPTY.get();
+    }
+
+    private static boolean hasAbility(TransferenceTokenItem tokenItem, int i) {
+        return tokenItem.getAbilityList().get().size() >= i;
     }
 
     private static boolean hasAbility(FrameHelmetItem<?> frameHelmetItem, int i) {

@@ -11,6 +11,8 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 public class ArsenalMenu extends AbstractContainerMenu {
@@ -26,6 +28,10 @@ public class ArsenalMenu extends AbstractContainerMenu {
         checkContainerSize(inventory, 30);
         this.arsenalBlockEntity = (ArsenalBlockEntity) blockEntity;
         this.level = inventory.player.level();
+
+        this.arsenalBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+            this.addSlot(new SlotItemHandler(handler, 0, 20, 36));
+        });
 
         addPlayerSlots(inventory);
     }

@@ -28,7 +28,7 @@ public class FrameArmorItem<T extends FrameArmorItem<T>> extends Item implements
     private final EquipmentSlot equipmentSlot;
 
     public FrameArmorItem(EquipmentSlot equipmentSlot, Properties pProperties) {
-        super(pProperties);
+        super(pProperties.stacksTo(1));
         this.equipmentSlot = equipmentSlot;
     }
 

@@ -25,7 +25,7 @@ public class AbstractModItem extends Item implements IModAttribute {
         this.modRarity = modRarity;
     }
 
-    @Override
+/*    @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack modItem = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         if (!pLevel.isClientSide()) {
@@ -42,7 +42,7 @@ public class AbstractModItem extends Item implements IModAttribute {
             }
         }
         return InteractionResultHolder.pass(modItem);
-    }
+    }*/
 
     public void installMod(Player player, ItemStack modHolder) {
         CompoundTag compoundTag = modHolder.getOrCreateTag();

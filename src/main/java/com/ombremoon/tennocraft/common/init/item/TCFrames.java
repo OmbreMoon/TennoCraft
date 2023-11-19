@@ -3,10 +3,12 @@ package com.ombremoon.tennocraft.common.init.item;
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.object.item.mineframe.ExcaliburFrameItem;
 import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceTokenItem;
 import com.ombremoon.tennocraft.object.item.mineframe.helmet.ExcaliburHelmetItem;
 import com.ombremoon.tennocraft.object.item.mineframe.helmet.VoltHelmetItem;
 import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
 import com.ombremoon.tennocraft.object.item.mineframe.VoltFrameItem;
+import com.ombremoon.tennocraft.object.item.mineframe.token.VoltToken;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterials;
@@ -17,6 +19,10 @@ import java.util.function.Supplier;
 
 public class TCFrames {
     public static void init() {}
+
+    //TRANSFERENCE TOKENS
+    public static final RegistryObject<Item> VOLT_TOKEN = registerTokenItem("volt_token",
+            () -> new VoltToken(new Item.Properties()));
 
     public static final RegistryObject<Item> VOLT_HELMET = registerFrameItem("volt_helmet",
             () -> new VoltHelmetItem(new Item.Properties()) {});
@@ -32,6 +38,10 @@ public class TCFrames {
             () -> new ExcaliburFrameItem(EquipmentSlot.CHEST, new Item.Properties()) {});
 
     private static <T extends Item> RegistryObject<T> registerFrameItem(String name, Supplier<T> itemSupplier) {
+        return TCItems.registerItem(name, itemSupplier);
+    }
+
+    private static <T extends Item> RegistryObject<T> registerTokenItem(String name, Supplier<T> itemSupplier) {
         return TCItems.registerItem(name, itemSupplier);
     }
 }

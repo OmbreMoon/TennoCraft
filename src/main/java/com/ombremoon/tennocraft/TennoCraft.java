@@ -7,8 +7,10 @@ import com.ombremoon.tennocraft.common.init.block.TCBlockEntities;
 import com.ombremoon.tennocraft.common.init.block.TCBlocks;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
+import com.ombremoon.tennocraft.common.init.item.TCFrames;
 import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.network.TCMessages;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceTokenItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.food.FoodProperties;
@@ -35,6 +37,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.slf4j.Logger;
+import top.theillusivec4.curios.api.CuriosApi;
 
 @Mod(TennoCraft.MOD_ID)
 public class TennoCraft {

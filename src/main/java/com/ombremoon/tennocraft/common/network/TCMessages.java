@@ -2,10 +2,7 @@ package com.ombremoon.tennocraft.common.network;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.network.packet.client.ClientboundMovementPacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityFourPacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityOnePacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityThreePacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityTwoPacket;
+import com.ombremoon.tennocraft.common.network.packet.server.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
@@ -29,6 +26,18 @@ public class TCMessages {
                 .simpleChannel();
 
         INSTANCE = net;
+
+        net.messageBuilder(ServerboundOpenArsenalPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ServerboundOpenArsenalPacket::new)
+                .encoder(ServerboundOpenArsenalPacket::toBytes)
+                .consumerMainThread(ServerboundOpenArsenalPacket::handle)
+                .add();
+
+        net.messageBuilder(ServerboundTransferencePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ServerboundTransferencePacket::new)
+                .encoder(ServerboundTransferencePacket::toBytes)
+                .consumerMainThread(ServerboundTransferencePacket::handle)
+                .add();
 
         net.messageBuilder(ServerboundAbilityOnePacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(ServerboundAbilityOnePacket::new)

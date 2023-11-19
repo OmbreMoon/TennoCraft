@@ -2,16 +2,17 @@ package com.ombremoon.tennocraft.client;
 
 import com.ombremoon.tennocraft.TennoCraft;
 //import com.ombremoon.tennocraft.client.model.frames.VoltModel;
+import com.ombremoon.tennocraft.client.gui.ArsenalGUI;
+import com.ombremoon.tennocraft.client.gui.PlayerArsenalGUI;
 import com.ombremoon.tennocraft.client.model.frames.ExcaliburModel;
 import com.ombremoon.tennocraft.client.model.frames.VoltModel;
 import com.ombremoon.tennocraft.client.render.layers.ExcaliburLayer;
 import com.ombremoon.tennocraft.client.render.layers.VoltLayer;
+import com.ombremoon.tennocraft.common.init.TCMenuTypes;
 import com.ombremoon.tennocraft.common.network.TCMessages;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityFourPacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityOnePacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityThreePacket;
-import com.ombremoon.tennocraft.common.network.packet.server.ServerboundAbilityTwoPacket;
+import com.ombremoon.tennocraft.common.network.packet.server.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -28,6 +29,7 @@ import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientEvents {
 
@@ -35,7 +37,14 @@ public class ClientEvents {
     public static class ClientModBusEvents {
 
         @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event) {
+            MenuScreens.register(TCMenuTypes.PLAYER_ARSENAL_MENU.get(), PlayerArsenalGUI::new);
+            MenuScreens.register(TCMenuTypes.ARSENAL_MENU.get(), ArsenalGUI::new);
+        }
+
+        @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
+            event.register(KeyBinds.OPEN_PLAYER_ARSENAL_BINDING);
             event.register(KeyBinds.ABILITY_ONE_BINDING);
             event.register(KeyBinds.ABILITY_TWO_BINDING);
             event.register(KeyBinds.ABILITY_THREE_BINDING);
@@ -65,6 +74,12 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onAbilityInput(InputEvent.Key event) {
+            if (KeyBinds.OPEN_PLAYER_ARSENAL_BINDING.consumeClick()) {
+                TCMessages.sendToServer(new ServerboundOpenArsenalPacket());
+            }
+            if (KeyBinds.TRANSFERENCE_BINDING.consumeClick()) {
+                TCMessages.sendToServer(new ServerboundTransferencePacket());
+            }
             if (KeyBinds.ABILITY_ONE_BINDING.consumeClick()) {
                 TCMessages.sendToServer(new ServerboundAbilityOnePacket());
             }
