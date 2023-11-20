@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.network;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.network.packet.client.ClientboundMovementPacket;
+import com.ombremoon.tennocraft.common.network.packet.client.ClientboundTransferencePacket;
 import com.ombremoon.tennocraft.common.network.packet.server.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -67,6 +68,12 @@ public class TCMessages {
                 .decoder(ClientboundMovementPacket::new)
                 .encoder(ClientboundMovementPacket::toBytes)
                 .consumerMainThread(ClientboundMovementPacket::handle)
+                .add();
+
+        net.messageBuilder(ClientboundTransferencePacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ClientboundTransferencePacket::new)
+                .encoder(ClientboundTransferencePacket::toBytes)
+                .consumerMainThread(ClientboundTransferencePacket::handle)
                 .add();
     }
 

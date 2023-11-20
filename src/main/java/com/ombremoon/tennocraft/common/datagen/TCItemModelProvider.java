@@ -2,7 +2,6 @@ package com.ombremoon.tennocraft.common.datagen;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.init.item.TCFrames;
-import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.init.item.TCMods;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -21,17 +20,13 @@ public class TCItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        registerMineframeModels();
+        registerTransferenceKeys();
         registerModModels();
     }
 
-    private void registerMineframeModels() {
-        tempItem(TCFrames.VOLT_HELMET);
-        tempItem(TCFrames.VOLT_CHASSIS);
-        tempItem(TCFrames.VOLT_LEGGINGS);
-        tempItem(TCFrames.VOLT_BOOTS);
-        tempItem(TCFrames.EXCALIBUR_HELMET);
-        tempItem(TCFrames.EXCALIBUR_CHASSIS);
+    private void registerTransferenceKeys() {
+        tempItem(TCFrames.VOLT_KEY);
+        tempItem(TCFrames.EXCALIBUR_KEY);
     }
 
     private void registerPrimaryWeaponModels() {

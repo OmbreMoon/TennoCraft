@@ -1,4 +1,4 @@
-package com.ombremoon.tennocraft.player.ability.volt;
+package com.ombremoon.tennocraft.player.ability.frame.volt;
 
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.player.ability.AbilityType;

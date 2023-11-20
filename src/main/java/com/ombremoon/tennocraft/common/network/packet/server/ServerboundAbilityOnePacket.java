@@ -1,9 +1,7 @@
 package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
-import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceTokenItem;
-import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 import com.ombremoon.tennocraft.util.FrameUtil;
@@ -13,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
 
 public class ServerboundAbilityOnePacket implements IAbstractMessage {
     public ServerboundAbilityOnePacket() {
@@ -38,7 +35,7 @@ public class ServerboundAbilityOnePacket implements IAbstractMessage {
             //Check to see if full Frame is on
             if (FrameUtil.hasOnFrame(player)) {
                 ItemStack frameStack = FrameUtil.getFrameStack(player);
-                TransferenceTokenItem tokenItem = (TransferenceTokenItem) frameStack.getItem();
+                TransferenceKeyItem tokenItem = (TransferenceKeyItem) frameStack.getItem();
 
                 //Gets 1st ability from ability list
                 AbilityType<?> frameAbility = FrameUtil.getFirstAbility(tokenItem);
@@ -50,7 +47,7 @@ public class ServerboundAbilityOnePacket implements IAbstractMessage {
         return true;
     }
 
-    private boolean hasEnoughEnergy(ItemStack itemStack, TransferenceTokenItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
+    private boolean hasEnoughEnergy(ItemStack itemStack, TransferenceKeyItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
         return frameType.getFrameEnergy() * (1 + FrameUtil.getFrameEnergy(itemStack)) > abstractFrameAbility.getEnergyRequired();
     }
 }

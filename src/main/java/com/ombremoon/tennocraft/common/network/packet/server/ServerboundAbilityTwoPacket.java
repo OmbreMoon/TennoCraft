@@ -1,8 +1,7 @@
 package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
-import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
-import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 import com.ombremoon.tennocraft.util.FrameUtil;
@@ -12,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
 
 public class ServerboundAbilityTwoPacket implements IAbstractMessage {
     public ServerboundAbilityTwoPacket() {
@@ -37,13 +35,11 @@ public class ServerboundAbilityTwoPacket implements IAbstractMessage {
             //Check to see if full Frame is on
             if (FrameUtil.hasOnFrame(player)) {
                 ItemStack frameStack = FrameUtil.getFrameStack(player);
-                Iterable<ItemStack> armorSlots = player.getArmorSlots();
-                FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>) StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
-                FrameHelmetItem<?> frameHelmetItem = FrameUtil.getFrameFromType(frameType);
+                TransferenceKeyItem tokenItem = (TransferenceKeyItem) frameStack.getItem();
 
-                //Gets 1st ability from ability list
-                AbilityType<?> frameAbility = FrameUtil.getSecondAbility(frameHelmetItem);
-                if (hasEnoughEnergy(frameStack, frameType, frameAbility.getSupplier())) {
+                //Gets 2nd ability from ability list
+                AbilityType<?> frameAbility = FrameUtil.getSecondAbility(tokenItem);
+                if (hasEnoughEnergy(frameStack, tokenItem.getFrameType(), frameAbility.getSupplier())) {
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
                 }
             }
@@ -51,7 +47,7 @@ public class ServerboundAbilityTwoPacket implements IAbstractMessage {
         return true;
     }
 
-    private boolean hasEnoughEnergy(ItemStack itemStack, FrameArmorItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
+    private boolean hasEnoughEnergy(ItemStack itemStack, TransferenceKeyItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
         return frameType.getFrameEnergy() * (1 + FrameUtil.getFrameEnergy(itemStack)) > abstractFrameAbility.getEnergyRequired();
     }
 }

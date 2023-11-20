@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.mixin;
 
+import com.ombremoon.tennocraft.common.network.packet.client.data.TransferenceSyncData;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.effect.MobEffects;
@@ -13,10 +14,10 @@ public class PlayerMovementMixin {
     private int jumpCount = 0;
     private boolean justJumped = false;
 
-    @Inject(method = "aiStep", at = @At("HEAD"), remap = false)
-    private void mixinAiStep(CallbackInfo info) {
+    @Inject(at = @At("HEAD"), method = "aiStep", remap = false)
+    public void mixinAiStep(CallbackInfo info) {
         LocalPlayer player = (LocalPlayer) (Object) this;
-        if (FrameUtil.hasOnFrame(player)) {;
+        if (TransferenceSyncData.getHasOnFrame()) {
             if (player.onGround() || player.onClimbable()) {
                 jumpCount = 1;
             } else if (!justJumped && jumpCount > 0 && player.getDeltaMovement().y < 0) {

@@ -4,9 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
-import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceTokenItem;
-import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.player.ability.AbilityManager;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
@@ -16,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,8 +22,6 @@ import net.minecraftforge.registries.RegistryObject;
 import top.theillusivec4.curios.api.CuriosCapability;
 
 import java.util.Map;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class FrameUtil {
     public static final String CURIO_SLOT = "tenno";
@@ -34,36 +29,9 @@ public class FrameUtil {
     public static final String FRAME_ATTR = "Frame Attributes";
     private static int moddedEnergy;
 
-/*
-    public static boolean hasOnFrame(LivingEntity entity) {
-        Iterable<ItemStack> armorSlots = entity.getArmorSlots();
-        Stream<ItemStack> frameSlots = StreamSupport.stream(armorSlots.spliterator(), false);
-        boolean flag = frameSlots.allMatch(itemStack -> itemStack.getItem() instanceof FrameArmorItem<?>);
-        if (flag) {
-           FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>)StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
-            for (ItemStack itemStack : entity.getArmorSlots()) {
-                FrameArmorItem<?> armorItem = (FrameArmorItem<?>) itemStack.getItem();
-                if (!armorItem.getFrameType().equals(frameType)) {
-                    return false;
-                }
-            }
-        } else {
-            return false;
-        }
-        return true;
-    }
-*/
 
     public static boolean hasOnFrame(LivingEntity livingEntity) {
         return livingEntity.getTags().contains(TRANSFERENCE);
-    }
-
-    public static FrameHelmetItem<?> getFrameFromType(FrameArmorItem.FrameType frameType) {
-        return (FrameHelmetItem<?>) frameType.getFrameArmorItem().get();
-    }
-
-    public static FrameHelmetItem<?> getFrameFromAbility(AbilityType<?> ability) {
-        return (FrameHelmetItem<?>) ability.getFrameType().getFrameArmorItem().get();
     }
 
     public static ItemStack getFrameStack(Player player) {
@@ -173,39 +141,23 @@ public class FrameUtil {
         return moddedEnergy;
     }
 
-    public static AbilityType<?> getSecondAbility(FrameHelmetItem<?> frameHelmetItem) {
-        return hasAbility(frameHelmetItem, 2) ? frameHelmetItem.getAbilityList().get().get(1) : FrameAbilities.EMPTY.get();
-    }
-
-    public static AbilityType<?> getThirdAbility(FrameHelmetItem<?> frameHelmetItem) {
-        return hasAbility(frameHelmetItem, 3) ? frameHelmetItem.getAbilityList().get().get(2) : FrameAbilities.EMPTY.get();
-    }
-
-    public static AbilityType<?> getUltimateAbility(FrameHelmetItem<?> frameHelmetItem) {
-        return hasAbility(frameHelmetItem, 4) ? frameHelmetItem.getAbilityList().get().get(3) : FrameAbilities.EMPTY.get();
-    }
-
-    public static AbilityType<?> getFirstAbility(TransferenceTokenItem tokenItem) {
+    public static AbilityType<?> getFirstAbility(TransferenceKeyItem tokenItem) {
         return hasAbility(tokenItem, 1) ? tokenItem.getAbilityList().get().get(0) : FrameAbilities.EMPTY.get();
     }
 
-    public static AbilityType<?> getSecondAbility(TransferenceTokenItem tokenItem) {
+    public static AbilityType<?> getSecondAbility(TransferenceKeyItem tokenItem) {
         return hasAbility(tokenItem, 2) ? tokenItem.getAbilityList().get().get(1) : FrameAbilities.EMPTY.get();
     }
 
-    public static AbilityType<?> getThirdAbility(TransferenceTokenItem tokenItem) {
+    public static AbilityType<?> getThirdAbility(TransferenceKeyItem tokenItem) {
         return hasAbility(tokenItem, 3) ? tokenItem.getAbilityList().get().get(2) : FrameAbilities.EMPTY.get();
     }
 
-    public static AbilityType<?> getUltimateAbility(TransferenceTokenItem tokenItem) {
+    public static AbilityType<?> getUltimateAbility(TransferenceKeyItem tokenItem) {
         return hasAbility(tokenItem, 4) ? tokenItem.getAbilityList().get().get(3) : FrameAbilities.EMPTY.get();
     }
 
-    private static boolean hasAbility(TransferenceTokenItem tokenItem, int i) {
+    private static boolean hasAbility(TransferenceKeyItem tokenItem, int i) {
         return tokenItem.getAbilityList().get().size() >= i;
-    }
-
-    private static boolean hasAbility(FrameHelmetItem<?> frameHelmetItem, int i) {
-        return frameHelmetItem.getAbilityList().get().size() >= i;
     }
 }

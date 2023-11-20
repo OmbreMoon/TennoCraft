@@ -18,7 +18,7 @@ public class TCCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TennoCraft.MOD_ID);
 
     public static RegistryObject<CreativeModeTab> TC_FRAMES = CREATIVE_MODE_TABS.register("tc_frames_tab",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(TCFrames.VOLT_HELMET.get()))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(TCFrames.VOLT_KEY.get()))
                     .title(Component.translatable("creativemodetab.tc_frames_tab")).build());
 
     public static RegistryObject<CreativeModeTab> TC_BLOCKS = CREATIVE_MODE_TABS.register("tc_blocks_tab",
@@ -32,12 +32,8 @@ public class TCCreativeModeTabs {
 
     private static void registerTCItems(final BuildCreativeModeTabContentsEvent event) {
         if (event.getTab() == TCCreativeModeTabs.TC_FRAMES.get()) {
-            event.accept(TCFrames.VOLT_HELMET);
-            event.accept(TCFrames.VOLT_CHASSIS);
-            event.accept(TCFrames.VOLT_LEGGINGS);
-            event.accept(TCFrames.VOLT_BOOTS);
-            event.accept(TCFrames.EXCALIBUR_HELMET);
-            event.accept(TCFrames.EXCALIBUR_CHASSIS);
+            event.accept(TCFrames.VOLT_KEY);
+            event.accept(TCFrames.EXCALIBUR_KEY);
             event.accept(TCMods.CONTINUITY);
             event.accept(TCMods.NARROW_MINDED);
         }

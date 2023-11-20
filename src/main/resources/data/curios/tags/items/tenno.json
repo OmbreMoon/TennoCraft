@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "tennocraft:volt_token"
+    "tennocraft:volt_key",
+    "tennocraft:excalibur_key"
   ]
 }

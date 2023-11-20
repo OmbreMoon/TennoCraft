@@ -1,9 +1,9 @@
 package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
-import com.ombremoon.tennocraft.object.item.mineframe.FrameArmorItem;
-import com.ombremoon.tennocraft.object.item.mineframe.helmet.FrameHelmetItem;
+import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
+import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,7 +11,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
-import java.util.stream.StreamSupport;
 
 public class ServerboundAbilityFourPacket implements IAbstractMessage {
     public ServerboundAbilityFourPacket() {
@@ -35,17 +34,20 @@ public class ServerboundAbilityFourPacket implements IAbstractMessage {
 
             //Check to see if full Frame is on
             if (FrameUtil.hasOnFrame(player)) {
-                Iterable<ItemStack> armorSlots = player.getArmorSlots();
-                FrameArmorItem.FrameType frameType = ((FrameArmorItem<?>) StreamSupport.stream(armorSlots.spliterator(), false).toList().get(0).getItem()).getFrameType();
-                FrameHelmetItem<?> frameHelmetItem = FrameUtil.getFrameFromType(frameType);
+                ItemStack frameStack = FrameUtil.getFrameStack(player);
+                TransferenceKeyItem tokenItem = (TransferenceKeyItem) frameStack.getItem();
 
                 //Gets 4th ability from ability list
-                AbilityType<?> frameAbility = FrameUtil.getUltimateAbility(frameHelmetItem);
-                if (frameHelmetItem.getFrameEnergy() > frameAbility.getSupplier().getEnergyRequired()) {
+                AbilityType<?> frameAbility = FrameUtil.getUltimateAbility(tokenItem);
+                if (hasEnoughEnergy(frameStack, tokenItem.getFrameType(), frameAbility.getSupplier())) {
                     FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
                 }
             }
         });
         return true;
+    }
+
+    private boolean hasEnoughEnergy(ItemStack itemStack, TransferenceKeyItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
+        return frameType.getFrameEnergy() * (1 + FrameUtil.getFrameEnergy(itemStack)) > abstractFrameAbility.getEnergyRequired();
     }
 }

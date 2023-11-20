@@ -1,17 +1,18 @@
-package com.ombremoon.tennocraft.player.ability.volt;
+/*
+package com.ombremoon.tennocraft.player.ability.frame.mag;
 
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
 import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
 
-public class ShockAbility extends AbstractFrameAbility {
+public class PullAbility extends AbstractFrameAbility {
 
-    public ShockAbility(AbilityType<?> abilityType, int energyRequired, float abilityRange) {
+    public PullAbility(AbilityType<?> abilityType, int energyRequired, float abilityRange) {
         super(abilityType, energyRequired, 0, 1, abilityRange);
     }
 
-    public ShockAbility() {
-        this(FrameAbilities.SHOCK_ABILITY.get(), 25, 7.5F);
+    public PullAbility() {
+        this(FrameAbilities.PULL_ABILITY.get(), 25, 7.5F);
     }
 
     @Override
@@ -20,3 +21,4 @@ public class ShockAbility extends AbstractFrameAbility {
         super.onStart();
     }
 }
+*/

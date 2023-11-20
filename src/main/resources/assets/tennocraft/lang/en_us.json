@@ -2,12 +2,8 @@
   "creativemodetab.tc_frames_tab": "TennoCraft Frames",
   "creativemodetab.tc_blocks_tab": "TennoCraft Blocks",
 
-  "item.tennocraft.volt_helmet": "Volt Helmet",
-  "item.tennocraft.volt_chassis": "Volt Chassis",
-  "item.tennocraft.volt_leggings": "Volt Leggings",
-  "item.tennocraft.volt_boots": "Volt Boots",
-  "item.tennocraft.excalibur_helmet": "Excalibur Helmet",
-  "item.tennocraft.excalibur_chassis": "Excalibur Chassis",
+  "item.tennocraft.volt_key": "Volt Transference Key",
+  "item.tennocraft.excalibur_key": "Excalibur Transference Key",
 
   "key.category.tennocraft.tc": "TennoCraft",
   "key.category.tennocraft.ability_one": "Ability 1",
