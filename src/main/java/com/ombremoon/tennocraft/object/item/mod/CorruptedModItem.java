@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.object.item.mod;
 
+import com.ombremoon.tennocraft.common.AttributeHandler;
 import com.ombremoon.tennocraft.player.attribute.FrameAttribute;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.nbt.ListTag;
@@ -24,8 +25,8 @@ public class CorruptedModItem extends AbstractModItem {
     @Override
     protected void applyModifier(ItemStack itemStack) {
         ListTag listTag = itemStack.getTag().getList(FrameUtil.FRAME_ATTR, 10);
-        listTag.add(FrameUtil.storeFrameAttribute(FrameUtil.getFrameAttributeId(getBonusAttribute()), getBonusAttributeModifier()));
-        listTag.add(FrameUtil.storeFrameAttribute(FrameUtil.getFrameAttributeId(getPenaltyAttribute()), getPenaltyAttributeModifier()));
+        listTag.add(AttributeHandler.storeFrameAttribute(AttributeHandler.getFrameAttributeId(getBonusAttribute()), getBonusAttributeModifier()));
+        listTag.add(AttributeHandler.storeFrameAttribute(AttributeHandler.getFrameAttributeId(getPenaltyAttribute()), getPenaltyAttributeModifier()));
         super.applyModifier(itemStack);
     }
 

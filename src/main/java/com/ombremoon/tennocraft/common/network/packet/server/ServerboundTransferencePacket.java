@@ -32,7 +32,7 @@ public class ServerboundTransferencePacket implements IAbstractMessage {
                 return;
 
             if (FrameUtil.getFrameStack(serverPlayer).getItem() instanceof TransferenceKeyItem) {
-                if (serverPlayer.getTags().contains(FrameUtil.TRANSFERENCE)) {
+                if (FrameUtil.hasOnFrame(serverPlayer)) {
                     serverPlayer.getTags().remove(FrameUtil.TRANSFERENCE);
                     TCMessages.sendToPlayer(new ClientboundTransferencePacket(false), serverPlayer);
                 } else {

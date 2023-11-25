@@ -1,4 +1,4 @@
-package com.ombremoon.tennocraft.client.render.layers;
+package com.ombremoon.tennocraft.client.render.frame;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;

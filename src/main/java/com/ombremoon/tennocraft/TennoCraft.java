@@ -1,12 +1,16 @@
 package com.ombremoon.tennocraft;
 
 import com.mojang.logging.LogUtils;
+import com.ombremoon.tennocraft.client.ClientEvents;
 import com.ombremoon.tennocraft.common.init.TCCreativeModeTabs;
 import com.ombremoon.tennocraft.common.init.TCMenuTypes;
 import com.ombremoon.tennocraft.common.init.block.TCBlockEntities;
 import com.ombremoon.tennocraft.common.init.block.TCBlocks;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
+import com.ombremoon.tennocraft.common.init.entity.TCEntities;
+import com.ombremoon.tennocraft.common.init.entity.TCEntityAttributes;
+import com.ombremoon.tennocraft.common.init.entity.TCMobEffects;
 import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import net.minecraft.resources.ResourceLocation;
@@ -33,12 +37,16 @@ public class TennoCraft {
         TCBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         TCItems.register(modEventBus);
         TCCreativeModeTabs.register(modEventBus);
+        TCEntities.register(modEventBus);
         TCMenuTypes.register(modEventBus);
+        TCMobEffects.register(modEventBus);
+        TCEntityAttributes.init(modEventBus);
         FrameAbilities.register(modEventBus);
         FrameAttributes.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(ClientEvents.ClientModEvents::init);
         TCMessages.register();
     }
 

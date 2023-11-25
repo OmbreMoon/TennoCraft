@@ -15,6 +15,7 @@ public class FrameAttributes {
     public static DeferredRegister<FrameAttribute> FRAME_ATTRIBUTES = DeferredRegister.create(TennoCraft.customLocation("attributes"), TennoCraft.MOD_ID);
     public static final Supplier<IForgeRegistry<FrameAttribute>> REGISTRY = FRAME_ATTRIBUTES.makeRegistry(RegistryBuilder::new);
 
+    //FRAME ATTRIBUTES
     /**Handles maximum damage frame can take before breaking*/
     public static final RegistryObject<FrameAttribute> HEALTH = registerAttribute("health", new RangedFrameAttribute(TennoCraft.customLocation("health"), "tennocraft.frame_attribute.frame.health", 1, 1, 5));
     /**Handles damage frame can take before taking health damage. Toxin damage disregards this number*/
@@ -26,6 +27,9 @@ public class FrameAttributes {
     public static final RegistryObject<FrameAttribute> RANGE = registerAttribute("range", new RangedFrameAttribute(TennoCraft.customLocation("range"), "tennocraft.frame_attribute.frame.range", 0, -10, 10));
     public static final RegistryObject<FrameAttribute> EFFICIENCY = registerAttribute("efficiency", new RangedFrameAttribute(TennoCraft.customLocation("efficiency"), "tennocraft.frame_attribute.frame.efficiency", 0, -10, 10));
     public static final RegistryObject<FrameAttribute> DURATION = registerAttribute("duration", new RangedFrameAttribute(TennoCraft.customLocation("duration"), "tennocraft.frame_attribute.frame.duration", 0, -10, 10));
+
+    //WEAPON ATTRIBUTES
+
 
     private static RegistryObject<FrameAttribute> registerAttribute(String attributeName, FrameAttribute frameAttribute) {
         return FRAME_ATTRIBUTES.register(attributeName, () -> frameAttribute);

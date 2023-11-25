@@ -20,6 +20,8 @@ public class TCDamageTypeTagsProvider extends TagsProvider<DamageType> {
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
         tag(DamageTypeTags.BYPASSES_ARMOR)
-                .add(TCDamageTypes.MALFUNCTION);
+                .add(TCDamageTypes.MALFUNCTION)
+                .add(TCDamageTypes.BULLET)
+                .add(TCDamageTypes.SLASH);
     }
 }

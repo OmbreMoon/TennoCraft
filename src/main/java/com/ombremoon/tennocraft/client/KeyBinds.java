@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
@@ -26,4 +27,14 @@ public class KeyBinds {
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_F, KEY_CATEGORY_TC);
     public static KeyMapping ABILITY_FOUR_BINDING = new KeyMapping(KEY_ABILITY_FOUR, KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, KEY_CATEGORY_TC);
+
+    public static KeyMapping getShootKeyBind() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.options.keyAttack;
+    }
+
+    public static KeyMapping getAimKeyBind() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.options.keyUse;
+    }
 }

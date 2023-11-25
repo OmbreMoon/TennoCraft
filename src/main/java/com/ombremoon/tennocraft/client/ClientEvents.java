@@ -4,29 +4,26 @@ import com.ombremoon.tennocraft.TennoCraft;
 //import com.ombremoon.tennocraft.client.model.frames.VoltModel;
 import com.ombremoon.tennocraft.client.gui.ArsenalGUI;
 import com.ombremoon.tennocraft.client.gui.PlayerArsenalGUI;
+import com.ombremoon.tennocraft.client.model.entity.mob.GrineerLancerModel;
 import com.ombremoon.tennocraft.client.model.frames.ExcaliburModel;
+import com.ombremoon.tennocraft.client.model.frames.MagModel;
 import com.ombremoon.tennocraft.client.model.frames.VoltModel;
-import com.ombremoon.tennocraft.client.render.layers.ExcaliburLayer;
-import com.ombremoon.tennocraft.client.render.layers.VoltLayer;
+import com.ombremoon.tennocraft.client.render.frame.ExcaliburLayer;
+import com.ombremoon.tennocraft.client.render.frame.MagLayer;
+import com.ombremoon.tennocraft.client.render.frame.VoltLayer;
+import com.ombremoon.tennocraft.client.render.mob.GrineerLancerRenderer;
 import com.ombremoon.tennocraft.common.init.TCMenuTypes;
+import com.ombremoon.tennocraft.common.init.entity.TCMobs;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import com.ombremoon.tennocraft.common.network.packet.server.*;
-import net.minecraft.client.Minecraft;
+import com.ombremoon.tennocraft.player.weapon.WeaponHandler;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.model.geom.EntityModelSet;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -43,8 +40,16 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+
+            //MOBS
+            event.registerEntityRenderer(TCMobs.GRINEER_LANCER.get(), GrineerLancerRenderer::new);
+        }
+
+        @SubscribeEvent
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
             event.register(KeyBinds.OPEN_PLAYER_ARSENAL_BINDING);
+            event.register(KeyBinds.TRANSFERENCE_BINDING);
             event.register(KeyBinds.ABILITY_ONE_BINDING);
             event.register(KeyBinds.ABILITY_TWO_BINDING);
             event.register(KeyBinds.ABILITY_THREE_BINDING);
@@ -55,6 +60,9 @@ public class ClientEvents {
         public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
             event.registerLayerDefinition(VoltModel.VOLT_LAYER_LOCATION, VoltModel::createBodyLayer);
             event.registerLayerDefinition(ExcaliburModel.EXCALIBUR_LAYER_LOCATION, ExcaliburModel::createBodyLayer);
+            event.registerLayerDefinition(MagModel.MAG_LAYER_LOCATION, MagModel::createBodyLayer);
+
+            event.registerLayerDefinition(GrineerLancerModel.LAYER_LOCATION, GrineerLancerModel::createBodyLayer);
         }
 
         @SubscribeEvent
@@ -65,12 +73,17 @@ public class ClientEvents {
                     continue;
                 playerRenderer.addLayer(new VoltLayer<>(playerRenderer));
                 playerRenderer.addLayer(new ExcaliburLayer<>(playerRenderer));
+                playerRenderer.addLayer(new MagLayer<>(playerRenderer));
             }
         }
     }
 
     @Mod.EventBusSubscriber(modid = TennoCraft.MOD_ID, value = Dist.CLIENT)
     public static class ClientModEvents {
+
+        public static void init() {
+            MinecraftForge.EVENT_BUS.register(WeaponHandler.getInstance());
+        }
 
         @SubscribeEvent
         public static void onAbilityInput(InputEvent.Key event) {

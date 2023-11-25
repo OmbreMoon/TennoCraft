@@ -39,15 +39,15 @@ public class ServerboundAbilityOnePacket implements IAbstractMessage {
 
                 //Gets 1st ability from ability list
                 AbilityType<?> frameAbility = FrameUtil.getFirstAbility(tokenItem);
-                if (hasEnoughEnergy(frameStack, tokenItem.getFrameType(), frameAbility.getSupplier())) {
-                    FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameAbility);
+                if (hasEnoughEnergy(frameStack, frameAbility.getSupplier())) {
+                    FrameUtil.initFrameAbility(player, player.level(), player.blockPosition(), frameStack, frameAbility);
                 }
             }
         });
         return true;
     }
 
-    private boolean hasEnoughEnergy(ItemStack itemStack, TransferenceKeyItem.FrameType frameType, AbstractFrameAbility abstractFrameAbility) {
-        return frameType.getFrameEnergy() * (1 + FrameUtil.getFrameEnergy(itemStack)) > abstractFrameAbility.getEnergyRequired();
+    private boolean hasEnoughEnergy(ItemStack itemStack, AbstractFrameAbility abstractFrameAbility) {
+        return FrameUtil.getFrameEnergy(itemStack) > abstractFrameAbility.getEnergyRequired();
     }
 }

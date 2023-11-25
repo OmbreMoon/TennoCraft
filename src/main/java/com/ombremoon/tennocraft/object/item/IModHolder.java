@@ -1,4 +1,4 @@
-package com.ombremoon.tennocraft.object.item.mineframe;
+package com.ombremoon.tennocraft.object.item;
 
 import com.ombremoon.tennocraft.object.item.mod.AbstractModItem;
 import com.ombremoon.tennocraft.object.item.mod.ModType;

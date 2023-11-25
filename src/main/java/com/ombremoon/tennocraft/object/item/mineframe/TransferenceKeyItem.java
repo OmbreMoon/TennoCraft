@@ -21,9 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class TransferenceKeyItem extends Item implements ICurioItem {
-    protected Supplier<List<AbilityType<?>>> abilityList = ArrayList::new;
-    protected float frameEnergy;
+public abstract class TransferenceKeyItem extends Item implements ICurioItem {
+//    protected Supplier<List<AbilityType<?>>> abilityList = ArrayList::new;
 
     public TransferenceKeyItem(Properties pProperties) {
         super(pProperties.stacksTo(1));
@@ -43,17 +42,17 @@ public class TransferenceKeyItem extends Item implements ICurioItem {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
 
-    public float getFrameEnergy() {
-        return this.frameEnergy;
-    }
+//    public Supplier<List<AbilityType<?>>> getAbilityList() {
+//        return this.abilityList;
+//    }
 
-    public java.util.function.Supplier<List<AbilityType<?>>> getAbilityList() {
-        return this.abilityList;
-    }
+    public abstract Supplier<List<AbilityType<?>>> getAbilityList();
 
-    public FrameType getFrameType() {
-        return FrameType.NONE;
-    }
+//    public FrameType getFrameType() {
+//        return FrameType.NONE;
+//    }
+
+    public abstract FrameType getFrameType();
 
     public enum FrameType {
         NONE(0, 0, 0, 0),

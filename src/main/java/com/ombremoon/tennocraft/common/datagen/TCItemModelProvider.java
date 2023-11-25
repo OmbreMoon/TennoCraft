@@ -2,7 +2,9 @@ package com.ombremoon.tennocraft.common.datagen;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.init.item.TCFrames;
+import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.init.item.TCMods;
+import com.ombremoon.tennocraft.common.init.item.TCWeapons;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -21,12 +23,16 @@ public class TCItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         registerTransferenceKeys();
+        registerSecondaryWeaponModels();
+        registerMeleeWeaponModels();
         registerModModels();
+        registerSpawnEggs();
     }
 
     private void registerTransferenceKeys() {
         tempItem(TCFrames.VOLT_KEY);
         tempItem(TCFrames.EXCALIBUR_KEY);
+        tempItem(TCFrames.MAG_KEY);
     }
 
     private void registerPrimaryWeaponModels() {
@@ -34,11 +40,12 @@ public class TCItemModelProvider extends ItemModelProvider {
     }
 
     private void registerSecondaryWeaponModels() {
-
+        tempItem(TCWeapons.LATO);
+        tempItem(TCWeapons.ANGSTRUM);
     }
 
     private void registerMeleeWeaponModels() {
-
+        tempItem(TCWeapons.SKANA);
     }
 
     private void registerModModels() {
@@ -47,7 +54,7 @@ public class TCItemModelProvider extends ItemModelProvider {
     }
 
     private void registerSpawnEggs() {
-
+        withExistingParent(TCItems.GRINEER_LANCER_SPAWN_EGG.getId().getPath(), mcLoc("item/template_spawn_egg"));
     }
 
     private ItemModelBuilder crossItem(RegistryObject<Block> block) {

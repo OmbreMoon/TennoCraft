@@ -1,6 +1,6 @@
 package com.ombremoon.tennocraft.object.item.mineframe.transference;
 
-import com.ombremoon.tennocraft.object.item.mineframe.IModHolder;
+import com.ombremoon.tennocraft.object.item.IModHolder;
 import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.object.item.mod.ModType;
 import com.ombremoon.tennocraft.player.ability.AbilityType;
@@ -16,7 +16,6 @@ public class ExcaliburKey extends TransferenceKeyItem implements IModHolder {
 
     public ExcaliburKey(Properties pProperties) {
         super(pProperties);
-        this.frameEnergy = 1000;
     }
 
     @Override

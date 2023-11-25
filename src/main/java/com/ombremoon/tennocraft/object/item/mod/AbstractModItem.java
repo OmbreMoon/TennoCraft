@@ -1,15 +1,9 @@
 package com.ombremoon.tennocraft.object.item.mod;
 
-import com.ombremoon.tennocraft.object.item.mineframe.IModHolder;
-import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class AbstractModItem extends Item implements IModAttribute {
     private final ModType modType;
@@ -33,7 +27,6 @@ public class AbstractModItem extends Item implements IModAttribute {
                 ItemStack modHolderStack = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
                 ModType itemModType = modHolder.getModType();
                 if (itemModType.equals(getModType())) {
-                    System.out.println(FrameUtil.getFrameAttributeTags(modHolderStack));
                     if (isModPresent(modHolderStack)) {
                         installMod(pPlayer, modHolderStack);
                         return InteractionResultHolder.sidedSuccess(modItem, pLevel.isClientSide);
@@ -46,10 +39,7 @@ public class AbstractModItem extends Item implements IModAttribute {
 
     public void installMod(Player player, ItemStack modHolder) {
         CompoundTag compoundTag = modHolder.getOrCreateTag();
-        if (!compoundTag.contains("Frame Attributes", 9)) {
-            compoundTag.put("Frame Attributes", new ListTag());
-        }
-        modHolder.getTag().putString(this.getName(), this.getName());
+        compoundTag.putString(this.getName(), this.getName());
         applyModifier(modHolder);
     }
 

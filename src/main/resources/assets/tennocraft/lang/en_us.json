@@ -1,9 +1,17 @@
 {
   "creativemodetab.tc_frames_tab": "TennoCraft Frames",
+  "creativemodetab.tc_weapons_tab": "TennoCraft Weapons",
   "creativemodetab.tc_blocks_tab": "TennoCraft Blocks",
+  "creativemodetab.tc_spawn_eggs_tab": "TennoCraft Spawn Eggs",
 
   "item.tennocraft.volt_key": "Volt Transference Key",
   "item.tennocraft.excalibur_key": "Excalibur Transference Key",
+  "item.tennocraft.mag_key": "Mag Transference Key",
+
+  "item.tennocraft.lato": "Lato",
+  "item.tennocraft.angstrum": "Angstrum",
+
+  "item.tennocraft.grineer_lancer_spawn_egg": "Grineer Lancer Spawn Egg",
 
   "key.category.tennocraft.tc": "TennoCraft",
   "key.category.tennocraft.ability_one": "Ability 1",

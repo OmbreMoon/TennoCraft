@@ -1,6 +1,7 @@
 package com.ombremoon.tennocraft.player.ability;
 
 import com.google.common.collect.Multimap;
+import com.ombremoon.tennocraft.common.AttributeHandler;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
 import com.ombremoon.tennocraft.object.entity.projectile.FrameProjectile;
@@ -20,10 +21,12 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class AbstractFrameAbility {
@@ -148,8 +151,9 @@ public abstract class AbstractFrameAbility {
             } else if (!isNotActive) {
                 onTick();
                 if (ticks % getAbilityDuration() == 0
-                        || (level.getPlayerByUUID(userID) != null && !FrameUtil.hasOnFrame(level.getPlayerByUUID(userID)))
-                        || (level.getPlayerByUUID(userID) != null && !level.getPlayerByUUID(userID).isAlive())) {
+                        || (level.getPlayerByUUID(userID) != null && !FrameUtil.hasOnFrame(Objects.requireNonNull(level.getPlayerByUUID(userID))))
+                        || (level.getPlayerByUUID(userID) != null && !level.getPlayerByUUID(userID).isAlive())
+                        || (level.getPlayerByUUID(userID) == null)) {
                     System.out.println(ticks);
                     endAbility();
                 }
@@ -194,10 +198,6 @@ public abstract class AbstractFrameAbility {
     protected void removeModifier(LivingEntity livingEntity, Attribute attribute, UUID uuid) {
         AttributeInstance attributeInstance = getAttributeInstance(livingEntity, attribute);
         attributeInstance.removePermanentModifier(uuid);
-    }
-
-    protected void shootAbstractProjectile(FrameProjectile<?> frameProjectile) {
-
     }
 
     public AbilityType<?> getAbilityType() {
@@ -253,9 +253,10 @@ public abstract class AbstractFrameAbility {
 
     //Attributes
 
+    //FIX!!!!!!!
     public float getModdedDuration(ItemStack itemStack) {
-        Multimap<FrameAttribute, Float> frameAttributes = FrameUtil.getFrameAttributes(itemStack);
-        for (Map.Entry<FrameAttribute, Float> entry : frameAttributes.entries()) {
+        Map<FrameAttribute, Float> frameAttributes = AttributeHandler.getFrameAttributes(itemStack);
+        for (Map.Entry<FrameAttribute, Float> entry : frameAttributes.entrySet()) {
             FrameAttribute frameAttribute = entry.getKey();
             float attributeModifier = entry.getValue();
             if (frameAttribute == FrameAttributes.DURATION.get()) {
