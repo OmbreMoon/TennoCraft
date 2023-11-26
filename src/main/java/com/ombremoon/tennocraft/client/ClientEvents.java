@@ -16,7 +16,7 @@ import com.ombremoon.tennocraft.common.init.TCMenuTypes;
 import com.ombremoon.tennocraft.common.init.entity.TCMobs;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import com.ombremoon.tennocraft.common.network.packet.server.*;
-import com.ombremoon.tennocraft.player.weapon.WeaponHandler;
+import com.ombremoon.tennocraft.common.network.weapon.WeaponHandler;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;

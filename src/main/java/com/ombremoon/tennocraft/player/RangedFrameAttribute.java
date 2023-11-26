@@ -1,5 +1,6 @@
-package com.ombremoon.tennocraft.player.attribute;
+package com.ombremoon.tennocraft.player;
 
+import com.ombremoon.tennocraft.player.FrameAttribute;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 

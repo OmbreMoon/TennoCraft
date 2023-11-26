@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.client.model.frames.MagModel;
 import com.ombremoon.tennocraft.common.network.packet.client.data.TransferenceSyncData;
-import com.ombremoon.tennocraft.object.item.mineframe.transference.MagKey;
+import com.ombremoon.tennocraft.object.item.transference.MagKey;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;

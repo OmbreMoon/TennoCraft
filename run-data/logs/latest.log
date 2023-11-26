@@ -1,47 +1,47 @@
-[24Nov2023 21:44:12.797] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Bryce\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.2.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, tennocraft, --all, --output, C:\Users\Bryce\Documents\TennoCraft\src\generated\resources, --existing, C:\Users\Bryce\Documents\TennoCraft\src\main\resources, --mixin.config, tennocraft.mixin.json]
-[24Nov2023 21:44:12.806] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.7 by Eclipse Adoptium; OS Windows 10 arch amd64 version 10.0
-[24Nov2023 21:44:12.994] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[24Nov2023 21:44:13.070] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Bryce/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
-[24Nov2023 21:44:13.788] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.2.0\7f9181f85acc66547685a72020713fc8cbde98\javafmllanguage-1.20.1-47.2.0.jar is missing mods.toml file
-[24Nov2023 21:44:13.796] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.2.0\7872f5205685fdd26fae39b1be79b0e60ca5b7bd\lowcodelanguage-1.20.1-47.2.0.jar is missing mods.toml file
-[24Nov2023 21:44:13.803] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.2.0\d501d161cabed08b3c139a2c6217b02a39f3c3e9\mclanguage-1.20.1-47.2.0.jar is missing mods.toml file
-[24Nov2023 21:44:13.810] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.2.0\ffd3c6debac0a388c9e33ac43c9f5eafb91cb466\fmlcore-1.20.1-47.2.0.jar is missing mods.toml file
-[24Nov2023 21:44:13.984] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
-[24Nov2023 21:44:16.013] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by tennocraft.mixin.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[24Nov2023 21:44:16.013] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[24Nov2023 21:44:16.022] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Bryce\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, tennocraft, --all, --output, C:\Users\Bryce\Documents\TennoCraft\src\generated\resources, --existing, C:\Users\Bryce\Documents\TennoCraft\src\main\resources]
-[24Nov2023 21:44:16.167] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[24Nov2023 21:44:16.169] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[24Nov2023 21:44:16.188] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[24Nov2023 21:44:16.189] [main/INFO] [mixin/]: Selecting config tennocraft.mixin.json
-[24Nov2023 21:44:16.194] [main/WARN] [mixin/]: Reference map 'tennocraft.refmap.json' for tennocraft.mixin.json could not be read. If this is a development environment you can ignore this message
-[24Nov2023 21:44:16.196] [main/INFO] [mixin/]: Selecting config curios.mixins.json
-[24Nov2023 21:44:16.545] [main/INFO] [mixin/]: Remapping refMap curios.refmap.json using C:\Users\Bryce\Documents\TennoCraft\build\createSrgToMcp\output.srg
-[24Nov2023 21:44:16.546] [main/INFO] [mixin/]: Preparing tennocraft.mixin.json (1)
-[24Nov2023 21:44:16.624] [main/INFO] [mixin/]: Preparing curios.mixins.json (8)
-[24Nov2023 21:44:16.774] [main/INFO] [mixin/]: Prepared 9 mixins in 0.585 sec (65.0ms avg) (0ms load, 0ms transform, 0ms plugin)
-[24Nov2023 21:44:17.257] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [tennocraft]
-[24Nov2023 21:44:17.459] [main/INFO] [mixin/]: Mixing AccessorEntity from curios.mixins.json into net.minecraft.world.entity.Entity
-[24Nov2023 21:44:17.635] [main/INFO] [mixin/]: Mixing MixinLivingEntity from curios.mixins.json into net.minecraft.world.entity.LivingEntity
-[24Nov2023 21:44:18.775] [main/INFO] [mixin/]: Mixing MixinPowderSnowBlock from curios.mixins.json into net.minecraft.world.level.block.PowderSnowBlock
-[24Nov2023 21:44:20.473] [main/INFO] [mixin/]: Mixing MixinShearsItem from curios.mixins.json into net.minecraft.world.item.ShearsItem
-[24Nov2023 21:44:22.708] [main/INFO] [mixin/]: Mixing MixinApplyBonusCount from curios.mixins.json into net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
-[24Nov2023 21:44:23.734] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.2.0, for MC 1.20.1 with MCP 20230612.114412
-[24Nov2023 21:44:23.735] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.2.0 Initialized
-[24Nov2023 21:44:23.877] [modloading-worker-0/INFO] [mixin/]: Mixing PlayerMovementMixin from tennocraft.mixin.json into net.minecraft.client.player.LocalPlayer
-[24Nov2023 21:44:24.568] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Bryce/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1/forge-1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[24Nov2023 21:44:24.569] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Bryce/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1/forge-1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[24Nov2023 21:44:24.891] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[24Nov2023 21:44:24.897] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 5 ms
-[24Nov2023 21:44:24.898] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
-[24Nov2023 21:44:24.974] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 76 ms
-[24Nov2023 21:44:24.975] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: tennocraft
-[24Nov2023 21:44:24.975] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: tennocraft finished after 0 ms
-[24Nov2023 21:44:24.975] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: tennocraft
-[24Nov2023 21:44:25.002] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: tennocraft finished after 26 ms
-[24Nov2023 21:44:25.002] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
-[24Nov2023 21:44:25.146] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 144 ms
-[24Nov2023 21:44:25.146] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:damage_type mod id tennocraft
-[24Nov2023 21:44:25.163] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:damage_type mod id tennocraft finished after 16 ms
-[24Nov2023 21:44:25.163] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 273 ms
-[24Nov2023 21:44:25.175] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 14, old count: 13, new count: 15, removed stale: 0, written: 1
+[25Nov2023 13:26:48.842] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\Bryce\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.2.0, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, tennocraft, --all, --output, C:\Users\Bryce\Documents\TennoCraft\src\generated\resources, --existing, C:\Users\Bryce\Documents\TennoCraft\src\main\resources, --mixin.config, tennocraft.mixin.json]
+[25Nov2023 13:26:48.851] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.7 by Eclipse Adoptium; OS Windows 10 arch amd64 version 10.0
+[25Nov2023 13:26:49.073] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[25Nov2023 13:26:49.175] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/Bryce/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
+[25Nov2023 13:26:49.838] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.2.0\7f9181f85acc66547685a72020713fc8cbde98\javafmllanguage-1.20.1-47.2.0.jar is missing mods.toml file
+[25Nov2023 13:26:49.845] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.2.0\7872f5205685fdd26fae39b1be79b0e60ca5b7bd\lowcodelanguage-1.20.1-47.2.0.jar is missing mods.toml file
+[25Nov2023 13:26:49.851] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.2.0\d501d161cabed08b3c139a2c6217b02a39f3c3e9\mclanguage-1.20.1-47.2.0.jar is missing mods.toml file
+[25Nov2023 13:26:49.857] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\Bryce\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.2.0\ffd3c6debac0a388c9e33ac43c9f5eafb91cb466\fmlcore-1.20.1-47.2.0.jar is missing mods.toml file
+[25Nov2023 13:26:50.017] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[25Nov2023 13:26:52.035] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by tennocraft.mixin.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[25Nov2023 13:26:52.036] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[25Nov2023 13:26:52.044] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\Bryce\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, tennocraft, --all, --output, C:\Users\Bryce\Documents\TennoCraft\src\generated\resources, --existing, C:\Users\Bryce\Documents\TennoCraft\src\main\resources]
+[25Nov2023 13:26:52.185] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
+[25Nov2023 13:26:52.187] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
+[25Nov2023 13:26:52.207] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
+[25Nov2023 13:26:52.207] [main/INFO] [mixin/]: Selecting config tennocraft.mixin.json
+[25Nov2023 13:26:52.213] [main/WARN] [mixin/]: Reference map 'tennocraft.refmap.json' for tennocraft.mixin.json could not be read. If this is a development environment you can ignore this message
+[25Nov2023 13:26:52.215] [main/INFO] [mixin/]: Selecting config curios.mixins.json
+[25Nov2023 13:26:52.548] [main/INFO] [mixin/]: Remapping refMap curios.refmap.json using C:\Users\Bryce\Documents\TennoCraft\build\createSrgToMcp\output.srg
+[25Nov2023 13:26:52.549] [main/INFO] [mixin/]: Preparing tennocraft.mixin.json (1)
+[25Nov2023 13:26:52.622] [main/INFO] [mixin/]: Preparing curios.mixins.json (8)
+[25Nov2023 13:26:52.783] [main/INFO] [mixin/]: Prepared 9 mixins in 0.574 sec (63.8ms avg) (0ms load, 0ms transform, 0ms plugin)
+[25Nov2023 13:26:53.239] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [tennocraft]
+[25Nov2023 13:26:53.475] [main/INFO] [mixin/]: Mixing AccessorEntity from curios.mixins.json into net.minecraft.world.entity.Entity
+[25Nov2023 13:26:53.650] [main/INFO] [mixin/]: Mixing MixinLivingEntity from curios.mixins.json into net.minecraft.world.entity.LivingEntity
+[25Nov2023 13:26:55.142] [main/INFO] [mixin/]: Mixing MixinPowderSnowBlock from curios.mixins.json into net.minecraft.world.level.block.PowderSnowBlock
+[25Nov2023 13:26:57.053] [main/INFO] [mixin/]: Mixing MixinShearsItem from curios.mixins.json into net.minecraft.world.item.ShearsItem
+[25Nov2023 13:26:59.231] [main/INFO] [mixin/]: Mixing MixinApplyBonusCount from curios.mixins.json into net.minecraft.world.level.storage.loot.functions.ApplyBonusCount
+[25Nov2023 13:27:00.323] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.2.0, for MC 1.20.1 with MCP 20230612.114412
+[25Nov2023 13:27:00.324] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.2.0 Initialized
+[25Nov2023 13:27:00.453] [modloading-worker-0/INFO] [mixin/]: Mixing PlayerMovementMixin from tennocraft.mixin.json into net.minecraft.client.player.LocalPlayer
+[25Nov2023 13:27:01.085] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Bryce/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1/forge-1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1-recomp.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[25Nov2023 13:27:01.085] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/Bryce/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1/forge-1.20.1-47.2.0_mapped_parchment_2023.06.26-1.20.1-recomp.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[25Nov2023 13:27:01.331] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[25Nov2023 13:27:01.338] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 5 ms
+[25Nov2023 13:27:01.338] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[25Nov2023 13:27:01.414] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 75 ms
+[25Nov2023 13:27:01.414] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: tennocraft
+[25Nov2023 13:27:01.414] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: tennocraft finished after 0 ms
+[25Nov2023 13:27:01.414] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: tennocraft
+[25Nov2023 13:27:01.442] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: tennocraft finished after 27 ms
+[25Nov2023 13:27:01.442] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
+[25Nov2023 13:27:01.597] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 154 ms
+[25Nov2023 13:27:01.597] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:damage_type mod id tennocraft
+[25Nov2023 13:27:01.615] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:damage_type mod id tennocraft finished after 17 ms
+[25Nov2023 13:27:01.615] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 284 ms
+[25Nov2023 13:27:01.629] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 17, old count: 16, new count: 18, removed stale: 0, written: 1

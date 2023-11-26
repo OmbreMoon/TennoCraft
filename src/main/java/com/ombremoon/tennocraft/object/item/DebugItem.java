@@ -1,8 +1,6 @@
 package com.ombremoon.tennocraft.object.item;
 
 import com.ombremoon.tennocraft.common.AttributeHandler;
-import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -20,9 +18,8 @@ public class DebugItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack itemStack = FrameUtil.getFrameStack(pPlayer);
         if (itemStack.getItem() instanceof TransferenceKeyItem) {
+            System.out.println(AttributeHandler.getFrameAttributeTags(pPlayer.getItemInHand(InteractionHand.OFF_HAND)));
             System.out.println(AttributeHandler.getFrameAttributeTags(itemStack));
-            System.out.println(FrameUtil.getFrameEnergy(itemStack));
-            System.out.println(FrameUtil.hasOnFrame(pPlayer));
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }

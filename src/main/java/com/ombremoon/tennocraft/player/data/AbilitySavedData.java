@@ -1,7 +1,8 @@
-package com.ombremoon.tennocraft.player.ability;
+package com.ombremoon.tennocraft.player.data;
 
 import com.ombremoon.tennocraft.TennoCraft;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
+import com.ombremoon.tennocraft.player.AbstractFrameAbility;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;

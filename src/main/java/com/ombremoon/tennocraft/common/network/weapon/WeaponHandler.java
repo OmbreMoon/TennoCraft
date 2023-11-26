@@ -1,5 +1,6 @@
-package com.ombremoon.tennocraft.player.weapon;
+package com.ombremoon.tennocraft.common.network.weapon;
 
+import com.ombremoon.tennocraft.object.item.weapon.AbstractProjectileWeapon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,6 +50,10 @@ public class WeaponHandler {
     }
 
     public void shootBullet(Player player, ItemStack weaponStack) {
+        if (!(weaponStack.getItem() instanceof AbstractProjectileWeapon projectileWeapon)) {
+            return;
+        }
+
 
     }
 }

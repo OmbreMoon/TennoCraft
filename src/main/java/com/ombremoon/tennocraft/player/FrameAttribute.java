@@ -1,11 +1,13 @@
-package com.ombremoon.tennocraft.player.attribute;
+package com.ombremoon.tennocraft.player;
 
 import com.google.common.collect.Maps;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
+import com.ombremoon.tennocraft.object.world.DamageType;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -25,12 +27,19 @@ public class FrameAttribute {
         this.defaultValue = defaultValue;
     }
 
-    public  Map<Integer, ItemStack> getTransferenceSlotItems(Player player) {
+    public Map<Integer, ItemStack> getTransferenceSlotItems(Player player) {
         Map<Integer, ItemStack> map = Maps.newHashMap();
         for (int i = 0; i < FrameUtil.TRANSFERENCE_SLOTS; i++) {
             ItemStack itemStack = player.getCapability(CuriosCapability.INVENTORY).orElseThrow(NullPointerException::new).getStacksHandler(FrameUtil.CURIO_SLOT).get().getStacks().getStackInSlot(i);
             if (!itemStack.isEmpty()) {
                 map.put(i, itemStack);
+            }
+        }
+        int j = FrameUtil.TRANSFERENCE_SLOTS;
+        for (ItemStack itemStack : player.getHandSlots()) {
+            if (!itemStack.isEmpty()) {
+                map.put(j, itemStack);
+                j++;
             }
         }
         return map;
@@ -47,12 +56,20 @@ public class FrameAttribute {
         return this.getOrCreateDescriptionId();
     }
 
-    public void doPostAttack(LivingEntity attacker, Entity target, float modifier) {
+    public void doPostAttack(LivingEntity attacker, Entity target) {
 
     }
 
-    public void doPostHurt(LivingEntity attacker, Entity target, float modifier) {
+    public void doPostHurt(LivingEntity attacker, Entity target) {
 
+    }
+
+    public boolean isElementalAttribute() {
+        return false;
+    }
+
+    public DamageType getDamageType() {
+        return null;
     }
 
     public ResourceLocation getResourceLocation() {

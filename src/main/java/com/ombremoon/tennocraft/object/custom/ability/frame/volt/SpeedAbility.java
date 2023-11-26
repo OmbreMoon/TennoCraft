@@ -1,8 +1,8 @@
-package com.ombremoon.tennocraft.player.ability.frame.volt;
+package com.ombremoon.tennocraft.object.custom.ability.frame.volt;
 
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
-import com.ombremoon.tennocraft.player.ability.AbilityType;
-import com.ombremoon.tennocraft.player.ability.AbstractFrameAbility;
+import com.ombremoon.tennocraft.player.data.AbilityType;
+import com.ombremoon.tennocraft.player.AbstractFrameAbility;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;

@@ -1,11 +1,9 @@
-package com.ombremoon.tennocraft.player.ability;
+package com.ombremoon.tennocraft.player;
 
-import com.google.common.collect.Multimap;
 import com.ombremoon.tennocraft.common.AttributeHandler;
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
-import com.ombremoon.tennocraft.object.entity.projectile.FrameProjectile;
-import com.ombremoon.tennocraft.player.attribute.FrameAttribute;
+import com.ombremoon.tennocraft.player.data.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -21,7 +19,6 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 

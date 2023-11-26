@@ -1,6 +1,7 @@
-package com.ombremoon.tennocraft.player.ability;
+package com.ombremoon.tennocraft.player.data;
 
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
+import com.ombremoon.tennocraft.object.item.TransferenceKeyItem;
+import com.ombremoon.tennocraft.player.AbstractFrameAbility;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 

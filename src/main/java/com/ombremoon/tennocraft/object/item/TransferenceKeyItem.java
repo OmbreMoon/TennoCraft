@@ -1,28 +1,21 @@
-package com.ombremoon.tennocraft.object.item.mineframe;
+package com.ombremoon.tennocraft.object.item;
 
 import com.ombremoon.tennocraft.common.init.entity.TCDamageTypes;
-import com.ombremoon.tennocraft.player.ability.AbilityType;
+import com.ombremoon.tennocraft.player.data.AbilityType;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class TransferenceKeyItem extends Item implements ICurioItem {
-//    protected Supplier<List<AbilityType<?>>> abilityList = ArrayList::new;
 
     public TransferenceKeyItem(Properties pProperties) {
         super(pProperties.stacksTo(1));
@@ -42,15 +35,7 @@ public abstract class TransferenceKeyItem extends Item implements ICurioItem {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
     }
 
-//    public Supplier<List<AbilityType<?>>> getAbilityList() {
-//        return this.abilityList;
-//    }
-
     public abstract Supplier<List<AbilityType<?>>> getAbilityList();
-
-//    public FrameType getFrameType() {
-//        return FrameType.NONE;
-//    }
 
     public abstract FrameType getFrameType();
 

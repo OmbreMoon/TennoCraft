@@ -2,7 +2,7 @@ package com.ombremoon.tennocraft.common;
 
 import com.google.common.collect.Maps;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
-import com.ombremoon.tennocraft.player.attribute.FrameAttribute;
+import com.ombremoon.tennocraft.player.FrameAttribute;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
@@ -37,11 +37,12 @@ public class AttributeHandler {
         return frameAttribute.getResourceLocation();
     }
 
+    //Returns list of attributes and respective modifiers for a specified stack
     public static ListTag getFrameAttributeTags(ItemStack itemStack) {
         return itemStack.getTag() != null ? itemStack.getTag().getList(FRAME_ATTR, 10) : new ListTag();
     }
 
-    //Returns specific attribute modifier for a specified frame stack
+    //Returns the total specific attribute modifier for all attribute slots
     public static float getAttributeModifier(FrameAttribute frameAttribute, Player player) {
         Iterable<ItemStack> iterable = frameAttribute.getTransferenceSlotItems(player).values();
         if (iterable == null) {
@@ -51,15 +52,14 @@ public class AttributeHandler {
 
             for(ItemStack itemstack : iterable) {
                 float j = getTagAttributeModifier(frameAttribute, itemstack);
-                if (j > i) {
-                    i = j;
-                }
+                i += j;
             }
 
             return i;
         }
     }
 
+    //Returns specific attribute modifier for a specified frame stack
     public static float getTagAttributeModifier(FrameAttribute frameAttribute, ItemStack itemStack) {
         if (!itemStack.isEmpty()) {
             ResourceLocation resourceLocation = getFrameAttributeId(frameAttribute);
@@ -76,6 +76,23 @@ public class AttributeHandler {
         return 0;
     }
 
+    public static boolean hasTagAttributeModifier(FrameAttribute frameAttribute, ItemStack itemStack) {
+        if (!itemStack.isEmpty()) {
+            ResourceLocation resourceLocation = getFrameAttributeId(frameAttribute);
+            ListTag listTag = getFrameAttributeTags(itemStack);
+
+            for (int i = 0; i < listTag.size(); i++) {
+                CompoundTag compoundTag = listTag.getCompound(i);
+                ResourceLocation resourceLocation1 = getFrameAttributeId(compoundTag);
+                if (resourceLocation1 != null && resourceLocation1.equals(resourceLocation)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //Set attribute modifier for a stack
     public static void setTagAttributeModifier(FrameAttribute frameAttribute, ItemStack itemStack, float amount) {
         if (!itemStack.isEmpty()) {
             ResourceLocation resourceLocation = getFrameAttributeId(frameAttribute);
@@ -91,7 +108,7 @@ public class AttributeHandler {
         }
     }
 
-    //Returns all attribute modifiers for a specified frame stack
+    //Returns map of all attribute modifiers for a specified frame stack
     public static Map<FrameAttribute, Float> getFrameAttributes(ItemStack itemStack) {
         ListTag listTag = getFrameAttributeTags(itemStack);
         return deserializeAttributes(listTag);

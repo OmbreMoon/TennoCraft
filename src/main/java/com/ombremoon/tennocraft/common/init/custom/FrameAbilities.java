@@ -1,10 +1,10 @@
 package com.ombremoon.tennocraft.common.init.custom;
 
 import com.ombremoon.tennocraft.TennoCraft;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
-import com.ombremoon.tennocraft.player.ability.AbilityType;
-import com.ombremoon.tennocraft.player.ability.frame.volt.ShockAbility;
-import com.ombremoon.tennocraft.player.ability.frame.volt.SpeedAbility;
+import com.ombremoon.tennocraft.object.item.TransferenceKeyItem;
+import com.ombremoon.tennocraft.player.data.AbilityType;
+import com.ombremoon.tennocraft.object.custom.ability.frame.volt.ShockAbility;
+import com.ombremoon.tennocraft.object.custom.ability.frame.volt.SpeedAbility;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;

@@ -51,6 +51,9 @@ public class TCItemModelProvider extends ItemModelProvider {
     private void registerModModels() {
         tempItem(TCMods.CONTINUITY);
         tempItem(TCMods.NARROW_MINDED);
+        tempItem(TCMods.HEATED_CHARGE);
+        tempItem(TCMods.MOLTEN_IMPACT);
+        tempItem(TCMods.VOLTAIC_EDGE);
     }
 
     private void registerSpawnEggs() {

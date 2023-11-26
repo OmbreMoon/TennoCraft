@@ -1,8 +1,8 @@
 package com.ombremoon.tennocraft.common.init.item;
 
-import com.ombremoon.tennocraft.object.item.mineframe.transference.ExcaliburKey;
-import com.ombremoon.tennocraft.object.item.mineframe.transference.MagKey;
-import com.ombremoon.tennocraft.object.item.mineframe.transference.VoltKey;
+import com.ombremoon.tennocraft.object.item.transference.ExcaliburKey;
+import com.ombremoon.tennocraft.object.item.transference.MagKey;
+import com.ombremoon.tennocraft.object.item.transference.VoltKey;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
 

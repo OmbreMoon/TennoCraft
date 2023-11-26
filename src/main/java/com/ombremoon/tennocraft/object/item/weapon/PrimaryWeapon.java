@@ -1,10 +1,7 @@
 package com.ombremoon.tennocraft.object.item.weapon;
 
 import com.ombremoon.tennocraft.object.item.mod.ModType;
-import com.ombremoon.tennocraft.object.world.DamageType;
-import com.ombremoon.tennocraft.player.weapon.WeaponProperties;
-
-import java.util.Map;
+import com.ombremoon.tennocraft.common.network.weapon.WeaponProperties;
 
 public class PrimaryWeapon extends AbstractProjectileWeapon {
     public PrimaryWeapon(Properties pProperties, WeaponProperties weaponProperties) {

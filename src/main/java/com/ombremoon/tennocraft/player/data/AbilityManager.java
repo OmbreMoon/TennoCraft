@@ -1,16 +1,13 @@
-package com.ombremoon.tennocraft.player.ability;
+package com.ombremoon.tennocraft.player.data;
 
 import com.ombremoon.tennocraft.TennoCraft;
+import com.ombremoon.tennocraft.player.AbstractFrameAbility;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = TennoCraft.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AbilityManager {

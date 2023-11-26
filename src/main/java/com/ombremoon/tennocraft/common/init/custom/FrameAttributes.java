@@ -1,7 +1,9 @@
 package com.ombremoon.tennocraft.common.init.custom;
 
 import com.ombremoon.tennocraft.TennoCraft;
-import com.ombremoon.tennocraft.player.attribute.*;
+import com.ombremoon.tennocraft.object.custom.attribute.HeatAttribute;
+import com.ombremoon.tennocraft.player.FrameAttribute;
+import com.ombremoon.tennocraft.player.RangedFrameAttribute;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -14,6 +16,10 @@ import java.util.function.Supplier;
 public class FrameAttributes {
     public static DeferredRegister<FrameAttribute> FRAME_ATTRIBUTES = DeferredRegister.create(TennoCraft.customLocation("attributes"), TennoCraft.MOD_ID);
     public static final Supplier<IForgeRegistry<FrameAttribute>> REGISTRY = FRAME_ATTRIBUTES.makeRegistry(RegistryBuilder::new);
+
+    //GENERAL
+    public static final RegistryObject<FrameAttribute> DAMAGE = registerAttribute("damage", new RangedFrameAttribute(TennoCraft.customLocation("damage"), "tennocraft.frame_attribute.weapon.damage", 2.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> STATUS = registerAttribute("status", new RangedFrameAttribute(TennoCraft.customLocation("status"), "tennocraft.frame_attribute.weapon.status", 1.0F, -10.0F, 10.0F));
 
     //FRAME ATTRIBUTES
     /**Handles maximum damage frame can take before breaking*/
@@ -29,7 +35,9 @@ public class FrameAttributes {
     public static final RegistryObject<FrameAttribute> DURATION = registerAttribute("duration", new RangedFrameAttribute(TennoCraft.customLocation("duration"), "tennocraft.frame_attribute.frame.duration", 0, -10, 10));
 
     //WEAPON ATTRIBUTES
-
+    public static final RegistryObject<FrameAttribute> CRIT_CHANCE = registerAttribute("crit_chance", new HeatAttribute(TennoCraft.customLocation("crit_chance"), "tennocraft.frame_attribute.weapon.crit_chance", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> CRIT_DAMAGE = registerAttribute("crit_damage", new HeatAttribute(TennoCraft.customLocation("crit_damage"), "tennocraft.frame_attribute.weapon.crit_damage", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> HEAT = registerAttribute("heat", new HeatAttribute(TennoCraft.customLocation("heat"), "tennocraft.frame_attribute.weapon.damage", 0.0F, 0.0F, (float)Integer.MAX_VALUE));
 
     private static RegistryObject<FrameAttribute> registerAttribute(String attributeName, FrameAttribute frameAttribute) {
         return FRAME_ATTRIBUTES.register(attributeName, () -> frameAttribute);

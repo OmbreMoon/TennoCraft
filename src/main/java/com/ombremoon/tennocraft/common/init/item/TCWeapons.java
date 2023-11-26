@@ -2,8 +2,8 @@ package com.ombremoon.tennocraft.common.init.item;
 
 import com.ombremoon.tennocraft.object.item.weapon.MeleeWeapon;
 import com.ombremoon.tennocraft.object.item.weapon.SecondaryWeapon;
-import com.ombremoon.tennocraft.player.weapon.WeaponProperties;
-import com.ombremoon.tennocraft.player.weapon.WeaponType;
+import com.ombremoon.tennocraft.common.network.weapon.WeaponProperties;
+import com.ombremoon.tennocraft.common.network.weapon.WeaponType;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.RegistryObject;
 
@@ -23,8 +23,8 @@ public class TCWeapons {
 
     //MELEE
     public static final RegistryObject<Item> SKANA = registerMeleeWeapon("skana", new Item.Properties(),
-            new WeaponProperties().weaponType(WeaponType.MELEE)
-                    .impactDamage(9).punctureDamage(9).slashDamage(42));
+            new WeaponProperties().weaponType(WeaponType.MELEE).critChance(0.25F).critMultiplier(1.5F)
+                    .impactDamage(9).punctureDamage(9).slashDamage(42).statusChance(0.16F));
 
     private static <T extends Item> RegistryObject<T> registerWeaponItem(String name, Supplier<T> itemSupplier) {
         return TCItems.registerItem(name, itemSupplier);

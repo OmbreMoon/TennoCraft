@@ -1,10 +1,10 @@
-package com.ombremoon.tennocraft.object.item.mineframe.transference;
+package com.ombremoon.tennocraft.object.item.transference;
 
 import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.object.item.IModHolder;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
+import com.ombremoon.tennocraft.object.item.TransferenceKeyItem;
 import com.ombremoon.tennocraft.object.item.mod.ModType;
-import com.ombremoon.tennocraft.player.ability.AbilityType;
+import com.ombremoon.tennocraft.player.data.AbilityType;
 
 import java.util.ArrayList;
 import java.util.List;

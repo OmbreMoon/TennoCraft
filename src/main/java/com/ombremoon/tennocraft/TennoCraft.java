@@ -10,7 +10,6 @@ import com.ombremoon.tennocraft.common.init.custom.FrameAbilities;
 import com.ombremoon.tennocraft.common.init.custom.FrameAttributes;
 import com.ombremoon.tennocraft.common.init.entity.TCEntities;
 import com.ombremoon.tennocraft.common.init.entity.TCEntityAttributes;
-import com.ombremoon.tennocraft.common.init.entity.TCMobEffects;
 import com.ombremoon.tennocraft.common.init.item.TCItems;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +38,6 @@ public class TennoCraft {
         TCCreativeModeTabs.register(modEventBus);
         TCEntities.register(modEventBus);
         TCMenuTypes.register(modEventBus);
-        TCMobEffects.register(modEventBus);
         TCEntityAttributes.init(modEventBus);
         FrameAbilities.register(modEventBus);
         FrameAttributes.register(modEventBus);

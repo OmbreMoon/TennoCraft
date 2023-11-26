@@ -3,7 +3,7 @@ package com.ombremoon.tennocraft.common.network.packet.server;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
 import com.ombremoon.tennocraft.common.network.packet.client.ClientboundTransferencePacket;
-import com.ombremoon.tennocraft.object.item.mineframe.TransferenceKeyItem;
+import com.ombremoon.tennocraft.object.item.TransferenceKeyItem;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

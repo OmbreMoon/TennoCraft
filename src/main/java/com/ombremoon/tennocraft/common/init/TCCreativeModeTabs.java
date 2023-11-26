@@ -58,6 +58,9 @@ public class TCCreativeModeTabs {
             event.accept(TCWeapons.LATO);
             event.accept(TCWeapons.ANGSTRUM);
             event.accept(TCWeapons.SKANA);
+            event.accept(TCMods.HEATED_CHARGE);
+            event.accept(TCMods.MOLTEN_IMPACT);
+            event.accept(TCMods.VOLTAIC_EDGE);
         }
     }
 

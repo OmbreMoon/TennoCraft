@@ -1,9 +1,7 @@
 package com.ombremoon.tennocraft.object.item.mod;
 
-import com.ombremoon.tennocraft.common.AttributeHandler;
-import com.ombremoon.tennocraft.player.attribute.FrameAttribute;
-import com.ombremoon.tennocraft.util.FrameUtil;
-import net.minecraft.nbt.ListTag;
+import com.ombremoon.tennocraft.player.FrameAttribute;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Supplier;
@@ -11,23 +9,22 @@ import java.util.function.Supplier;
 public class CorruptedModItem extends AbstractModItem {
     private final Supplier<FrameAttribute> bonusAttribute;
     private final Supplier<FrameAttribute> penaltyAttribute;
-    private final float bonusAttributeModifer;
-    private final float penaltyAttributeModifer;
+    private final float bonusAttributeModifier;
+    private final float penaltyAttributeModifier;
 
     public CorruptedModItem(ModType modType, String modName, Supplier<FrameAttribute> bonusAttribute, float bonusAttributeModifier, Supplier<FrameAttribute> penaltyAttribute, float penaltyAttributeModifier, Properties pProperties) {
         super(modType, modName, 10, ModRarity.RARE, pProperties);
         this.bonusAttribute = bonusAttribute;
         this.penaltyAttribute = penaltyAttribute;
-        this.bonusAttributeModifer = bonusAttributeModifier;
-        this.penaltyAttributeModifer = penaltyAttributeModifier;
+        this.bonusAttributeModifier = bonusAttributeModifier;
+        this.penaltyAttributeModifier = penaltyAttributeModifier;
     }
 
     @Override
-    protected void applyModifier(ItemStack itemStack) {
-        ListTag listTag = itemStack.getTag().getList(FrameUtil.FRAME_ATTR, 10);
-        listTag.add(AttributeHandler.storeFrameAttribute(AttributeHandler.getFrameAttributeId(getBonusAttribute()), getBonusAttributeModifier()));
-        listTag.add(AttributeHandler.storeFrameAttribute(AttributeHandler.getFrameAttributeId(getPenaltyAttribute()), getPenaltyAttributeModifier()));
-        super.applyModifier(itemStack);
+    protected void applyModifier(Player player, ItemStack itemStack) {
+        increaseModifier(getBonusAttribute(), itemStack, this.getBonusAttributeModifier());
+        increaseModifier(getPenaltyAttribute(), itemStack, this.getPenaltyAttributeModifier() );
+        super.applyModifier(player, itemStack);
     }
 
     public FrameAttribute getBonusAttribute() {
@@ -39,10 +36,10 @@ public class CorruptedModItem extends AbstractModItem {
     }
 
     public float getBonusAttributeModifier() {
-        return this.bonusAttributeModifer;
+        return this.bonusAttributeModifier;
     }
 
     public float getPenaltyAttributeModifier() {
-        return this.penaltyAttributeModifer;
+        return this.penaltyAttributeModifier;
     }
 }
