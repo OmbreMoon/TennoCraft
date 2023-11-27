@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.common.init.item;
 
+import com.ombremoon.tennocraft.common.init.entity.TCProjectiles;
 import com.ombremoon.tennocraft.object.item.weapon.MeleeWeapon;
 import com.ombremoon.tennocraft.object.item.weapon.SecondaryWeapon;
 import com.ombremoon.tennocraft.common.network.weapon.WeaponProperties;
@@ -14,7 +15,7 @@ public class TCWeapons {
 
     //SECONDARY
     public static final RegistryObject<Item> LATO = registerSecondaryWeapon("lato", new Item.Properties(),
-            new WeaponProperties().weaponType(WeaponType.SEMIAUTO)
+            new WeaponProperties().weaponType(WeaponType.SEMIAUTO).fireRate(4)
                     .impactDamage(5).punctureDamage(5).slashDamage(10).statusChance(0.06F));
 
     public static final RegistryObject<Item> ANGSTRUM = registerSecondaryWeapon("angstrum", new Item.Properties(),

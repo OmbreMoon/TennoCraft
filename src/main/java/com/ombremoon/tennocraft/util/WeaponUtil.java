@@ -13,6 +13,10 @@ public class WeaponUtil {
         return AttributeHandler.getTagAttributeModifier(FrameAttributes.DAMAGE.get(), itemStack);
     }
 
+    public static float getFireRateModifier(ItemStack itemStack) {
+        return AttributeHandler.getTagAttributeModifier(FrameAttributes.FIRE_RATE.get(), itemStack);
+    }
+
     public static float getCritChanceModifier(ItemStack itemStack) {
         return AttributeHandler.getTagAttributeModifier(FrameAttributes.CRIT_CHANCE.get(), itemStack);
     }

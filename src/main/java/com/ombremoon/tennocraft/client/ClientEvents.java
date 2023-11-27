@@ -12,11 +12,13 @@ import com.ombremoon.tennocraft.client.render.frame.ExcaliburLayer;
 import com.ombremoon.tennocraft.client.render.frame.MagLayer;
 import com.ombremoon.tennocraft.client.render.frame.VoltLayer;
 import com.ombremoon.tennocraft.client.render.mob.GrineerLancerRenderer;
+import com.ombremoon.tennocraft.client.render.projectile.AbstractBulletRenderer;
 import com.ombremoon.tennocraft.common.init.TCMenuTypes;
 import com.ombremoon.tennocraft.common.init.entity.TCMobs;
+import com.ombremoon.tennocraft.common.init.entity.TCProjectiles;
 import com.ombremoon.tennocraft.common.network.TCMessages;
 import com.ombremoon.tennocraft.common.network.packet.server.*;
-import com.ombremoon.tennocraft.common.network.weapon.WeaponHandler;
+import com.ombremoon.tennocraft.event.ProjectileWeaponEvents;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -44,6 +46,7 @@ public class ClientEvents {
 
             //MOBS
             event.registerEntityRenderer(TCMobs.GRINEER_LANCER.get(), GrineerLancerRenderer::new);
+            event.registerEntityRenderer(TCProjectiles.ABSTRACT_BULLET.get(), AbstractBulletRenderer::new);
         }
 
         @SubscribeEvent
@@ -82,7 +85,7 @@ public class ClientEvents {
     public static class ClientModEvents {
 
         public static void init() {
-            MinecraftForge.EVENT_BUS.register(WeaponHandler.getInstance());
+            MinecraftForge.EVENT_BUS.register(ProjectileWeaponEvents.getInstance());
         }
 
         @SubscribeEvent

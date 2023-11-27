@@ -65,6 +65,7 @@ public class MeleeWeapon extends AbstractWeaponItem {
             pTarget.hurt(pTarget.damageSources().generic(), elementalDamage);
 
             if (RandomUtil.percentChance(meleeWeapon.getModdedStatus(itemStack))) {
+                System.out.println("Status");
                 Map<DamageType, Float> damageMap = Maps.newEnumMap(DamageType.class);
                 float damageModifier = (1 + WeaponUtil.getDamageModifier(itemStack));
                 for (Map.Entry<DamageType, Float> entry : meleeWeapon.getDamageMap().entrySet()) {

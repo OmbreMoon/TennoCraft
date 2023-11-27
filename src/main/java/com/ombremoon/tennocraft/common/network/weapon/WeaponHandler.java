@@ -1,59 +1,32 @@
 package com.ombremoon.tennocraft.common.network.weapon;
 
+import com.ombremoon.tennocraft.common.init.entity.TCProjectiles;
+import com.ombremoon.tennocraft.common.network.packet.server.ServerboundShootPacket;
+import com.ombremoon.tennocraft.object.entity.projectile.AbstractBullet;
 import com.ombremoon.tennocraft.object.item.weapon.AbstractProjectileWeapon;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.ShieldItem;
+import net.minecraft.world.level.Level;
 
 public class WeaponHandler {
 
-    private static WeaponHandler instance;
-
-    public static WeaponHandler getInstance() {
-        if (instance == null) {
-            instance = new WeaponHandler();
-        }
-        return instance;
-    }
-
-    private boolean isActivePlayer() {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.getOverlay() != null)
-            return false;
-        if (minecraft.screen != null)
-            return false;
-        if (!minecraft.mouseHandler.isMouseGrabbed())
-            return false;
-        return minecraft.isWindowActive();
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onPlayerShoot(InputEvent.InteractionKeyMappingTriggered event) {
-
-        if (event.isCanceled())
-            return;
-
-        Player player = Minecraft.getInstance().player;
-        if (player != null) {
-
-        }
-
-    }
-
-    @SubscribeEvent
-    public void onAutomaticFire(TickEvent.ClientTickEvent event) {
-
-    }
-
-    public void shootBullet(Player player, ItemStack weaponStack) {
-        if (!(weaponStack.getItem() instanceof AbstractProjectileWeapon projectileWeapon)) {
+    public static void createBullet(ServerboundShootPacket packet, ServerPlayer serverPlayer) {
+        if (serverPlayer.getUseItem().getItem() instanceof ShieldItem) {
             return;
         }
 
+        Level level = serverPlayer.level();
+        ItemStack weaponStack = serverPlayer.getMainHandItem();
+        if (weaponStack.getItem() instanceof AbstractProjectileWeapon projectileWeapon) {
+            serverPlayer.setYRot(packet.getPitchAmount());
+            serverPlayer.setXRot(packet.getYawAmount());
 
+            AbstractBullet abstractBullet = TCProjectiles.ProjectileSpawner.getInstance().getProjectile(projectileWeapon.getWeaponLocation()).create(level, serverPlayer, weaponStack, projectileWeapon);
+            abstractBullet.setWeaponStack(weaponStack);
+            abstractBullet.setProjectileWeapon(projectileWeapon);
+            level.addFreshEntity(abstractBullet);
+            abstractBullet.tick();
+        }
     }
 }

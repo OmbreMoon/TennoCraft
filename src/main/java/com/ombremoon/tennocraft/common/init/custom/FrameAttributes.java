@@ -35,9 +35,10 @@ public class FrameAttributes {
     public static final RegistryObject<FrameAttribute> DURATION = registerAttribute("duration", new RangedFrameAttribute(TennoCraft.customLocation("duration"), "tennocraft.frame_attribute.frame.duration", 0, -10, 10));
 
     //WEAPON ATTRIBUTES
-    public static final RegistryObject<FrameAttribute> CRIT_CHANCE = registerAttribute("crit_chance", new HeatAttribute(TennoCraft.customLocation("crit_chance"), "tennocraft.frame_attribute.weapon.crit_chance", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
-    public static final RegistryObject<FrameAttribute> CRIT_DAMAGE = registerAttribute("crit_damage", new HeatAttribute(TennoCraft.customLocation("crit_damage"), "tennocraft.frame_attribute.weapon.crit_damage", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
-    public static final RegistryObject<FrameAttribute> HEAT = registerAttribute("heat", new HeatAttribute(TennoCraft.customLocation("heat"), "tennocraft.frame_attribute.weapon.damage", 0.0F, 0.0F, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> FIRE_RATE = registerAttribute("fire_rate", new RangedFrameAttribute(TennoCraft.customLocation("fire_rate"), "tennocraft.frame_attribute.weapon.fire_rate", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> CRIT_CHANCE = registerAttribute("crit_chance", new RangedFrameAttribute(TennoCraft.customLocation("crit_chance"), "tennocraft.frame_attribute.weapon.crit_chance", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> CRIT_DAMAGE = registerAttribute("crit_damage", new RangedFrameAttribute(TennoCraft.customLocation("crit_damage"), "tennocraft.frame_attribute.weapon.crit_damage", 0.0F, (float)Integer.MIN_VALUE, (float)Integer.MAX_VALUE));
+    public static final RegistryObject<FrameAttribute> HEAT = registerAttribute("heat", new HeatAttribute(TennoCraft.customLocation("heat"), "tennocraft.frame_attribute.weapon.heat", 0.0F, 0.0F, (float)Integer.MAX_VALUE));
 
     private static RegistryObject<FrameAttribute> registerAttribute(String attributeName, FrameAttribute frameAttribute) {
         return FRAME_ATTRIBUTES.register(attributeName, () -> frameAttribute);

@@ -64,6 +64,12 @@ public class TCMessages {
                 .consumerMainThread(ServerboundAbilityFourPacket::handle)
                 .add();
 
+        net.messageBuilder(ServerboundShootPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ServerboundShootPacket::new)
+                .encoder(ServerboundShootPacket::toBytes)
+                .consumerMainThread(ServerboundShootPacket::handle)
+                .add();
+
         net.messageBuilder(ClientboundMovementPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(ClientboundMovementPacket::new)
                 .encoder(ClientboundMovementPacket::toBytes)

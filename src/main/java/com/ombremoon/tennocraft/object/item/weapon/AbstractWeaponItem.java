@@ -2,20 +2,24 @@ package com.ombremoon.tennocraft.object.item.weapon;
 
 import com.google.common.collect.Maps;
 import com.ombremoon.tennocraft.common.AttributeHandler;
+import com.ombremoon.tennocraft.common.network.weapon.WeaponType;
 import com.ombremoon.tennocraft.object.item.IModHolder;
 import com.ombremoon.tennocraft.object.world.DamageType;
 import com.ombremoon.tennocraft.common.network.weapon.WeaponProperties;
 import com.ombremoon.tennocraft.player.FrameAttribute;
 import com.ombremoon.tennocraft.util.WeaponUtil;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.tslat.smartbrainlib.util.RandomUtil;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class AbstractWeaponItem extends Item implements IModHolder {
+    private final WeaponType weaponType;
     private final float critChance;
     private final float critMultiplier;
     private final float impactDamage;
@@ -27,6 +31,7 @@ public abstract class AbstractWeaponItem extends Item implements IModHolder {
 
     public AbstractWeaponItem(Properties pProperties, WeaponProperties weaponProperties) {
         super(pProperties.stacksTo(1));
+        this.weaponType = weaponProperties.weaponType;
         this.critChance = weaponProperties.critChance;
         this.critMultiplier = weaponProperties.critMultiplier;
         this.impactDamage = weaponProperties.impactDamage;
@@ -65,11 +70,27 @@ public abstract class AbstractWeaponItem extends Item implements IModHolder {
         return AttributeHandler.getTagAttributeModifier(frameAttribute, itemStack);
     }
 
-    //GET MOD LIST
+    public ResourceLocation getWeaponLocation() {
+        return ForgeRegistries.ITEMS.getKey(this);
+    }
 
     @Override
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
         return true;
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack pStack) {
+        return false;
+    }
+
+    @Override
+    public boolean isDamageable(ItemStack stack) {
+        return false;
+    }
+
+    public WeaponType getWeaponType() {
+        return this.weaponType;
     }
 
     public float getCritChance() {

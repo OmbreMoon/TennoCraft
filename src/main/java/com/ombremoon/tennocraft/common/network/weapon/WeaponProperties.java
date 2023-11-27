@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class WeaponProperties {
     public WeaponType weaponType;
+    public int fireRate;
     public float critChance;
     public float critMultiplier;
     public float impactDamage;
@@ -19,6 +20,11 @@ public class WeaponProperties {
 
     public WeaponProperties weaponType(WeaponType weaponType) {
         this.weaponType = weaponType;
+        return this;
+    }
+
+    public WeaponProperties fireRate(int fireRate) {
+        this.fireRate = fireRate;
         return this;
     }
 
