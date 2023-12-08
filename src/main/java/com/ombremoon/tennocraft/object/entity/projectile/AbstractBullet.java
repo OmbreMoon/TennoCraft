@@ -9,7 +9,6 @@ import com.ombremoon.tennocraft.player.FrameAttribute;
 import com.ombremoon.tennocraft.util.DamageUtil;
 import com.ombremoon.tennocraft.util.WeaponUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -18,52 +17,50 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BellBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.entity.IEntityAdditionalSpawnData;
 import net.minecraftforge.network.NetworkHooks;
 import net.tslat.smartbrainlib.util.RandomUtil;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData {
+public class AbstractBullet extends Projectile implements IEntityAdditionalSpawnData {
     protected int attackEntityId;
     protected LivingEntity attackEntity;
     private ItemStack weaponStack;
     private AbstractProjectileWeapon projectileWeapon;
+    protected float range;
     protected int life;
+    protected BlockPos startPos;
 
-    public AbstractBullet(EntityType<?> pEntityType, Level pLevel) {
+    public AbstractBullet(EntityType<? extends Projectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
-    public AbstractBullet(EntityType<?> pEntityType, Level pLevel, LivingEntity attackEntity, ItemStack weaponStack, AbstractProjectileWeapon projectileWeapon) {
-        super(pEntityType, pLevel);
+    public AbstractBullet(EntityType<? extends Projectile> pEntityType, double pX, double pY, double pZ, BlockPos startPos, Level pLevel) {
+        this(pEntityType, pLevel);
+        this.setPos(pX, pY, pZ);
+        this.startPos = startPos;
+    }
+
+    public AbstractBullet(EntityType<? extends Projectile> pEntityType, Level pLevel, LivingEntity attackEntity, ItemStack weaponStack, AbstractProjectileWeapon projectileWeapon) {
+        this(pEntityType, attackEntity.getX(), attackEntity.getEyeY() - (double)0.1F, attackEntity.getZ(), attackEntity.getOnPos(), pLevel);
         this.attackEntityId = attackEntity.getId();
         this.attackEntity = attackEntity;
+        this.weaponStack = weaponStack;
+        this.range = projectileWeapon.getRange();
         this.life = projectileWeapon.getProjectileLife();
-
-        Vec3 vec3 = this.getRotVector(weaponStack, attackEntity.getXRot(), attackEntity.getYRot());
-        double projectileSpeed = projectileWeapon.getProjectileSpeed();
-        this.setDeltaMovement(vec3.x * projectileSpeed, vec3.y * projectileSpeed, vec3.z * projectileSpeed);
-        this.interpolateMotion();
     }
-
 
     public int getAttackEntityId() {
         return this.attackEntityId;
@@ -85,6 +82,10 @@ public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData
         this.projectileWeapon = projectileWeapon;
     }
 
+    public BlockPos getStartPos() {
+        return this.startPos;
+    }
+
     public AbstractProjectileWeapon getProjectileWeapon() {
         return this.projectileWeapon;
     }
@@ -92,98 +93,87 @@ public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData
     @Override
     public void tick() {
         super.tick();
-        if (this.tickCount % 10 == 0) {
-            this.onStartTick();
+        BlockPos blockPos = this.blockPosition();
+        Vec3 vec3 = this.getDeltaMovement();
+        if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
+            double d0 = vec3.horizontalDistance();
+            this.setYRot((float)(Mth.atan2(vec3.x, vec3.z) * (double)(180F / (float)Math.PI)));
+            this.setXRot((float)(Mth.atan2(vec3.y, d0) * (double)(180F / (float)Math.PI)));
+            this.yRotO = this.getYRot();
+            this.xRotO = this.getXRot();
         }
-        this.interpolateMotion();
-        this.onTick();
 
-        if (!this.level().isClientSide) {
-            Vec3 startPosition = this.position();
-            Vec3 stopPosition = startPosition.add(this.getDeltaMovement());
-            HitResult hitResult = this.level().clip(new ClipContext(stopPosition, stopPosition, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-            if (hitResult.getType() != HitResult.Type.MISS) {
-                stopPosition = hitResult.getLocation();
-            }
-
-            List<EntityHitResult> entityHitResults = null;
-            if (/*temp conditon*/ true) {
-                EntityHitResult entityHitResult = this.getHitEntity(startPosition, stopPosition);
-                if (entityHitResult != null) {
-                    entityHitResults = Collections.singletonList(entityHitResult);
-                }
-            } else {
-                this.getHitEntities(startPosition, stopPosition);
-            }
-
-            if (entityHitResults != null && entityHitResults.size() > 0) {
-                for (EntityHitResult entityHitResult : entityHitResults) {
-                    hitResult = entityHitResult;
-                    if (((EntityHitResult)hitResult).getEntity() instanceof Player player) {
-                        if (this.getAttackEntity() instanceof Player && !(((Player) this.getAttackEntity()).canHarmPlayer(player))) {
-                            hitResult = null;
-                        }
-                    }
-                    if (hitResult != null) {
-                        this.onHit(hitResult, startPosition, stopPosition);
-                    }
-                }
-            } else {
-                this.onHit(hitResult, startPosition, stopPosition);
-            }
+        if (blockPos.distToCenterSqr(startPos.getCenter()) >= this.range) {
+            this.discard();
         }
-        double xPos = this.getX() + this.getDeltaMovement().x;
-        double yPos = this.getY() + this.getDeltaMovement().y;
-        double zPos = this.getZ() + this.getDeltaMovement().z;
-        this.setPos(xPos, yPos, zPos);
-        if (this.tickCount % this.life == 0) {
-            if (!this.isRemoved()) {
-                this.onEndTick();
+
+        if (!this.isRemoved()) {
+            Vec3 vec32 = this.position();
+            Vec3 vec33 = vec32.add(vec3);
+            HitResult hitresult = this.level().clip(new ClipContext(vec32, vec33, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+            if (hitresult.getType() != HitResult.Type.MISS) {
+                vec33 = hitresult.getLocation();
             }
-            this.remove(RemovalReason.KILLED);
+
+            EntityHitResult entityhitresult = this.findHitEntity(vec32, vec33);
+            if (entityhitresult != null) {
+                hitresult = entityhitresult;
+            }
+
+            if (hitresult != null && hitresult.getType() == HitResult.Type.ENTITY) {
+                Entity entity = ((EntityHitResult) hitresult).getEntity();
+                Entity entity1 = this.getOwner();
+                if (entity instanceof Player && entity1 instanceof Player && !((Player) entity1).canHarmPlayer((Player) entity)) {
+                    hitresult = null;
+                    entityhitresult = null;
+                }
+            }
+
+            if (hitresult != null && hitresult.getType() != HitResult.Type.MISS) {
+                this.onHit(hitresult);
+                this.hasImpulse = true;
+            }
+
+            hitresult = null;
+
+
+            vec3 = this.getDeltaMovement();
+            double d5 = vec3.x;
+            double d6 = vec3.y;
+            double d1 = vec3.z;
+
+            double d7 = this.getX() + d5;
+            double d2 = this.getY() + d6;
+            double d3 = this.getZ() + d1;
+            double d4 = vec3.horizontalDistance();
+            this.setYRot((float) (Mth.atan2(d5, d1) * (double) (180F / (float) Math.PI)));
+
+            this.setXRot((float) (Mth.atan2(d6, d4) * (double) (180F / (float) Math.PI)));
+            this.setXRot(lerpRotation(this.xRotO, this.getXRot()));
+            this.setYRot(lerpRotation(this.yRotO, this.getYRot()));
+
+            this.setDeltaMovement(vec3.scale((double) 0.99F));
+            Vec3 vec34 = this.getDeltaMovement();
+            this.setDeltaMovement(vec34.x, vec34.y - (double) 0.05F, vec34.z);
+
+            this.setPos(d7, d2, d3);
+        }
+
+        if (this.tickCount >= this.life) {
+            this.discard();
         }
     }
 
     @Override
-    public boolean shouldRenderAtSqrDistance(double pDistance) {
-        return true;
+    protected void onHit(HitResult pResult) {
+        super.onHit(pResult);
+        this.discard();
     }
 
-    public void onHit(HitResult hitResult, Vec3 startPosition, Vec3 stopPosition) {
-        if (hitResult instanceof  BlockHitResult blockHitResult) {
-            if (blockHitResult.getType() == HitResult.Type.MISS) {
-                return;
-            }
-
-            Vec3 vec3 = hitResult.getLocation();
-            BlockPos blockPos = blockHitResult.getBlockPos();
-            BlockState blockState = this.level().getBlockState(blockPos);
-            Block block = blockState.getBlock();
-
-            this.remove(RemovalReason.KILLED);
-
-            this.onHitBlock(blockHitResult, vec3);
-
-            if (block instanceof BellBlock bellBlock) {
-                bellBlock.attemptToRing(this.level(), blockPos, blockHitResult.getDirection());
-            }
-            return;
-        }
-
-        if (hitResult instanceof EntityHitResult entityHitResult) {
-            Entity entity = entityHitResult.getEntity();
-            if (entity.getId() == this.getAttackEntityId()) {
-                return;
-            }
-
-            this.onHitEntity(entity, startPosition, stopPosition);
-            this.remove(RemovalReason.KILLED);
-
-            entity.invulnerableTime = 0;
-        }
-    }
-
-    public void onHitEntity(Entity entity, Vec3 startPosition, Vec3 stopPosition) {
+    @Override
+    protected void onHitEntity(EntityHitResult pResult) {
+        super.onHitEntity(pResult);
+        Entity entity = pResult.getEntity();
         ItemStack itemStack = this.getWeaponStack();
         Item item = itemStack.getItem();
         if (item instanceof AbstractProjectileWeapon projectileWeapon) {
@@ -250,98 +240,14 @@ public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData
         }
     }
 
-    public void onHitBlock(BlockHitResult hitResult, Vec3 positionVec) {
-
-    }
-
-    public void onStartTick() {
-
-    }
-
-    public void onTick() {
-
-    }
-
-    public void onEndTick() {
-
-    }
-
     @Nullable
-    protected EntityHitResult getHitEntity(Vec3 startPosition, Vec3 stopPosition) {
-        double d0 = Double.MAX_VALUE;
-        Entity targetEntity = null;
-        Vec3 vec3 = null;
-        List<Entity> entityList = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0), this::canHitEntity);
-        for (Entity entity : entityList) {
-            if (entity != this.getAttackEntity()) {
-                EntityHitResult entityHitResult = this.getEntityHitResult(startPosition, stopPosition);
-                if (entityHitResult == null)
-                    continue;
-                Vec3 hitLocation = entityHitResult.getLocation();
-                double hitDistance = startPosition.distanceTo(hitLocation);
-                if (hitDistance < d0) {
-                    vec3 = hitLocation;
-                    targetEntity = entity;
-                    d0 = hitDistance;
-                }
-            }
-        }
-        return targetEntity == null ? null : new EntityHitResult(targetEntity, vec3);
-    }
-
-    @Nullable
-    protected List<EntityHitResult> getHitEntities(Vec3 startPosition, Vec3 stopPosition) {
-        List<EntityHitResult> hitResults = new ArrayList<>();
-        List<Entity> entityList = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0), this::canHitEntity);
-        for (Entity entity : entityList) {
-            if (!entity.equals(this.attackEntity)) {
-                EntityHitResult entityHitResult = this.getEntityHitResult(startPosition, stopPosition);
-                if (entityHitResult != null) {
-                    hitResults.add(entityHitResult);
-                }
-            }
-        }
-        return hitResults;
-    }
-
-    public EntityHitResult getEntityHitResult(Vec3 startPosition, Vec3 stopPosition) {
-        return ProjectileUtil.getEntityHitResult(this.getAttackEntity(), startPosition, stopPosition, this.getBoundingBox(), this::canHitEntity, 0.3);
-    }
-
-    public void interpolateMotion() {
-        Vec3 vec3 = this.getDeltaMovement();
-        double d0 = vec3.horizontalDistance();
-        this.setXRot((float)(Mth.atan2(vec3.y(), d0) * (double)(180F / (float)Math.PI)));
-        this.setYRot((float)(Mth.atan2(vec3.x(), vec3.z() * (double)(180F / (float)Math.PI))));
-        this.xRotO = this.getXRot();
-        this.yRotO = this.getYRot();
-    }
-
-    protected boolean canHitEntity(Entity entity) {
-        return entity != null && entity.isPickable() && !entity.isSpectator();
-    }
-
-    private Vec3 getRotVector(ItemStack itemStack, float pitch, float yaw) {
-        float f = Mth.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f1 = Mth.sin(-yaw * 0.017453292F - (float) Math.PI);
-        float f2 = -Mth.cos(-pitch * 0.017453292F);
-        float f3 = Mth.sin(-pitch * 0.017453292F);
-        return new Vec3((double) (f1 * f2), (double) f3, (double) (f * f2));
+    protected EntityHitResult findHitEntity(Vec3 pStartVec, Vec3 pEndVec) {
+        return ProjectileUtil.getEntityHitResult(this.level(), this, pStartVec, pEndVec, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D), this::canHitEntity);
     }
 
     @Override
     protected void defineSynchedData() {
 
-    }
-
-    @Override
-    protected void readAdditionalSaveData(CompoundTag pCompound) {
-        this.life = pCompound.getInt("Life");
-    }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag pCompound) {
-        pCompound.putInt("life", this.life);
     }
 
     @Override
@@ -354,7 +260,9 @@ public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData
             buffer.writeShort(Item.getId(this.getWeaponStack().getItem()));
             buffer.writeByte(this.getWeaponStack().getCount());
         }
+        buffer.writeFloat(this.range);
         buffer.writeVarInt(this.life);
+        buffer.writeBlockPos(this.startPos);
     }
 
     @Override
@@ -368,7 +276,9 @@ public class AbstractBullet extends Entity implements IEntityAdditionalSpawnData
             this.weaponStack = new ItemStack(Item.byId(itemId), additionalData.readByte());
         }
 
+        this.range = additionalData.readFloat();
         this.life = additionalData.readVarInt();
+        this.startPos = additionalData.readBlockPos();
     }
 
     @Override

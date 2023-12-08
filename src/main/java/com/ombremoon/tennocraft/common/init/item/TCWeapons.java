@@ -15,8 +15,8 @@ public class TCWeapons {
 
     //SECONDARY
     public static final RegistryObject<Item> LATO = registerSecondaryWeapon("lato", new Item.Properties(),
-            new WeaponProperties().weaponType(WeaponType.SEMIAUTO).fireRate(4)
-                    .impactDamage(5).punctureDamage(5).slashDamage(10).statusChance(0.06F));
+            new WeaponProperties().weaponType(WeaponType.SEMIAUTO).fireRate(4).critChance(0.1F).critMultiplier(1.8F)
+                    .impactDamage(5).punctureDamage(5).slashDamage(10).statusChance(0.06F).range(15.0F).accuracy(1.0F));
 
     public static final RegistryObject<Item> ANGSTRUM = registerSecondaryWeapon("angstrum", new Item.Properties(),
             new WeaponProperties().weaponType(WeaponType.CHARGE)

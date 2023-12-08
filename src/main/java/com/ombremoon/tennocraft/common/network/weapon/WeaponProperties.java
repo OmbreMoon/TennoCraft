@@ -16,6 +16,8 @@ public class WeaponProperties {
     public float heatDamage;
     public float blastDamage;
     public float statusChance;
+    public float range;
+    public float accuracy;
     public Map<DamageType, Float> damageMap = Maps.newEnumMap(DamageType.class);
 
     public WeaponProperties weaponType(WeaponType weaponType) {
@@ -70,6 +72,16 @@ public class WeaponProperties {
 
     public WeaponProperties statusChance(float statusChance) {
         this.statusChance = statusChance;
+        return this;
+    }
+
+    public WeaponProperties range(float range) {
+        this.range = range;
+        return this;
+    }
+
+    public WeaponProperties accuracy(float accuracy) {
+        this.accuracy = accuracy;
         return this;
     }
 }

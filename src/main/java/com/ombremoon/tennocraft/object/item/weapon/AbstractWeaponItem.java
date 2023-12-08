@@ -47,11 +47,11 @@ public abstract class AbstractWeaponItem extends Item implements IModHolder {
     }
 
     public float getModdedDamage(ItemStack itemStack) {
-        return (this.getTotalBaseDamage() * (1 + WeaponUtil.getDamageModifier(itemStack)));
+        return this.getTotalBaseDamage() * (1 + WeaponUtil.getDamageModifier(itemStack));
     }
 
     public float getModdedCritChance(ItemStack itemStack) {
-        return (this.getCritChance() * (1 + WeaponUtil.getCritChanceModifier(itemStack)));
+        return this.getCritChance() * (1 + WeaponUtil.getCritChanceModifier(itemStack));
     }
 
     public float calculateCritDamage(ItemStack itemStack) {

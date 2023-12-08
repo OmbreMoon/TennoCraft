@@ -52,7 +52,9 @@ public class FrameUtil {
                 frameAbility.setBlockPos(blockPos);
                 AbilityManager.addAbility(frameAbility);
                 frameAbility.start();
-                decreaseEnergy(player, itemStack, frameAbility);
+
+                if (!player.isCreative())
+                    frameAbility.decreaseEnergy(player, itemStack, frameAbility);
             }
         }
     }
@@ -80,6 +82,10 @@ public class FrameUtil {
 
     public static float getFrameEnergy(Player player) {
         return AttributeHandler.getAttributeModifier(FrameAttributes.ENERGY.get(), player);
+    }
+
+    public static float getDurationModifier(ItemStack frameStack) {
+        return AttributeHandler.getTagAttributeModifier(FrameAttributes.DURATION.get(), frameStack);
     }
 
     public static AbilityType<?> getFirstAbility(TransferenceKeyItem tokenItem) {

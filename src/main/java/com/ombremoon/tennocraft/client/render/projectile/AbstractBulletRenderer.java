@@ -25,10 +25,10 @@ public class AbstractBulletRenderer extends EntityRenderer<AbstractBullet> {
     @Override
     public void render(AbstractBullet pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         super.render(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
-        pPoseStack.pushPose();
+        /*pPoseStack.pushPose();
         pPoseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
         pPoseStack.mulPose(Axis.YP.rotationDegrees(180));
-        Minecraft.getInstance().getItemRenderer().renderStatic(pEntity.getWeaponStack(), ItemDisplayContext.NONE, pPackedLight, OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pEntity.level(), 0);
+        Minecraft.getInstance().getItemRenderer().renderStatic(pEntity.getWeaponStack(), ItemDisplayContext.NONE, pPackedLight, OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pEntity.level(), 0);*/
 
     }
 }

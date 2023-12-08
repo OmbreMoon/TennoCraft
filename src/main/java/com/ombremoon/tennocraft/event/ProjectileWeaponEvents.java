@@ -85,7 +85,7 @@ public class ProjectileWeaponEvents {
         if (!weaponCooldown.isOnCooldown(projectileWeapon)) {
             int fireRate = Math.round(projectileWeapon.getModdedFireRate(weaponStack));
             weaponCooldown.addCooldown(projectileWeapon, fireRate);
-            TCMessages.sendToServer(new ServerboundShootPacket(player.getYRot(), player.getXRot()));
+            TCMessages.sendToServer(new ServerboundShootPacket(player));
         }
 
     }

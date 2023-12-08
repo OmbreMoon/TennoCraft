@@ -51,7 +51,7 @@ public class TCEvents {
     public static void onEntitySpawn(EntityJoinLevelEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof AbstractBullet) {
-            System.out.println("FOR THE QUEENS!");
+//            System.out.println("FOR THE QUEENS!");
         }
     }
 }

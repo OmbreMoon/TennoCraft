@@ -29,11 +29,12 @@ import java.util.UUID;
 public abstract class AbstractFrameAbility {
     private String descriptionId;
     private float abilityDuration;
-    private float moddedDuration = 0;
+//    private float moddedDuration = 0;
 
     private final AbilityType<?> abilityType;
     private final int energyRequired;
-    private final int energyPerSecond;
+    private final float energyPerSecond;
+    private final int baseStrength;
     private final int durationInTicks;
     private final float initialRange;
 
@@ -46,10 +47,11 @@ public abstract class AbstractFrameAbility {
     public boolean isNotActive = false;
     public boolean isStarting = false;
 
-    public AbstractFrameAbility(AbilityType<?> abilityType, int energyRequired, int energyPerSecond, int durationInTicks, float initialRange) {
+    public AbstractFrameAbility(AbilityType<?> abilityType, int energyRequired, float energyPerSecond, int baseStrength, int durationInTicks, float initialRange) {
         this.abilityType = abilityType;
         this.energyRequired = energyRequired;
         this.energyPerSecond = energyPerSecond;
+        this.baseStrength = baseStrength;
         this.durationInTicks = durationInTicks;
         this.initialRange = initialRange;
     }
@@ -120,9 +122,7 @@ public abstract class AbstractFrameAbility {
     /*
     * Override to add additional effects at the start of ability cast
     */
-    protected void onStart() {
-
-    }
+    protected abstract void onStart(Player player, Level level, BlockPos blockPos);
 
     /*
      * Override to add effects that run every tick
@@ -134,7 +134,7 @@ public abstract class AbstractFrameAbility {
     /*
      * Override to add additional effects at the end of ability duration
      */
-    protected void onStop() {
+    protected void onStop(Player player, Level level, BlockPos blockPos) {
 
     }
 
@@ -160,11 +160,16 @@ public abstract class AbstractFrameAbility {
 
     protected void castAbility() {
         this.isStarting = false;
-        onStart();
+        Player player = level.getPlayerByUUID(userID);
+        if (player != null)
+            onStart(player, level, blockPos);
     }
 
     public void endAbility() {
-        onStop();
+        Player player = level.getPlayerByUUID(userID);
+        if (player != null) {
+            onStop(player, level, blockPos);
+        }
         this.isStarting = false;
         this.isNotActive = true;
         this.ticks = 0;
@@ -236,7 +241,7 @@ public abstract class AbstractFrameAbility {
         if (level.getPlayerByUUID(userID) != null) {
             Player player = level.getPlayerByUUID(userID);
             ItemStack frameStack = FrameUtil.getFrameStack(player);
-            this.abilityDuration = Math.round((durationInTicks * (1 + getModdedDuration(frameStack))));
+            this.abilityDuration = Math.round(durationInTicks * (1 + FrameUtil.getDurationModifier(frameStack)));
         }
     }
 
@@ -248,10 +253,12 @@ public abstract class AbstractFrameAbility {
         setAbilityDuration(this.durationInTicks);
     }
 
-    //Attributes
+    public void decreaseEnergy(Player player, ItemStack itemStack, AbstractFrameAbility frameAbility) {
+        System.out.println(AttributeHandler.getAttributeModifier(FrameAttributes.ENERGY.get(), player));
+        AttributeHandler.setTagAttributeModifier(FrameAttributes.ENERGY.get(), itemStack, AttributeHandler.getAttributeModifier(FrameAttributes.ENERGY.get(), player) - frameAbility.getEnergyRequired());
+    }
 
-    //FIX!!!!!!!
-    public float getModdedDuration(ItemStack itemStack) {
+/*    public float getModdedDuration(ItemStack itemStack) {
         Map<FrameAttribute, Float> frameAttributes = AttributeHandler.getFrameAttributes(itemStack);
         for (Map.Entry<FrameAttribute, Float> entry : frameAttributes.entrySet()) {
             FrameAttribute frameAttribute = entry.getKey();
@@ -262,5 +269,5 @@ public abstract class AbstractFrameAbility {
             }
         }
         return moddedDuration;
-    }
+    }*/
 }

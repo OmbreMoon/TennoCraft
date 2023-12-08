@@ -10,12 +10,16 @@ import java.util.function.Supplier;
 
 public abstract class AbstractProjectileWeapon extends AbstractWeaponItem {
     private final int fireRate;
+    private final float range;
+    private final float accuracy;
     private final int projectileLife;
     private final float projectileSpeed;
 
     public AbstractProjectileWeapon(Properties pProperties, WeaponProperties weaponProperties) {
         super(pProperties, weaponProperties);
         this.fireRate = weaponProperties.fireRate;
+        this.range = weaponProperties.range;
+        this.accuracy = weaponProperties.accuracy;
         this.projectileLife = this.getWeaponType().getProjectileLife();
         this.projectileSpeed = this.getWeaponType().getProjectileSpeed();
     }
@@ -26,6 +30,14 @@ public abstract class AbstractProjectileWeapon extends AbstractWeaponItem {
 
     public int getFireRate() {
         return this.fireRate;
+    }
+
+    public float getRange() {
+        return this.range;
+    }
+
+    public float getAccuracy() {
+        return this.accuracy;
     }
 
     public int getProjectileLife() {

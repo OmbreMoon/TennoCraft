@@ -1,37 +1,34 @@
 package com.ombremoon.tennocraft.common.network.packet.server;
 
 import com.ombremoon.tennocraft.common.network.packet.IAbstractMessage;
-import com.ombremoon.tennocraft.common.network.packet.server.data.RotationSyncData;
 import com.ombremoon.tennocraft.common.network.weapon.WeaponHandler;
-import com.ombremoon.tennocraft.object.item.TransferenceKeyItem;
-import com.ombremoon.tennocraft.player.data.AbilityType;
-import com.ombremoon.tennocraft.util.FrameUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class ServerboundShootPacket implements IAbstractMessage {
-    private static ServerboundShootPacket packet;
-    private float pitchAmount;
     private float yawAmount;
+    private float pitchAmount;
 
-    public ServerboundShootPacket(float pitchAmount, float yawAmount) {
-        this.pitchAmount = pitchAmount;
-        this.yawAmount = yawAmount;
+    public ServerboundShootPacket(Player player) {
+        yawAmount = player.getXRot();
+        pitchAmount = player.getYHeadRot();
     }
 
     public ServerboundShootPacket(FriendlyByteBuf friendlyByteBuf) {
-        friendlyByteBuf.writeFloat(pitchAmount);
-        friendlyByteBuf.writeFloat(yawAmount);
+        yawAmount = friendlyByteBuf.readFloat();
+        pitchAmount = friendlyByteBuf.readFloat();
     }
 
     @Override
     public void toBytes( FriendlyByteBuf friendlyByteBuf) {
-//        this.pitchAmount = friendlyByteBuf.readFloat();
-//        this.yawAmount = friendlyByteBuf.readFloat();
+        friendlyByteBuf.writeFloat(yawAmount);
+        friendlyByteBuf.writeFloat(pitchAmount);
     }
 
     @Override
@@ -42,18 +39,11 @@ public class ServerboundShootPacket implements IAbstractMessage {
             if (player == null)
                 return;
 
-            RotationSyncData.setData(pitchAmount, yawAmount);
-            WeaponHandler.createBullet(this, player);
+            player.setYRot(pitchAmount);
+            player.setXRot(yawAmount);
+            WeaponHandler.createBullet(player);
 
         });
         return true;
-    }
-
-    public float getPitchAmount() {
-        return this.pitchAmount;
-    }
-
-    public float getYawAmount() {
-        return this.yawAmount;
     }
 }
