@@ -8,7 +8,6 @@ import com.ombremoon.tennocraft.common.modholder.api.mod.ModInstance;
 import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
 import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.RangedWeaponSchema;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;

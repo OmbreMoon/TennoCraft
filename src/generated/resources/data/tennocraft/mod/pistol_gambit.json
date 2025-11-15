@@ -7,7 +7,8 @@
     },
     "maxRank": 5,
     "polarity": "madurai",
-    "rarity": "common"
+    "rarity": "common",
+    "supports": "#tennocraft:pistol"
   },
   "description": "",
   "effects": {

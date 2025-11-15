@@ -65,8 +65,8 @@ public record Modification(Component name, Component description, ModDefinition 
     }
 
     public static ModDefinition definition(
-//            HolderSet<Schema> supportedSchemas,
-//            HolderSet<Schema> incompatibleSchemas,
+            HolderSet<Schema> supportedSchemas,
+            HolderSet<Schema> incompatibleSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
@@ -74,23 +74,23 @@ public record Modification(Component name, Component description, ModDefinition 
             ModRarity rarity,
             Variant variant
     ) {
-        return new ModDefinition(/*supportedSchemas, Optional.of(incompatibleSchemas), */type, polarity, drain, maxRank, rarity, Optional.of(variant));
+        return new ModDefinition(supportedSchemas, Optional.of(incompatibleSchemas), type, polarity, drain, maxRank, rarity, Optional.of(variant));
     }
 
     public static ModDefinition definition(
-//            HolderSet<Schema> supportedSchemas,
-//            HolderSet<Schema> incompatibleSchemas,
+            HolderSet<Schema> supportedSchemas,
+            HolderSet<Schema> incompatibleSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
             int maxRank,
             ModRarity rarity
     ) {
-        return new ModDefinition(/*supportedSchemas, Optional.of(incompatibleSchemas), */type, polarity, drain, maxRank, rarity, Optional.empty());
+        return new ModDefinition(supportedSchemas, Optional.of(incompatibleSchemas), type, polarity, drain, maxRank, rarity, Optional.empty());
     }
 
-/*    public static ModDefinition definition(
-//            HolderSet<Schema> supportedSchemas,
+    public static ModDefinition definition(
+            HolderSet<Schema> supportedSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
@@ -98,31 +98,31 @@ public record Modification(Component name, Component description, ModDefinition 
             ModRarity rarity,
             Variant variant
     ) {
-        return new ModDefinition(*//*supportedSchemas, Optional.empty(), *//*type, polarity, drain, maxRank, rarity, Optional.of(variant));
+        return new ModDefinition(supportedSchemas, Optional.empty(), type, polarity, drain, maxRank, rarity, Optional.of(variant));
     }
 
     public static ModDefinition definition(
-//            HolderSet<Schema> supportedSchemas,
+            HolderSet<Schema> supportedSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
             int maxRank,
             ModRarity rarity
     ) {
-        return new ModDefinition(*//*supportedSchemas, Optional.empty(), *//*type, polarity, drain, maxRank, rarity, Optional.empty());
-    }*/
+        return new ModDefinition(supportedSchemas, Optional.empty(), type, polarity, drain, maxRank, rarity, Optional.empty());
+    }
 
-    /*public HolderSet<Schema> getSupportedSchemas() {
+    public HolderSet<Schema> getSupportedSchemas() {
         return this.definition.supportedSchemas;
     }
 
     public boolean isSupportedSchema(Holder<Schema> schema) {
         return this.definition.supportedSchemas.contains(schema);
-    }*/
+    }
 
-/*    public boolean isIncompatibleSchema(Holder<Schema> schema) {
+    public boolean isIncompatibleSchema(Holder<Schema> schema) {
         return this.definition.incompatibleSchemas.map(holders -> holders.contains(schema)).orElse(false);
-    }*/
+    }
 
     public ModType getType() {
         return this.definition.type;
@@ -290,11 +290,11 @@ public record Modification(Component name, Component description, ModDefinition 
         }
     }
 
-    public record ModDefinition(/*HolderSet<Schema> supportedSchemas, Optional<HolderSet<Schema>> incompatibleSchemas, */ModType type, ModPolarity polarity, Drain drain, int maxRank, ModRarity rarity, Optional<Variant> variant) {
+    public record ModDefinition(HolderSet<Schema> supportedSchemas, Optional<HolderSet<Schema>> incompatibleSchemas, ModType type, ModPolarity polarity, Drain drain, int maxRank, ModRarity rarity, Optional<Variant> variant) {
         public static final MapCodec<ModDefinition> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
-//                        RegistryCodecs.homogeneousList(Keys.SCHEMA).fieldOf("supports").forGetter(ModDefinition::supportedSchemas),
-//                        RegistryCodecs.homogeneousList(Keys.SCHEMA).optionalFieldOf("incompatible").forGetter(ModDefinition::incompatibleSchemas),
+                        RegistryCodecs.homogeneousList(Keys.SCHEMA).fieldOf("supports").forGetter(ModDefinition::supportedSchemas),
+                        RegistryCodecs.homogeneousList(Keys.SCHEMA).optionalFieldOf("incompatible").forGetter(ModDefinition::incompatibleSchemas),
                         ModType.CODEC.fieldOf("type").forGetter(ModDefinition::type),
                         ModPolarity.CODEC.fieldOf("polarity").forGetter(ModDefinition::polarity),
                         Drain.CODEC.fieldOf("drain").forGetter(ModDefinition::drain),
@@ -304,7 +304,7 @@ public record Modification(Component name, Component description, ModDefinition 
                 ).apply(instance, ModDefinition::new)
         );
 
-        private static final ModDefinition EMPTY = new ModDefinition(/*HolderSet.empty(), Optional.empty(), */ModType.STANDARD, ModPolarity.ANY, constantDrain(0), 0, ModRarity.COMMON, Optional.empty());
+        private static final ModDefinition EMPTY = new ModDefinition(HolderSet.empty(), Optional.empty(), ModType.STANDARD, ModPolarity.ANY, constantDrain(0), 0, ModRarity.COMMON, Optional.empty());
     }
 
     public record Drain(int base, int perRank) {
