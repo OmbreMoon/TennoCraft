@@ -1,0 +1,31 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 4,
+      "per_rank": 1
+    },
+    "maxRank": 5,
+    "polarity": "madurai",
+    "rarity": "common",
+    "supports": "#tennocraft:pistol"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:attributes": [
+      {
+        "amount": {
+          "type": "tennocraft:linear",
+          "base": 0.2,
+          "per_rank": 0.2
+        },
+        "attribute": "tennocraft:crit_chance",
+        "id": "tennocraft:mod.pistol_gambit",
+        "operation": "add_multiplied_total"
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.pistol_gambit"
+  }
+}

@@ -1,0 +1,117 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 64,
+				"texture_height": 64,
+				"visible_bounds_width": 3,
+				"visible_bounds_height": 3.5,
+				"visible_bounds_offset": [0, 1.25, 0]
+			},
+			"bones": [
+				{
+					"name": "bipedHead",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorHead",
+					"parent": "bipedHead",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4.5, 23.25, -4.5], "size": [9, 9, 9], "inflate": 0.025, "uv": [0, 0]},
+						{"origin": [-1.5, 25.5, -4.5], "size": [3, 6, 7], "pivot": [-1.5, 25.5, -4.5], "rotation": [30, 0, 0], "uv": [17, 30]},
+						{"origin": [-1.5, 27.44615, -1.63878], "size": [9, 9, 3], "pivot": [0, 34.94615, -0.13878], "rotation": [22.20765, -20.70481, 40.89339], "uv": [24, 18]}
+					]
+				},
+				{
+					"name": "bipedBody",
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "armorBody",
+					"parent": "bipedBody",
+					"pivot": [0, 24, 0],
+					"cubes": [
+						{"origin": [-4, 12, -2], "size": [8, 12, 4], "inflate": 0.3, "uv": [0, 18]}
+					]
+				},
+				{
+					"name": "bipedRightArm",
+					"pivot": [-5, 22, 0]
+				},
+				{
+					"name": "armorRightArm",
+					"parent": "bipedRightArm",
+					"pivot": [-5, 22, 0],
+					"cubes": [
+						{"origin": [-8, 20, -2.75], "size": [4, 4, 5], "inflate": 0.3, "uv": [37, 30], "mirror": true},
+						{"origin": [-8, 20, -2.25], "size": [4, 4, 4], "inflate": 0.275, "pivot": [-3.725, 24.275, -2.525], "rotation": [0, 0, 22.5], "uv": [33, 39], "mirror": true},
+						{"origin": [-8, 12, -2], "size": [4, 12, 4], "inflate": 0.275, "uv": [0, 34], "mirror": true},
+						{"origin": [-11, 18, -2.25], "size": [3, 0, 4], "pivot": [-8, 18.001, -2], "rotation": [5.123, 21.93857, 13.4936], "uv": [54, 0], "mirror": true},
+						{"origin": [-11, 17, -2.25], "size": [3, 0, 4], "pivot": [-8, 18.001, -2], "rotation": [5.123, 21.93857, 13.4936], "uv": [54, 0], "mirror": true},
+						{"origin": [-11, 19, -2.25], "size": [3, 0, 4], "pivot": [-8, 18.001, -2], "rotation": [5.123, 21.93857, 13.4936], "uv": [54, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "bipedLeftArm",
+					"pivot": [5, 22, 0]
+				},
+				{
+					"name": "armorLeftArm",
+					"parent": "bipedLeftArm",
+					"pivot": [5, 22, 0],
+					"cubes": [
+						{"origin": [4, 20, -2.75], "size": [4, 4, 5], "inflate": 0.3, "uv": [37, 30]},
+						{"origin": [4, 20, -2.25], "size": [4, 4, 4], "inflate": 0.275, "pivot": [3.725, 24.275, -2.525], "rotation": [0, 0, -22.5], "uv": [33, 39]},
+						{"origin": [4, 12, -2], "size": [4, 12, 4], "inflate": 0.275, "uv": [0, 34]},
+						{"origin": [8, 18, -2.25], "size": [3, 0, 4], "pivot": [8, 18.001, -2], "rotation": [5.123, -21.93857, -13.4936], "uv": [54, 0]},
+						{"origin": [8, 17, -2.25], "size": [3, 0, 4], "pivot": [8, 18.001, -2], "rotation": [5.123, -21.93857, -13.4936], "uv": [54, 0]},
+						{"origin": [8, 19, -2.25], "size": [3, 0, 4], "pivot": [8, 18.001, -2], "rotation": [5.123, -21.93857, -13.4936], "uv": [54, 0]}
+					]
+				},
+				{
+					"name": "bipedLeftLeg",
+					"pivot": [2, 12, 0]
+				},
+				{
+					"name": "armorLeftLeg",
+					"parent": "bipedLeftLeg",
+					"pivot": [2, 12, 0],
+					"cubes": [
+						{"origin": [0, 3, -2], "size": [4, 9, 4], "inflate": 0.275, "uv": [36, 0]}
+					]
+				},
+				{
+					"name": "armorLeftBoot",
+					"parent": "bipedLeftLeg",
+					"pivot": [2, 12, 0],
+					"cubes": [
+						{"origin": [0, 0, -2], "size": [4, 3, 4], "inflate": 0.5, "uv": [16, 43]}
+					]
+				},
+				{
+					"name": "bipedRightLeg",
+					"pivot": [-2, 12, 0]
+				},
+				{
+					"name": "armorRightLeg",
+					"parent": "bipedRightLeg",
+					"pivot": [-2, 12, 0],
+					"cubes": [
+						{"origin": [-4, 3, -2], "size": [4, 9, 4], "inflate": 0.275, "uv": [36, 0], "mirror": true}
+					]
+				},
+				{
+					"name": "armorRightBoot",
+					"parent": "bipedRightLeg",
+					"pivot": [-2, 12, 0],
+					"cubes": [
+						{"origin": [-4, 0, -2], "size": [4, 3, 4], "inflate": 0.5, "uv": [16, 43], "mirror": true}
+					]
+				}
+			]
+		}
+	]
+}

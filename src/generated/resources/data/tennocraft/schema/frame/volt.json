@@ -1,0 +1,26 @@
+{
+  "type": "tennocraft:frame",
+  "abilities": [
+    "tennocraft:test"
+  ],
+  "armor": 0,
+  "description": "volt",
+  "energy": {
+    "first": 20,
+    "second": 1
+  },
+  "health": {
+    "first": 20,
+    "second": 1
+  },
+  "layout": {
+    "compatibility": "frame",
+    "slots": []
+  },
+  "shield": {
+    "first": 20,
+    "second": 1
+  },
+  "sprintSpeed": 0.0,
+  "startEnergy": 0
+}

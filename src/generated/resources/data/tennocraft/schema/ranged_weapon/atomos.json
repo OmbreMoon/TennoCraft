@@ -1,0 +1,75 @@
+{
+  "type": "tennocraft:ranged_weapon",
+  "attacks": {
+    "auto": [
+      {
+        "attack": {
+          "ammoCost": 0,
+          "fireRate": 0.0,
+          "multiShot": 0,
+          "projectileSpeed": 0.0,
+          "projectileType": {
+            "type": "tennocraft:hitscan",
+            "maxDistance": 300
+          },
+          "punchThrough": 0.0,
+          "spread": {
+            "max_inclusive": 6,
+            "min_inclusive": 2
+          }
+        },
+        "critChance": 0.0,
+        "critMultiplier": 0.0,
+        "damage": [],
+        "noise": "alarming",
+        "status": 0.0
+      }
+    ],
+    "semi": [
+      {
+        "attack": {
+          "ammoCost": 0,
+          "fireRate": 0.0,
+          "multiShot": 0,
+          "projectileSpeed": 0.0,
+          "projectileType": {
+            "type": "tennocraft:hitscan",
+            "maxDistance": 300
+          },
+          "punchThrough": 0.0,
+          "spread": {
+            "max_inclusive": 6,
+            "min_inclusive": 2
+          }
+        },
+        "critChance": 1.0,
+        "critMultiplier": 0.0,
+        "damage": [],
+        "noise": "alarming",
+        "status": 0.0
+      }
+    ]
+  },
+  "general": {
+    "layout": {
+      "compatibility": "primary",
+      "slots": []
+    },
+    "mastery": 0,
+    "maxRank": 30,
+    "slot": "secondary",
+    "triggerTypes": [
+      "auto",
+      "semi"
+    ]
+  },
+  "utility": {
+    "accuracy": "medium",
+    "ammoPickup": 0,
+    "fireRate": 0.0,
+    "magSize": 0,
+    "maxAmmo": 0,
+    "reloadTime": 0.0,
+    "rivenDisposition": 1.0
+  }
+}

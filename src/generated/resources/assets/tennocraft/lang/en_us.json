@@ -1,0 +1,13 @@
+{
+  "item.tennocraft.debug": "Debug",
+  "item.tennocraft.mod": "Mod",
+  "item.tennocraft.secondary_weapon": "Secondary Weapon",
+  "item.tennocraft.transference_key": "Transference Key",
+  "itemGroup.mods": "TennoCraft Mods",
+  "itemGroup.ranged": "TennoCraft Ranged Weapons",
+  "itemGroup.tennocraft": "TennoCraft",
+  "modification.tennocraft.pistol_gambit": "Pistol Gambit",
+  "tennocraft.frame.missing_description": "Missing Description",
+  "tennocraft.frame.volt": "Volt",
+  "tennocraft.ranged_weapon.atomos": "Atomos"
+}

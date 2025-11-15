@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.ombremoon.tennocraft.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "tennocraft.refmap.json",
+  "mixins": [
+    "ArmorSlotMixin"
+  ],
+  "client": [
+    "ItemRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

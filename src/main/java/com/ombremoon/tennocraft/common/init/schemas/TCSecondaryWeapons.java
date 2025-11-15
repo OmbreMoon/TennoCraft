@@ -1,0 +1,50 @@
+package com.ombremoon.tennocraft.common.init.schemas;
+
+import com.ombremoon.tennocraft.common.modholder.api.weapon.TriggerType;
+import com.ombremoon.tennocraft.common.modholder.api.weapon.WeaponBuilder;
+import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.world.item.weapon.WeaponSlot;
+import com.ombremoon.tennocraft.main.CommonClass;
+import com.ombremoon.tennocraft.main.Keys;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.data.worldgen.BootstrapContext;
+import net.minecraft.resources.ResourceKey;
+
+import java.util.List;
+
+public interface TCSecondaryWeapons {
+    List<ResourceKey<Schema>> SECONDARY_WEAPONS = new ObjectArrayList<>();
+
+    ResourceKey<Schema> ATOMOS = key("atomos");
+
+    static void bootstrap(BootstrapContext<Schema> context) {
+        register(
+                context,
+                ATOMOS,
+                WeaponBuilder.of()
+                        .slot(WeaponSlot.SECONDARY)
+                        .triggerTypes(TriggerType.AUTO, TriggerType.SEMI)
+                        .ranged()
+                            .utility()
+                                .buildUtility()
+                            .attack(TriggerType.AUTO)
+                                .withData()
+                                .createAttack()
+                                .buildAttack()
+                            .attack(TriggerType.SEMI)
+                                .critChance(1.0F)
+                                .withData()
+                                .createAttack()
+                                .buildAttack()
+        );
+    }
+
+    private static void register(BootstrapContext<Schema> context, ResourceKey<Schema> key, WeaponBuilder.Ranged builder) {
+        context.register(key, builder.build());
+        SECONDARY_WEAPONS.add(key);
+    }
+
+    private static ResourceKey<Schema> key(String name) {
+        return ResourceKey.create(Keys.SCHEMA, CommonClass.customLocation("ranged_weapon/" + name));
+    }
+}
