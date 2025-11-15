@@ -28,12 +28,13 @@ public abstract class RangedWeapon extends AbstractWeapon<RangedWeaponSchema> {
             Holder<Modification> mod = level.registryAccess().holderOrThrow(TCSecondaryWeaponMods.PISTOL_GAMBIT);
             var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
             if (handler != null) {
-//                handler.cycleAlternateFire(stack);
+                handler.cycleAlternateFire(stack);
                 ModContainer mods = this.getMods(stack);
                 log(mods);
 //                mods.modCache.setMod(0, new ModInstance(mod, 3));
 //                handler.confirmModChanges(stack);
 //                mods.confirmMods(this, stack);
+                log(handler.getTriggerType());
                 log(this.getStats(stack).getInstance(TCAttributes.CRIT_CHANCE).getValue());
             }
         }

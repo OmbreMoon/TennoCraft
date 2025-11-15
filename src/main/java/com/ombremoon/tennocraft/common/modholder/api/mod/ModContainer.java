@@ -119,7 +119,7 @@ public class ModContainer {
         this.clearCachedMods();
     }
 
-    private void collectModdedAttributes(IModHolder<?> holder, ItemStack stack) {
+    public void collectModdedAttributes(IModHolder<?> holder, ItemStack stack) {
         if (stack != null) {
             AttributeMap attributes = holder.getStats(stack);
             ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {

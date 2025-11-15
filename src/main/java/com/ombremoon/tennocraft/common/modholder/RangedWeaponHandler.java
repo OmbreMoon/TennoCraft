@@ -11,10 +11,11 @@ import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.modholder.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
 import com.ombremoon.tennocraft.common.world.item.IModHolder;
+import com.ombremoon.tennocraft.util.ModHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
@@ -52,21 +53,25 @@ public class RangedWeaponHandler {
         }
 
         this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
-        if (tag.contains("Stats", 9)) {
-            ListTag listTag = tag.getList("Stats", 10);
-            this.stats.load(listTag);
+        if (tag.contains("Stats")) {
+            CompoundTag nbt = tag.getCompound("Stats");
+            String trigger = this.triggerType.getSerializedName();
+            if (nbt.contains(trigger, 9)) {
+                ListTag listTag = nbt.getList(this.triggerType.getSerializedName(), 10);
+                this.stats.load(listTag);
+            }
         }
     }
 
     public void cycleAlternateFire(ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.cycleAlternateFire(this.triggerType);
+        mutable.cycleAlternateFire(stack, this.triggerType);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
     public void confirmModChanges(ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(stack, this.mods, this.stats);
+        mutable.confirmModChanges(stack, this.mods, this.stats, this.triggerType);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -115,20 +120,44 @@ public class RangedWeaponHandler {
             this.schema = handler.schema;
         }
 
-        public void confirmModChanges(ItemStack stack, ModContainer container, AttributeMap stats) {
-            container.confirmMods((IModHolder<?>) stack.getItem(), stack);
+        public void confirmModChanges(ItemStack stack, ModContainer mods, AttributeMap stats, TriggerType triggerType) {
+            mods.confirmMods((IModHolder<?>) stack.getItem(), stack);
             ListTag modList = new ListTag();
-            ListTag statList = stats.save();
-            modList = container.save(modList);
+            modList = mods.save(modList);
             this.tag.put("Mods", modList);
-            this.tag.put("Stats", statList);
+            this.saveStats(stats, triggerType);
         }
 
-        public <T extends TriggerType> void cycleAlternateFire(T triggerType) {
+        public <T extends TriggerType> void cycleAlternateFire(ItemStack stack, T triggerType) {
             var type = findNextTypeInList(this.schema.getProperties().triggers(), triggerType);
             if (type != triggerType) {
                 this.tag.putString("TriggerType", type.getSerializedName());
+                this.setAlternateFireAttributes(stack, type);
             }
+        }
+
+        private void setAlternateFireAttributes(ItemStack stack, TriggerType type) {
+            var attacks = this.schema.getProperties().getAttacks(type);
+            var stats = new AttributeMap(createRangedWeaponAttributes(attacks.getFirst()));
+            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
+                AttributeInstance instance = stats.getInstance(attributeHolder);
+                if (instance != null) {
+                    instance.removeModifier(attributeModifier);
+                }
+
+                //Stop Location Based Effects
+            });
+            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
+                AttributeInstance instance = stats.getInstance(attributeHolder);
+                if (instance != null) {
+                    instance.removeModifier(attributeModifier.id());
+                    instance.addPermanentModifier(attributeModifier);
+                }
+
+                //Run Location Changed Effects
+            });
+
+            this.saveStats(stats, type);
         }
 
         private static <T> T findNextTypeInList(Collection<T> list, T current) {
@@ -144,6 +173,13 @@ public class RangedWeaponHandler {
             }
 
             return list.isEmpty() ? current : list.iterator().next();
+        }
+
+        private void saveStats(AttributeMap stats, TriggerType triggerType) {
+            CompoundTag nbt = new CompoundTag();
+            ListTag statList = stats.save();
+            nbt.put(triggerType.getSerializedName(), statList);
+            this.tag.put("Stats", nbt);
         }
 
         public RangedWeaponHandler toImmutable() {
