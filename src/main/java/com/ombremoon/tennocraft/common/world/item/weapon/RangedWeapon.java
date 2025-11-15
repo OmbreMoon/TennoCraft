@@ -26,17 +26,16 @@ public abstract class RangedWeapon extends AbstractWeapon<RangedWeaponSchema> {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!level.isClientSide) {
             Holder<Modification> mod = level.registryAccess().holderOrThrow(TCSecondaryWeaponMods.PISTOL_GAMBIT);
-            var instance = new ModInstance(mod, 3);
-            CompoundTag tag = instance.save();
-            log(tag);
-//            var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
-//            if (handler != null) {
+            var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
+            if (handler != null) {
 //                handler.cycleAlternateFire(stack);
-//                ModContainer mods = this.getMods(stack);
-//                this.getMods(stack).modCache.setMod(0, new ModInstance(mod, 3));
+                ModContainer mods = this.getMods(stack);
+                log(mods);
+//                mods.modCache.setMod(0, new ModInstance(mod, 3));
 //                handler.confirmModChanges(stack);
-//                log(this.getStats(stack).getInstance(TCAttributes.CRIT_CHANCE).getValue());
-//            }
+//                mods.confirmMods(this, stack);
+                log(this.getStats(stack).getInstance(TCAttributes.CRIT_CHANCE).getValue());
+            }
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
     }

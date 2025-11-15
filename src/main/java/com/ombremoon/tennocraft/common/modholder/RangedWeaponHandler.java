@@ -66,7 +66,7 @@ public class RangedWeaponHandler {
 
     public void confirmModChanges(ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(stack, this.mods);
+        mutable.confirmModChanges(stack, this.mods, this.stats);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -115,11 +115,13 @@ public class RangedWeaponHandler {
             this.schema = handler.schema;
         }
 
-        public void confirmModChanges(ItemStack stack, ModContainer container) {
+        public void confirmModChanges(ItemStack stack, ModContainer container, AttributeMap stats) {
             container.confirmMods((IModHolder<?>) stack.getItem(), stack);
-            ListTag listTag = new ListTag();
-            listTag = container.save(listTag);
-            this.tag.put("Mods", listTag);
+            ListTag modList = new ListTag();
+            ListTag statList = stats.save();
+            modList = container.save(modList);
+            this.tag.put("Mods", modList);
+            this.tag.put("Stats", statList);
         }
 
         public <T extends TriggerType> void cycleAlternateFire(T triggerType) {

@@ -1,13 +1,29 @@
 package com.ombremoon.tennocraft.common.modholder.api.mod;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import org.slf4j.Logger;
 
 public record ModInstance(Holder<Modification> mod, int rank) {
     public static final Logger LOGGER = Constants.LOG;
+    public static final Codec<ModInstance> CODEC = RecordCodecBuilder.create(
+            instance -> instance.group(
+                    Modification.CODEC.fieldOf("mod").forGetter(ModInstance::mod),
+                    Codec.INT.fieldOf("rank").forGetter(ModInstance::rank)
+            ).apply(instance, ModInstance::new)
+    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, ModInstance> STREAM_CODEC = StreamCodec.composite(
+            Modification.STREAM_CODEC, ModInstance::mod,
+            ByteBufCodecs.VAR_INT, ModInstance::rank,
+            ModInstance::new
+    );
     public static final ModInstance EMPTY = new ModInstance(Holder.direct(Modification.EMPTY), 0);
 
     public boolean isEmpty() {
@@ -25,10 +41,18 @@ public record ModInstance(Holder<Modification> mod, int rank) {
     }
 
     public static ModInstance load(CompoundTag compoundTag) {
-        Holder<Modification> mod = Modification.CODEC
-                .parse(NbtOps.INSTANCE, compoundTag.get("Mod"))
-                .getOrThrow();
-        return new ModInstance(mod, compoundTag.getInt("Rank"));
+        if (compoundTag.contains("ModInstance")) {
+            CompoundTag tag = compoundTag.getCompound("ModInstance");
+            Holder<Modification> mod = Modification.CODEC
+                    .parse(NbtOps.INSTANCE, tag.get("Mod"))
+                    .resultOrPartial(LOGGER::error)
+                    .orElse(null);
+            if (mod != null) {
+                return new ModInstance(mod, tag.getInt("Rank"));
+            }
+        }
+
+        return null;
     }
 
     public static class Mutable {

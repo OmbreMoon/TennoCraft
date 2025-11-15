@@ -22,7 +22,7 @@ public interface TCSecondaryWeaponMods {
                 PISTOL_GAMBIT,
                 Modification.mod(
                         Modification.definition(
-                                schemas.getOrThrow(TCTags.Schemas.PISTOL),
+//                                schemas.getOrThrow(TCTags.Schemas.PISTOL),
                                 ModType.STANDARD,
                                 ModPolarity.MADURAI,
                                 Modification.dynamicDrain(4),

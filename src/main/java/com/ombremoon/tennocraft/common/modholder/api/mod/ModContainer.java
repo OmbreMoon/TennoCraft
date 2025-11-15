@@ -73,11 +73,12 @@ public class ModContainer {
     public void load(ListTag listTag) {
         this.mods.clear();
 
-//        for (int i = 0; i < listTag.size(); i++) {
-//            CompoundTag compoundTag = listTag.getCompound(i);
-//            ModInstance mod = ModInstance.load(compoundTag);
-//            this.mods.set(compoundTag.getByte("Slot"), mod);
-//        }
+        for (int i = 0; i < listTag.size(); i++) {
+            CompoundTag compoundTag = listTag.getCompound(i);
+            ModInstance mod = ModInstance.load(compoundTag);
+            if (mod != null)
+                this.mods.set(compoundTag.getByte("Slot"), mod);
+        }
     }
 
     public void loadCache() {
@@ -133,7 +134,7 @@ public class ModContainer {
                 AttributeInstance instance = holder.getStats(stack).getInstance(attributeHolder);
                 if (instance != null) {
                     instance.removeModifier(attributeModifier.id());
-                    instance.addTransientModifier(attributeModifier);
+                    instance.addPermanentModifier(attributeModifier);
                 }
 
                 //Run Location Changed Effects
@@ -152,7 +153,7 @@ public class ModContainer {
                 AttributeInstance instance = holder.getStats().getInstance(attributeHolder);
                 if (instance != null) {
                     instance.removeModifier(attributeModifier.id());
-                    instance.addTransientModifier(attributeModifier);
+                    instance.addPermanentModifier(attributeModifier);
                 }
 
                 //Run Location Changed Effects

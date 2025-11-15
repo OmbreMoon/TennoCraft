@@ -34,8 +34,8 @@ public class TCData {
     public static final Supplier<DataComponentType<RangedWeaponHandler>> RANGED_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("ranged_weapon_handler",
             builder -> builder.persistent(RangedWeaponHandler.CODEC));
 
-    public static final Supplier<DataComponentType<Holder<Modification>>> MOD = COMPONENT_TYPES.registerComponentType("mod",
-            builder -> builder.persistent(Modification.CODEC).networkSynchronized(Modification.STREAM_CODEC));
+    public static final Supplier<DataComponentType<ModInstance>> MOD = COMPONENT_TYPES.registerComponentType("mod",
+            builder -> builder.persistent(ModInstance.CODEC).networkSynchronized(ModInstance.STREAM_CODEC));
 
     public static void register(IEventBus modEventBus) {
         TCData.ATTACHMENT_TYPES.register(modEventBus);
