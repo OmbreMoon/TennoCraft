@@ -27,7 +27,7 @@ public class ModItem extends Item implements Loggable {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         ItemStack stack = player.getItemInHand(usedHand);
         if (!level.isClientSide) {
-            log(stack.get(TCData.MOD).save());
+            log(stack.get(TCData.MOD).save(level.registryAccess()));
         }
         return super.use(level, player, usedHand);
     }

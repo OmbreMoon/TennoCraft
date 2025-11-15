@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.modholder.api.mod;
 
 import com.ombremoon.tennocraft.common.world.item.IModHolder;
 import com.ombremoon.tennocraft.util.ModHelper;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
@@ -56,13 +57,13 @@ public class ModContainer {
         this.mods.set(slot, mod);
     }
 
-    public ListTag save(ListTag listTag) {
+    public ListTag save(ListTag listTag, HolderLookup.Provider provider) {
         for (int i = 0; i < this.mods.size(); i++) {
             ModInstance mod = this.mods.get(i);
             if (!mod.isEmpty()) {
                 CompoundTag tag = new CompoundTag();
                 tag.putByte("Slot", (byte) i);
-                tag.put("ModInstance", mod.save());
+                tag.put("ModInstance", mod.save(provider));
                 listTag.add(tag);
             }
         }
@@ -70,14 +71,16 @@ public class ModContainer {
         return listTag;
     }
 
-    public void load(ListTag listTag) {
+    public void load(ListTag listTag, HolderLookup.Provider provider) {
         this.mods.clear();
 
         for (int i = 0; i < listTag.size(); i++) {
             CompoundTag compoundTag = listTag.getCompound(i);
-            ModInstance mod = ModInstance.load(compoundTag);
-            if (mod != null)
-                this.mods.set(compoundTag.getByte("Slot"), mod);
+            if (compoundTag.contains("ModInstance")) {
+                ModInstance mod = ModInstance.load(compoundTag, provider);
+                if (mod != null)
+                    this.mods.set(compoundTag.getByte("Slot"), mod);
+            }
         }
     }
 

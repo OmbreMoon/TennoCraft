@@ -3,12 +3,15 @@ package com.ombremoon.tennocraft.common.modholder.api.mod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.main.Constants;
+import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 
 public record ModInstance(Holder<Modification> mod, int rank) {
@@ -30,29 +33,19 @@ public record ModInstance(Holder<Modification> mod, int rank) {
         return this.mod.value().isEmpty();
     }
 
-    public CompoundTag save() {
+    public CompoundTag save(HolderLookup.Provider provider) {
         CompoundTag compoundTag = new CompoundTag();
-        Modification.CODEC
-                .encodeStart(NbtOps.INSTANCE, this.mod)
-                .resultOrPartial(LOGGER::error)
-                .ifPresent(nbt -> compoundTag.put("Mod", nbt));
+        compoundTag.putString("Mod", this.mod.getKey().location().toString());
         compoundTag.putInt("Rank", this.rank);
         return compoundTag;
     }
 
-    public static ModInstance load(CompoundTag compoundTag) {
-        if (compoundTag.contains("ModInstance")) {
-            CompoundTag tag = compoundTag.getCompound("ModInstance");
-            Holder<Modification> mod = Modification.CODEC
-                    .parse(NbtOps.INSTANCE, tag.get("Mod"))
-                    .resultOrPartial(LOGGER::error)
-                    .orElse(null);
-            if (mod != null) {
-                return new ModInstance(mod, tag.getInt("Rank"));
-            }
-        }
-
-        return null;
+    public static ModInstance load(CompoundTag compoundTag, HolderLookup.Provider provider) {
+        CompoundTag tag = compoundTag.getCompound("ModInstance");
+        ResourceLocation location = ResourceLocation.parse(tag.getString("Mod"));
+        var key = ResourceKey.create(Keys.MOD, location);
+        Holder<Modification> mod = provider.holder(key).orElse(null);
+        return mod != null ? new ModInstance(mod, tag.getInt("Rank")) : null;
     }
 
     public static class Mutable {

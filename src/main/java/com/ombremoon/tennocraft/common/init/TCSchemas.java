@@ -14,7 +14,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 import java.util.function.Supplier;
 
 public class TCSchemas {
-    public static final ResourceKey<Registry<SchemaSerializer<?>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("schema"));
+    public static final ResourceKey<Registry<SchemaSerializer<?>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("schema_types"));
     public static final Registry<SchemaSerializer<?>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
     public static final DeferredRegister<SchemaSerializer<?>> SCHEMAS = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
 

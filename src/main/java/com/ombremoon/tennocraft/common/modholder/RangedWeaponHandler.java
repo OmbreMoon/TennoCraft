@@ -4,27 +4,31 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.init.TCAttributes;
 import com.ombremoon.tennocraft.common.init.TCData;
+import com.ombremoon.tennocraft.common.modholder.api.mod.ModContainer;
+import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
 import com.ombremoon.tennocraft.common.modholder.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.RangedAttackSchema;
 import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModContainer;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
 import com.ombremoon.tennocraft.common.world.item.IModHolder;
+import com.ombremoon.tennocraft.util.Loggable;
 import com.ombremoon.tennocraft.util.ModHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class RangedWeaponHandler {
+public class RangedWeaponHandler implements Loggable {
     public static final Codec<RangedWeaponHandler> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     CompoundTag.CODEC.fieldOf("tag").forGetter(handler -> handler.tag),
@@ -34,14 +38,20 @@ public class RangedWeaponHandler {
 
     private final CompoundTag tag;
     private final RangedWeaponSchema schema;
+    private final List<RangedAttackSchema> attacks = new ObjectArrayList<>();
     private final ModContainer mods;
     private final AttributeMap stats;
-    private final List<RangedAttackSchema> attacks = new ObjectArrayList<>();
     private TriggerType triggerType;
+    private RegistryAccess registries;
 
     public RangedWeaponHandler(CompoundTag tag, Schema schema) {
         this.tag = tag;
         this.schema = (RangedWeaponSchema) schema;
+
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            this.registries = server.registryAccess();
+        }
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.triggerType = this.getTriggerType();
@@ -49,7 +59,7 @@ public class RangedWeaponHandler {
         this.mods = new ModContainer(compatibility);
         if (tag.contains("Mods", 9)) {
             ListTag listTag = tag.getList("Mods", 10);
-            this.mods.load(listTag);
+            this.mods.load(listTag, this.registries);
         }
 
         this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
@@ -73,6 +83,10 @@ public class RangedWeaponHandler {
         Mutable mutable = new Mutable(this);
         mutable.confirmModChanges(stack, this.mods, this.stats, this.triggerType);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
+    }
+
+    public CompoundTag getTag() {
+        return this.tag;
     }
 
     public RangedWeaponSchema getSchema() {
@@ -114,16 +128,18 @@ public class RangedWeaponHandler {
     public static class Mutable {
         private final CompoundTag tag;
         private final RangedWeaponSchema schema;
+        private final RegistryAccess registries;
 
         public Mutable(RangedWeaponHandler handler) {
             this.tag = handler.tag;
             this.schema = handler.schema;
+            this.registries = handler.registries;
         }
 
         public void confirmModChanges(ItemStack stack, ModContainer mods, AttributeMap stats, TriggerType triggerType) {
             mods.confirmMods((IModHolder<?>) stack.getItem(), stack);
             ListTag modList = new ListTag();
-            modList = mods.save(modList);
+            modList = mods.save(modList, this.registries);
             this.tag.put("Mods", modList);
             this.saveStats(stats, triggerType);
         }
