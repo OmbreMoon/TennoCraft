@@ -35,17 +35,29 @@ public record ModInstance(Holder<Modification> mod, int rank) {
 
     public CompoundTag save(HolderLookup.Provider provider) {
         CompoundTag compoundTag = new CompoundTag();
-        compoundTag.putString("Mod", this.mod.getKey().location().toString());
+        this.mod.unwrapKey().ifPresentOrElse(
+                key -> compoundTag.putString("Mod", key.location().toString()),
+                () -> LOGGER.warn("Attempted to save direct holder without key")
+        );
         compoundTag.putInt("Rank", this.rank);
         return compoundTag;
     }
 
-    public static ModInstance load(CompoundTag compoundTag, HolderLookup.Provider provider) {
-        CompoundTag tag = compoundTag.getCompound("ModInstance");
+    public static ModInstance load(CompoundTag tag, HolderLookup.Provider provider) {
+        if (!tag.contains("Mod")) {
+            return EMPTY;
+        }
+        
         ResourceLocation location = ResourceLocation.parse(tag.getString("Mod"));
-        var key = ResourceKey.create(Keys.MOD, location);
-        Holder<Modification> mod = provider.holder(key).orElse(null);
-        return mod != null ? new ModInstance(mod, tag.getInt("Rank")) : null;
+        ResourceKey<Modification> key = ResourceKey.create(Keys.MOD, location);
+        
+        return provider.lookup(Keys.MOD)
+                .flatMap(lookup -> lookup.get(key))
+                .map(holder -> new ModInstance(holder, tag.getInt("Rank")))
+                .orElseGet(() -> {
+                    LOGGER.warn("Failed to load mod with key: {}", key.location());
+                    return EMPTY;
+                });
     }
 
     public static class Mutable {
