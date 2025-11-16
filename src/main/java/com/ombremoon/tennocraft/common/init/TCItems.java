@@ -59,7 +59,7 @@ public class TCItems {
                         SchemaDirectory.getRangedWeapons().forEach(schema -> {
                             ItemStack stack = new ItemStack(SECONDARY_WEAPON.get());
                             stack.set(TCData.SCHEMA, schema);
-                            stack.set(TCData.RANGED_WEAPON_HANDLER, new RangedWeaponHandler(new CompoundTag(), itemDisplayParameters.holders().holderOrThrow(schema.schemaKey()).value()));
+                            stack.set(TCData.RANGED_WEAPON_HANDLER, new RangedWeaponHandler(new CompoundTag(), itemDisplayParameters.holders().holderOrThrow(schema.schemaKey()).value(), itemDisplayParameters.holders()));
                             output.accept(stack);
                         });
                     }).title(Component.translatable("itemGroup.ranged"))

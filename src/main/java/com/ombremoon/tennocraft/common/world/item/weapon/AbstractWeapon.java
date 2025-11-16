@@ -47,13 +47,21 @@ public abstract class AbstractWeapon<T extends WeaponSchema> extends Item implem
     @Override
     public ModContainer getMods(ItemStack stack) {
         var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
-        return handler != null ? handler.getMods() : null;
+        if (handler != null) {
+            handler.ensureRegistryAccess(stack);
+            return handler.getMods();
+        }
+        return null;
     }
 
     @Override
     public AttributeMap getStats(ItemStack stack) {
         var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
-        return handler != null ? handler.getStats() : null;
+        if (handler != null) {
+            handler.ensureRegistryAccess(stack);
+            return handler.getStats();
+        }
+        return null;
     }
 
     @Override

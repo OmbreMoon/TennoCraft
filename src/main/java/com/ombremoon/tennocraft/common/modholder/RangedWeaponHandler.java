@@ -14,7 +14,7 @@ import com.ombremoon.tennocraft.common.world.item.IModHolder;
 import com.ombremoon.tennocraft.util.Loggable;
 import com.ombremoon.tennocraft.util.ModHelper;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
@@ -24,16 +24,26 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
+import javax.annotation.Nullable;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 public class RangedWeaponHandler implements Loggable {
-    public static final Codec<RangedWeaponHandler> CODEC = RecordCodecBuilder.create(
-            instance -> instance.group(
-                    CompoundTag.CODEC.fieldOf("tag").forGetter(handler -> handler.tag),
-                    Schema.DIRECT_CODEC.fieldOf("schema").forGetter(handler -> handler.schema)
-            ).apply(instance, RangedWeaponHandler::new)
+    public static final Codec<RangedWeaponHandler> CODEC = Codec.withAlternative(
+            RecordCodecBuilder.create(
+                    instance -> instance.group(
+                            CompoundTag.CODEC.fieldOf("tag").forGetter(handler -> handler.tag),
+                            Schema.DIRECT_CODEC.fieldOf("schema").forGetter(handler -> handler.schema)
+                    ).apply(instance, RangedWeaponHandler::forCodec)
+            ),
+            RecordCodecBuilder.create(
+                    instance -> instance.group(
+                            CompoundTag.CODEC.fieldOf("tag").forGetter(handler -> handler.tag),
+                            Schema.DIRECT_CODEC.fieldOf("schema").forGetter(handler -> handler.schema)
+                    ).apply(instance, RangedWeaponHandler::forCodec)
+            )
     );
 
     private final CompoundTag tag;
@@ -42,24 +52,25 @@ public class RangedWeaponHandler implements Loggable {
     private final ModContainer mods;
     private final AttributeMap stats;
     private TriggerType triggerType;
-    private RegistryAccess registries;
+    @Nullable
+    private HolderLookup.Provider registries;
 
-    public RangedWeaponHandler(CompoundTag tag, Schema schema) {
+    private static RangedWeaponHandler forCodec(CompoundTag tag, Schema schema) {
+        return new RangedWeaponHandler(tag, schema, null);
+    }
+
+    public RangedWeaponHandler(CompoundTag tag, Schema schema, @Nullable HolderLookup.Provider registries) {
         this.tag = tag;
         this.schema = (RangedWeaponSchema) schema;
-
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        if (server != null) {
-            this.registries = server.registryAccess();
-        }
+        this.registries = registries;
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.triggerType = this.getTriggerType();
         this.attacks.addAll(this.schema.getProperties().getAttacks(this.triggerType));
         this.mods = new ModContainer(compatibility);
-        if (tag.contains("Mods", 9)) {
+        if (tag.contains("Mods", 9) && registries != null) {
             ListTag listTag = tag.getList("Mods", 10);
-            this.mods.load(listTag, this.registries);
+            this.mods.load(listTag, registries);
         }
 
         this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
@@ -69,6 +80,25 @@ public class RangedWeaponHandler implements Loggable {
             if (nbt.contains(trigger, 9)) {
                 ListTag listTag = nbt.getList(this.triggerType.getSerializedName(), 10);
                 this.stats.load(listTag);
+            }
+        }
+    }
+
+    public void setRegistries(HolderLookup.Provider registries) {
+        if (this.registries == null) {
+            this.registries = registries;
+            if (this.tag.contains("Mods", 9)) {
+                ListTag listTag = this.tag.getList("Mods", 10);
+                this.mods.load(listTag, registries);
+            }
+        }
+    }
+
+    public void ensureRegistryAccess(ItemStack stack) {
+        if (this.registries == null) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            if (server != null) {
+                setRegistries(server.registryAccess());
             }
         }
     }
@@ -128,7 +158,8 @@ public class RangedWeaponHandler implements Loggable {
     public static class Mutable {
         private final CompoundTag tag;
         private final RangedWeaponSchema schema;
-        private final RegistryAccess registries;
+        @Nullable
+        private final HolderLookup.Provider registries;
 
         public Mutable(RangedWeaponHandler handler) {
             this.tag = handler.tag;
@@ -199,7 +230,7 @@ public class RangedWeaponHandler implements Loggable {
         }
 
         public RangedWeaponHandler toImmutable() {
-            return new RangedWeaponHandler(this.tag, this.schema);
+            return new RangedWeaponHandler(this.tag, this.schema, this.registries);
         }
     }
 }
