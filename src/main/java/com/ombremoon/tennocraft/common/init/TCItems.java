@@ -1,22 +1,22 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.modholder.RangedWeaponHandler;
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModInstance;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.ModInstance;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.world.SchemaDirectory;
 import com.ombremoon.tennocraft.common.world.item.DebugItem;
 import com.ombremoon.tennocraft.common.world.item.ModItem;
 import com.ombremoon.tennocraft.common.world.item.TransferenceKeyItem;
-import com.ombremoon.tennocraft.common.world.item.weapon.SecondaryWeapon;
+import com.ombremoon.tennocraft.common.world.item.weapon.MeleeWeaponItem;
+import com.ombremoon.tennocraft.common.world.item.weapon.PrimaryWeaponItem;
+import com.ombremoon.tennocraft.common.world.item.weapon.RangedWeaponItem;
+import com.ombremoon.tennocraft.common.world.item.weapon.SecondaryWeaponItem;
+import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -35,13 +35,15 @@ public class TCItems {
 
     public static final Supplier<Item> DEBUG = ITEMS.register("debug", () -> new DebugItem(new Item.Properties()));
     public static final Supplier<Item> TRANSFERENCE_KEY = registerItem("transference_key", () -> new TransferenceKeyItem(itemProperties()), false, true);
-    public static final Supplier<Item> SECONDARY_WEAPON = registerItem("secondary_weapon", () -> new SecondaryWeapon(itemProperties()), true, true);
+    public static final Supplier<Item> PRIMARY_WEAPON = registerItem("primary_weapon", () -> new PrimaryWeaponItem(itemProperties()), true, true);
+    public static final Supplier<Item> SECONDARY_WEAPON = registerItem("secondary_weapon", () -> new SecondaryWeaponItem(itemProperties()), true, true);
+    public static final Supplier<Item> MELEE_WEAPON = registerItem("melee_weapon", () -> new MeleeWeaponItem(itemProperties()), true, true);
     public static final Supplier<Item> MOD = registerItem("mod", () -> new ModItem(itemProperties()), false, true);
 
     public static final Supplier<CreativeModeTab> FRAME_TAB = CREATIVE_MODE_TABS.register("frames", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP,0)
             .icon(() -> new ItemStack(TRANSFERENCE_KEY.get()))
             .displayItems(
-                    (itemDisplayParameters, output)-> {
+                    (itemDisplayParameters, output) -> {
                         ITEMS.getEntries().forEach((registryObject)-> {
                             if (!EXCLUDED_ITEMS.contains(registryObject))
                                 output.accept(new ItemStack(registryObject.get()));
@@ -50,28 +52,38 @@ public class TCItems {
                         SchemaDirectory.getFrames().forEach(schema -> {
                             output.accept(TransferenceKeyItem.createWithFrame(schema));
                         });
-                    }).title(Component.translatable("itemGroup.tennocraft"))
+                    })
+            .title(Component.translatable("itemGroup.tennocraft"))
             .build());
     public static final Supplier<CreativeModeTab> RANGED_TAB = CREATIVE_MODE_TABS.register("ranged", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP,0)
             .icon(() -> new ItemStack(SECONDARY_WEAPON.get()))
             .displayItems(
-                    (itemDisplayParameters, output)-> {
+                    (itemDisplayParameters, output) -> {
                         SchemaDirectory.getRangedWeapons().forEach(schema -> {
-                            ItemStack stack = new ItemStack(SECONDARY_WEAPON.get());
-                            stack.set(TCData.SCHEMA, schema);
-                            stack.set(TCData.RANGED_WEAPON_HANDLER, new RangedWeaponHandler(new CompoundTag(), itemDisplayParameters.holders().holderOrThrow(schema.schemaKey()).value(), itemDisplayParameters.holders()));
-                            output.accept(stack);
+                            output.accept(RangedWeaponItem.createWithRangedSchema(schema, itemDisplayParameters.holders()));
                         });
-                    }).title(Component.translatable("itemGroup.ranged"))
+                    })
+            .title(Component.translatable("itemGroup.ranged"))
+            .build());
+    public static final Supplier<CreativeModeTab> MELEE_TAB = CREATIVE_MODE_TABS.register("melee", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP,0)
+            .icon(() -> new ItemStack(MELEE_WEAPON.get()))
+            .displayItems(
+                    (itemDisplayParameters, output) -> {
+                        SchemaDirectory.getMeleeWeapons().forEach(schema -> {
+                            output.accept(MeleeWeaponItem.createWithMeleeSchema(schema, itemDisplayParameters.holders()));
+                        });
+                    })
+            .title(Component.translatable("itemGroup.melee"))
             .build());
     public static final Supplier<CreativeModeTab> MOD_TAB = CREATIVE_MODE_TABS.register("mods", () -> CreativeModeTab.builder(CreativeModeTab.Row.TOP,0)
             .icon(() -> new ItemStack(MOD.get()))
             .displayItems(
-                    (itemDisplayParameters, output)-> {
+                    (itemDisplayParameters, output) -> {
                         itemDisplayParameters.holders().lookup(Keys.MOD).ifPresent(lookup -> {
                             generateMods(output, lookup);
                         });
-                    }).title(Component.translatable("itemGroup.mods"))
+                    })
+            .title(Component.translatable("itemGroup.mods"))
             .build());
 
     private static void generateMods(

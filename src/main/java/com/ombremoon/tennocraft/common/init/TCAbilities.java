@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.modholder.api.AbilityType;
-import com.ombremoon.tennocraft.common.modholder.api.PassiveAbilityType;
+import com.ombremoon.tennocraft.common.api.AbilityType;
+import com.ombremoon.tennocraft.common.api.PassiveAbilityType;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Holder;

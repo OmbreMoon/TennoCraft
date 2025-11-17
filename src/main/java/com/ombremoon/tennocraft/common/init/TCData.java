@@ -1,16 +1,13 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.modholder.FrameHandler;
-import com.ombremoon.tennocraft.common.modholder.RangedWeaponHandler;
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModInstance;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
+import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
+import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
+import com.ombremoon.tennocraft.common.api.mod.ModInstance;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import com.ombremoon.tennocraft.main.Constants;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -35,6 +32,9 @@ public class TCData {
 
     public static final Supplier<DataComponentType<RangedWeaponHandler>> RANGED_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("ranged_weapon_handler",
             builder -> builder.persistent(RangedWeaponHandler.CODEC));
+
+    public static final Supplier<DataComponentType<MeleeWeaponHandler>> MELEE_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("melee_weapon_handler",
+            builder -> builder.persistent(MeleeWeaponHandler.CODEC));
 
     public static final Supplier<DataComponentType<ModInstance>> MOD = COMPONENT_TYPES.registerComponentType("mod",
             builder -> builder.persistent(ModInstance.CODEC).networkSynchronized(ModInstance.STREAM_CODEC));

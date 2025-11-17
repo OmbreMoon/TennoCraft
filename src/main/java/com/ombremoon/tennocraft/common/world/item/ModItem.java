@@ -2,7 +2,7 @@ package com.ombremoon.tennocraft.common.world.item;
 
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCItems;
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModInstance;
+import com.ombremoon.tennocraft.common.api.mod.ModInstance;
 import com.ombremoon.tennocraft.util.Loggable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;

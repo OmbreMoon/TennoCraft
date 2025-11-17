@@ -1,0 +1,31 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 2,
+      "per_rank": 1
+    },
+    "maxRank": 5,
+    "polarity": "madurai",
+    "rarity": "rare",
+    "supports": "#tennocraft:frame"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:attributes": [
+      {
+        "amount": {
+          "type": "tennocraft:linear",
+          "base": 0.05,
+          "per_rank": 0.05
+        },
+        "attribute": "tennocraft:ability_duration",
+        "id": "tennocraft:mod.continuity",
+        "operation": "add_multiplied_total"
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.continuity"
+  }
+}

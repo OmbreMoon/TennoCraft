@@ -1,0 +1,31 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 4,
+      "per_rank": 1
+    },
+    "maxRank": 5,
+    "polarity": "madurai",
+    "rarity": "common",
+    "supports": "#tennocraft:melee"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:attributes": [
+      {
+        "amount": {
+          "type": "tennocraft:linear",
+          "base": 0.05,
+          "per_rank": 0.05
+        },
+        "attribute": "minecraft:generic.attack_speed",
+        "id": "tennocraft:mod.fury",
+        "operation": "add_multiplied_total"
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.fury"
+  }
+}

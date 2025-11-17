@@ -1,7 +1,8 @@
 package com.ombremoon.tennocraft.common.world.item;
 
-import com.ombremoon.tennocraft.common.modholder.api.FrameSchema;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.FrameSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCItems;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
@@ -38,6 +39,10 @@ public class TransferenceKeyItem extends Item implements GeoItem {
     }
 
     public static ItemStack createWithFrame(SchemaHolder schema) {
+        if (!(schema.schema() instanceof FrameSchema)) {
+            throw new IllegalStateException("Tried to create transference key with invalid schema: " + schema.schemaKey());
+        }
+
         ItemStack key = new ItemStack(TCItems.TRANSFERENCE_KEY.get());
         key.set(TCData.SCHEMA, schema);
         return key;

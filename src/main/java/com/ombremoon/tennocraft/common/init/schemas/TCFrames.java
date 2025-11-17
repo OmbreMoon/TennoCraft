@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.common.init.schemas;
 
-import com.ombremoon.tennocraft.common.modholder.api.FrameBuilder;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.FrameBuilder;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCAbilities;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import java.util.List;
 
 public interface TCFrames {
-    List<ResourceKey<Schema>> FRAMES = new ObjectArrayList<>();
 
     ResourceKey<Schema> VOLT = key("volt");
 
@@ -29,7 +28,7 @@ public interface TCFrames {
 
     private static void register(BootstrapContext<Schema> context, ResourceKey<Schema> key, FrameBuilder builder) {
         context.register(key, builder.build());
-        FRAMES.add(key);
+        Schemas.SCHEMAS.add(key);
     }
 
     private static ResourceKey<Schema> key(String name) {

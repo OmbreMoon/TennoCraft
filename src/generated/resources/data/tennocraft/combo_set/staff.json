@@ -1,0 +1,36 @@
+{
+  "neutral": [
+    {
+      "animation": "tennocraft:staff_auto_1",
+      "multipliers": [
+        {
+          "multiplier": 1.0
+        }
+      ]
+    },
+    {
+      "animation": "tennocraft:staff_auto_2",
+      "multipliers": [
+        {
+          "multiplier": 1.0
+        }
+      ]
+    },
+    {
+      "animation": "tennocraft:staff_auto_3",
+      "multipliers": [
+        {
+          "multiplier": 1.0
+        }
+      ]
+    },
+    {
+      "animation": "tennocraft:staff_auto_4",
+      "multipliers": [
+        {
+          "multiplier": 1.0
+        }
+      ]
+    }
+  ]
+}

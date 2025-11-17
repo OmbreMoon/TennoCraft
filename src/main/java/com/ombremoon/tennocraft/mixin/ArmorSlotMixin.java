@@ -1,6 +1,6 @@
 package com.ombremoon.tennocraft.mixin;
 
-import com.ombremoon.tennocraft.common.modholder.FrameHandler;
+import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.ArmorSlot;

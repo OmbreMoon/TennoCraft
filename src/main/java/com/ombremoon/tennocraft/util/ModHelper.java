@@ -1,9 +1,9 @@
 package com.ombremoon.tennocraft.util;
 
 import com.ombremoon.tennocraft.common.world.item.IModHolder;
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModContainer;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
-import com.ombremoon.tennocraft.common.modholder.api.mod.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.api.mod.ModContainer;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;

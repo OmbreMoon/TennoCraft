@@ -1,11 +1,11 @@
 package com.ombremoon.tennocraft.main;
 
 import com.ombremoon.tennocraft.common.init.*;
-import com.ombremoon.tennocraft.common.modholder.api.mod.RankBasedValue;
-import com.ombremoon.tennocraft.common.modholder.api.mod.TCModEffectComponents;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModEntityEffect;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModLocationEffect;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
+import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModEntityEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModLocationEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLLoader;

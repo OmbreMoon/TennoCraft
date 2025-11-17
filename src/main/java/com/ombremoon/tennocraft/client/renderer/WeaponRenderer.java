@@ -3,7 +3,7 @@ package com.ombremoon.tennocraft.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.ombremoon.tennocraft.client.model.DefaultWeaponModel;
-import com.ombremoon.tennocraft.common.world.item.weapon.AbstractWeapon;
+import com.ombremoon.tennocraft.common.world.item.weapon.AbstractWeaponItem;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -13,13 +13,13 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.loading.math.MolangQueries;
 import software.bernie.geckolib.renderer.GeoItemRenderer;
 
-public class WeaponRenderer extends GeoItemRenderer<AbstractWeapon<?>> {
+public class WeaponRenderer extends GeoItemRenderer<AbstractWeaponItem<?>> {
     public WeaponRenderer() {
         super(new DefaultWeaponModel());
     }
 
     @Override
-    public void defaultRender(PoseStack poseStack, AbstractWeapon<?> animatable, MultiBufferSource bufferSource, @Nullable RenderType renderType, @Nullable VertexConsumer buffer, float yaw, float partialTick, int packedLight) {
+    public void defaultRender(PoseStack poseStack, AbstractWeaponItem<?> animatable, MultiBufferSource bufferSource, @Nullable RenderType renderType, @Nullable VertexConsumer buffer, float yaw, float partialTick, int packedLight) {
         poseStack.pushPose();
 
         int renderColor = getRenderColor(animatable, partialTick, packedLight).argbInt();
@@ -50,7 +50,7 @@ public class WeaponRenderer extends GeoItemRenderer<AbstractWeapon<?>> {
         MolangQueries.clearActor();
     }
 
-    public ResourceLocation getModelResource(AbstractWeapon<?> animatable) {
+    public ResourceLocation getModelResource(AbstractWeaponItem<?> animatable) {
         if (this.currentItemStack != null) {
             ResourceLocation location = FrameUtil.getResource(this.currentItemStack, "geo/schema", ".geo.json");
             if (location != null)
@@ -61,7 +61,7 @@ public class WeaponRenderer extends GeoItemRenderer<AbstractWeapon<?>> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(AbstractWeapon<?> animatable) {
+    public ResourceLocation getTextureLocation(AbstractWeaponItem<?> animatable) {
         if (this.currentItemStack != null) {
             ResourceLocation location = FrameUtil.getResource(this.currentItemStack, "textures/schema", ".png");
             if (location != null)

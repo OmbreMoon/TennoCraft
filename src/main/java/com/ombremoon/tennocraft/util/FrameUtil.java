@@ -1,6 +1,6 @@
 package com.ombremoon.tennocraft.util;
 
-import com.ombremoon.tennocraft.common.modholder.FrameHandler;
+import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import net.minecraft.resources.ResourceLocation;

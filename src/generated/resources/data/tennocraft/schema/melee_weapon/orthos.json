@@ -1,0 +1,58 @@
+{
+  "type": "tennocraft:melee_weapon",
+  "attacks": {
+    "attack": {
+      "critChance": 0.06,
+      "critMultiplier": 1.5,
+      "damage": [
+        {
+          "amount": 27.75,
+          "damageType": "tennocraft:impact"
+        },
+        {
+          "amount": 27.75,
+          "damageType": "tennocraft:puncture"
+        },
+        {
+          "amount": 129.5,
+          "damageType": "tennocraft:slash"
+        }
+      ],
+      "noise": "silent",
+      "status": 0.18
+    },
+    "combo": "tennocraft:staff",
+    "heavySlamAttack": {
+      "damage": "tennocraft:blast",
+      "forcedProc": "minecraft:slowness",
+      "radius": 8.0
+    },
+    "slamAttack": {
+      "damage": "tennocraft:blast",
+      "forcedProc": "minecraft:slowness",
+      "radius": 7.0
+    },
+    "windUp": 18
+  },
+  "general": {
+    "layout": {
+      "compatibility": "melee",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "naramon"
+        }
+      ]
+    },
+    "mastery": 2,
+    "maxRank": 30,
+    "slot": "melee"
+  },
+  "utility": {
+    "attackSpeed": 0.92,
+    "blockAngle": 55,
+    "comboDuration": 100,
+    "followThrough": 0.6,
+    "rivenDisposition": 1.0
+  }
+}

@@ -1,9 +1,11 @@
 package com.ombremoon.tennocraft.datagen;
 
 import com.google.common.collect.ImmutableMap;
+import com.ombremoon.tennocraft.common.init.TCSchemas;
 import com.ombremoon.tennocraft.common.init.mods.Modifications;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.init.schemas.Schemas;
 import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
 import com.ombremoon.tennocraft.common.init.TCItems;
 import com.ombremoon.tennocraft.common.init.schemas.TCPrimaryWeapons;
@@ -39,9 +41,7 @@ public class ModLangProvider extends LanguageProvider {
     @Override
     protected void addTranslations() {
         TCItems.ITEMS.getEntries().forEach(this::itemLang);
-        TCFrames.FRAMES.forEach(this::schemaLang);
-        TCPrimaryWeapons.PRIMARY_WEAPONS.forEach(this::schemaLang);
-        TCSecondaryWeapons.SECONDARY_WEAPONS.forEach(this::schemaLang);
+        Schemas.SCHEMAS.forEach(this::schemaLang);
         Modifications.MODS.forEach(this::modLang);
         manualEntries();
     }
@@ -79,6 +79,7 @@ public class ModLangProvider extends LanguageProvider {
         add("tennocraft.frame.missing_description", "Missing Description");
         add("itemGroup.tennocraft", "TennoCraft");
         add("itemGroup.ranged", "TennoCraft Ranged Weapons");
+        add("itemGroup.melee", "TennoCraft Melee Weapons");
         add("itemGroup.mods", "TennoCraft Mods");
     }
 

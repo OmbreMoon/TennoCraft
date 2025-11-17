@@ -2,9 +2,9 @@ package com.ombremoon.tennocraft.common.init.mods;
 
 import com.ombremoon.tennocraft.common.init.TCAttributes;
 import com.ombremoon.tennocraft.common.init.TCTags;
-import com.ombremoon.tennocraft.common.modholder.api.mod.*;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModAttributeEffect;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.mod.*;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.HolderGetter;

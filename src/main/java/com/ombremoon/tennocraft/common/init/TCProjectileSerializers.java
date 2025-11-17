@@ -1,9 +1,9 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.data.AreaOfEffect;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.data.Hitscan;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.data.Projectile;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.data.ProjectileSerializer;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.AreaOfEffect;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.Hitscan;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.Projectile;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ProjectileSerializer;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;

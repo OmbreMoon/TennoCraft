@@ -1,16 +1,17 @@
 package com.ombremoon.tennocraft.common.world.item;
 
 
-import com.ombremoon.tennocraft.common.modholder.api.mod.ModContainer;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.handler.ModHandler;
+import com.ombremoon.tennocraft.common.api.mod.ModContainer;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public interface IModHolder<T extends Schema> {
+public interface IModHolder<T extends ModHandler> {
 
     Modification.Compatibility getModType();
 
@@ -19,6 +20,8 @@ public interface IModHolder<T extends Schema> {
     }
 
     ModContainer getMods(@Nullable ItemStack stack);
+
+    void confirmModChanges(ItemStack stack);
 
     default ModContainer getMods() {
         return this.getMods(null);

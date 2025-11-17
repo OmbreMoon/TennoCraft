@@ -1,8 +1,10 @@
 package com.ombremoon.tennocraft.datagen;
 
 import com.ombremoon.tennocraft.common.init.TCTags;
+import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
+import com.ombremoon.tennocraft.common.init.schemas.TCMeleeWeapons;
 import com.ombremoon.tennocraft.common.init.schemas.TCSecondaryWeapons;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.HolderLookup;
@@ -78,7 +80,9 @@ public class ModTagProvider {
 
         @Override
         protected void addTags(HolderLookup.Provider pProvider) {
+            populateTag(TCTags.Schemas.FRAME, TCFrames.VOLT);
             populateTag(TCTags.Schemas.PISTOL, TCSecondaryWeapons.ATOMOS);
+            populateTag(TCTags.Schemas.MELEE, TCMeleeWeapons.ORTHOS);
         }
 
         public void populateTag(TagKey<Schema> tag, ResourceKey<Schema>... schemas){

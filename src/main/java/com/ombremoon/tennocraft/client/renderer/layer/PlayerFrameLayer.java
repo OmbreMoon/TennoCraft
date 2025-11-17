@@ -2,7 +2,7 @@ package com.ombremoon.tennocraft.client.renderer.layer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.ombremoon.tennocraft.client.renderer.FrameRenderer;
-import com.ombremoon.tennocraft.common.modholder.FrameHandler;
+import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.common.world.item.TransferenceKeyItem;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import net.minecraft.client.model.PlayerModel;

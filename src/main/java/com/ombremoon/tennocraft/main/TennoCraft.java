@@ -1,15 +1,16 @@
 package com.ombremoon.tennocraft.main;
 
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCAbilities;
 import com.ombremoon.tennocraft.common.init.TCProjectileSerializers;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
-import com.ombremoon.tennocraft.common.modholder.api.mod.Modification;
-import com.ombremoon.tennocraft.common.modholder.api.mod.RankBasedValue;
-import com.ombremoon.tennocraft.common.modholder.api.mod.TCModEffectComponents;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModEntityEffect;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModLocationEffect;
-import com.ombremoon.tennocraft.common.modholder.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
+import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModEntityEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModLocationEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -24,6 +25,7 @@ public class TennoCraft {
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
         event.dataPackRegistry(Keys.SCHEMA, Schema.DIRECT_CODEC, Schema.DIRECT_CODEC);
         event.dataPackRegistry(Keys.MOD, Modification.DIRECT_CODEC, Modification.DIRECT_CODEC);
+        event.dataPackRegistry(Keys.COMBO_SET, ComboSet.DIRECT_CODEC, ComboSet.DIRECT_CODEC);
     });
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerRegistry);

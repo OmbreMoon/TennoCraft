@@ -1,8 +1,8 @@
 package com.ombremoon.tennocraft.common.init.schemas;
 
-import com.ombremoon.tennocraft.common.modholder.api.weapon.TriggerType;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.WeaponBuilder;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
+import com.ombremoon.tennocraft.common.api.weapon.WeaponBuilder;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.world.item.weapon.WeaponSlot;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import java.util.List;
 
 public interface TCSecondaryWeapons {
-    List<ResourceKey<Schema>> SECONDARY_WEAPONS = new ObjectArrayList<>();
 
     ResourceKey<Schema> ATOMOS = key("atomos");
 
@@ -41,7 +40,7 @@ public interface TCSecondaryWeapons {
 
     private static void register(BootstrapContext<Schema> context, ResourceKey<Schema> key, WeaponBuilder.Ranged builder) {
         context.register(key, builder.build());
-        SECONDARY_WEAPONS.add(key);
+        Schemas.SCHEMAS.add(key);
     }
 
     private static ResourceKey<Schema> key(String name) {

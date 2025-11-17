@@ -1,8 +1,9 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.modholder.api.FrameSchema;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.RangedWeaponSchema;
-import com.ombremoon.tennocraft.common.modholder.api.weapon.schema.SchemaSerializer;
+import com.ombremoon.tennocraft.common.api.FrameSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.SchemaSerializer;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
@@ -20,7 +21,7 @@ public class TCSchemas {
 
     public static final Supplier<SchemaSerializer<FrameSchema>> FRAME_SCHEMA = SCHEMAS.register("frame", FrameSchema.Serializer::new);
     public static final Supplier<SchemaSerializer<RangedWeaponSchema>> RANGED_WEAPON_SCHEMA = SCHEMAS.register("ranged_weapon", RangedWeaponSchema.Serializer::new);
-//    public static final Supplier<MapCodec<MeleeWeaponSchema>> RANGED_WEAPON_SCHEMA = SCHEMAS.register("ranged_weapon", () -> RangedWeaponSchema.CODEC);
+    public static final Supplier<SchemaSerializer<MeleeWeaponSchema>> MELEE_WEAPON_SCHEMA = SCHEMAS.register("melee_weapon", MeleeWeaponSchema.Serializer::new);
 
     public static void register(IEventBus modEventBus) {
         SCHEMAS.register(modEventBus);
