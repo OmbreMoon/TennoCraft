@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.api.handler;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
@@ -9,17 +10,18 @@ import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeUtilitySchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCData;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
-import com.ombremoon.tennocraft.util.DamageResult;
 import com.ombremoon.tennocraft.util.Loggable;
+import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
@@ -59,14 +61,14 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.attacks = this.schema.getAttacks().attack();
-        this.mods = new ModContainer(compatibility);
+        this.mods = new ModContainer(compatibility, this.schema);
         this.stats = new AttributeMap(createMeleeWeaponAttributes(this.schema.getUtility(), this.attacks));
 
-        if (registries != null) {
-            this.mods.deserializeNBT(registries, tag);
+        if (registries != null && tag.contains("Mods")) {
+            this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
         }
 
-        if (tag.contains("Stats")) {
+        if (tag.contains("Stats", 9)) {
             ListTag listTag = tag.getList("Stats", 10);
             this.stats.load(listTag);
         }
@@ -75,11 +77,13 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
     public void setRegistries(HolderLookup.Provider registries) {
         if (this.registries == null) {
             this.registries = registries;
-            this.mods.deserializeNBT(registries, this.tag);
+            if (this.tag.contains("Mods")) {
+                this.mods.deserializeNBT(registries, this.tag.getCompound("Mods"));
+            }
         }
     }
 
-    public void ensureRegistryAccess(ItemStack stack) {
+    public void ensureRegistryAccess() {
         if (this.registries == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server != null) {
@@ -88,13 +92,13 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         }
     }
 
-    public void handleComboModifiers(ItemStack stack, DamageResult.Partial partial) {
+    public void handleComboModifiers(ItemStack stack, LivingEntity target, WeaponDamageResult.Partial partial) {
 
     }
 
-    public void confirmModChanges(ItemStack stack) {
+    public void confirmModChanges(Level level, ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(stack, this.mods, this.stats);
+        mutable.confirmModChanges(level, stack, this.mods, this.stats);
         stack.set(TCData.MELEE_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -142,8 +146,9 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(ItemStack stack, ModContainer mods, AttributeMap stats) {
-            mods.confirmMods((IModHolder<?>) stack.getItem(), stack);
+        public void confirmModChanges(Level level, ItemStack stack, ModContainer mods, AttributeMap stats) {
+            mods.confirmMods(level,
+                    (IModHolder<?>) stack.getItem(), stack);
             this.saveChanges(mods, stats);
         }
 

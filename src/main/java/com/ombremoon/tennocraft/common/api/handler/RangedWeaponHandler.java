@@ -2,30 +2,32 @@ package com.ombremoon.tennocraft.common.api.handler;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.ombremoon.tennocraft.common.init.TCAttributes;
-import com.ombremoon.tennocraft.common.init.TCData;
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedAttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
+import com.ombremoon.tennocraft.common.init.TCAttributes;
+import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.util.Loggable;
 import com.ombremoon.tennocraft.util.ModHelper;
+import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -67,21 +69,9 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.triggerType = this.getTriggerType();
         this.attacks.addAll(this.schema.getProperties().getAttacks(this.triggerType));
-        this.mods = new ModContainer(compatibility);
+        this.mods = new ModContainer(compatibility, this.schema);
         this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
-
-        if (registries != null) {
-            this.mods.deserializeNBT(registries, tag);
-        }
-
-        if (tag.contains("Stats")) {
-            CompoundTag nbt = tag.getCompound("Stats");
-            String trigger = this.triggerType.getSerializedName();
-            if (nbt.contains(trigger, 9)) {
-                ListTag listTag = nbt.getList(this.triggerType.getSerializedName(), 10);
-                this.stats.load(listTag);
-            }
-        }
+        this.loadFromTag(tag, schema, registries);
     }
 
     public void setRegistries(HolderLookup.Provider registries) {
@@ -91,7 +81,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         }
     }
 
-    public void ensureRegistryAccess(ItemStack stack) {
+    public void ensureRegistryAccess() {
         if (this.registries == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             if (server != null) {
@@ -106,9 +96,12 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
-    public void confirmModChanges(ItemStack stack) {
+    public void handleBulletDamage(ItemStack stack, LivingEntity target, WeaponDamageResult.Partial partial) {
+    }
+
+    public void confirmModChanges(Level level, ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(stack, this.mods, this.stats, this.triggerType);
+        mutable.confirmModChanges(level, stack, this.mods, this.stats, this.triggerType);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -130,7 +123,12 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
 
     public TriggerType getTriggerType() {
         if (this.tag.contains("TriggerType")) {
-            return TriggerType.byName(this.tag.getString("TriggerType"));
+            TriggerType type = TriggerType.byName(this.tag.getString("TriggerType"));
+            if (this.triggerType != type) {
+                this.triggerType = type;
+            }
+
+            return this.triggerType;
         }
 
         return schema.getGeneral()
@@ -143,6 +141,21 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         return AttributeSupplier.builder()
                 .add(TCAttributes.CRIT_CHANCE, schema.getCritChance())
                 .build();
+    }
+
+    private void loadFromTag(CompoundTag tag, Schema schema, HolderLookup.Provider registries) {
+        if (registries != null) {
+            this.mods.deserializeNBT(registries, tag);
+        }
+
+        if (tag.contains("Stats")) {
+            CompoundTag nbt = tag.getCompound("Stats");
+            String trigger = this.triggerType.getSerializedName();
+            if (nbt.contains(trigger, 9)) {
+                ListTag listTag = nbt.getList(this.triggerType.getSerializedName(), 10);
+                this.stats.load(listTag);
+            }
+        }
     }
 
     @Override
@@ -166,8 +179,8 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(ItemStack stack, ModContainer mods, AttributeMap stats, TriggerType triggerType) {
-            mods.confirmMods((IModHolder<?>) stack.getItem(), stack);
+        public void confirmModChanges(Level level, ItemStack stack, ModContainer mods, AttributeMap stats, TriggerType triggerType) {
+            mods.confirmMods(level, (IModHolder<?>) stack.getItem(), stack);
             this.saveChanges(mods, stats, triggerType);
         }
 

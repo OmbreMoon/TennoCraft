@@ -1,7 +1,6 @@
 package com.ombremoon.tennocraft.common.world.item;
 
 import com.ombremoon.tennocraft.common.api.FrameSchema;
-import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCItems;
@@ -27,7 +26,7 @@ public class TransferenceKeyItem extends Item implements GeoItem {
 
     @Override
     public Component getName(ItemStack stack) {
-        SchemaHolder schema = stack.get(TCData.SCHEMA);
+        SchemaHolder<?> schema = stack.get(TCData.SCHEMA);
         if (schema != null) {
             ResourceLocation id = schema.location();
             String namespace = id.getNamespace();
@@ -38,7 +37,7 @@ public class TransferenceKeyItem extends Item implements GeoItem {
         return super.getName(stack);
     }
 
-    public static ItemStack createWithFrame(SchemaHolder schema) {
+    public static ItemStack createWithFrame(SchemaHolder<?> schema) {
         if (!(schema.schema() instanceof FrameSchema)) {
             throw new IllegalStateException("Tried to create transference key with invalid schema: " + schema.schemaKey());
         }
@@ -51,7 +50,7 @@ public class TransferenceKeyItem extends Item implements GeoItem {
     public static ItemStack createWithFrame(Level level, ResourceKey<Schema> key) {
         Schema schema = level.registryAccess().registryOrThrow(Keys.SCHEMA).getOrThrow(key);
         if (schema instanceof FrameSchema) {
-            var holder = new SchemaHolder(key, schema, "frame");
+            var holder = new SchemaHolder<>(key, schema, "frame");
             return createWithFrame(holder);
         }
 

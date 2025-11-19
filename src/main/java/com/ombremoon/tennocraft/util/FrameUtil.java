@@ -18,7 +18,7 @@ public class FrameUtil {
     }
 
     public static ResourceLocation getResource(ItemStack stack, String directory, String type) {
-        SchemaHolder schema = stack.get(TCData.SCHEMA);
+        SchemaHolder<?> schema = stack.get(TCData.SCHEMA);
         if (schema != null) {
             ResourceLocation location = schema.location();
             return ResourceLocation.fromNamespaceAndPath(

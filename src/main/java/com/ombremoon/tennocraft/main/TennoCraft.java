@@ -21,6 +21,8 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 @Mod(Constants.MOD_ID)
 public class TennoCraft {
 
+    //Holder -> ResourceKey -- DamageValue
+
     public TennoCraft(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
         event.dataPackRegistry(Keys.SCHEMA, Schema.DIRECT_CODEC, Schema.DIRECT_CODEC);

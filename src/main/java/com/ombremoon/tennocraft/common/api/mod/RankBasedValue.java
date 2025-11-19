@@ -20,13 +20,13 @@ public interface RankBasedValue {
     DeferredRegister<MapCodec<? extends RankBasedValue>> RANK_BASED_VALUE_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
     Codec<RankBasedValue> DISPATCH_CODEC = REGISTRY
             .byNameCodec()
-            .dispatch(RankBasedValue::codec, p_346236_ -> p_346236_);
+            .dispatch(RankBasedValue::codec, mapCodec -> mapCodec);
     Codec<RankBasedValue> CODEC = Codec.either(Constant.CODEC, DISPATCH_CODEC)
             .xmap(
-                    p_345066_ -> p_345066_.map(p_345590_ -> p_345590_, p_346044_ -> p_346044_),
-                    p_346307_ -> p_346307_ instanceof Constant constant
+                    either -> either.map(constant -> constant, rankBasedValue -> rankBasedValue),
+                    value -> value instanceof Constant constant
                             ? Either.left(constant)
-                            : Either.right(p_346307_)
+                            : Either.right(value)
             );
 
     static Supplier<MapCodec<? extends RankBasedValue>> bootstrap(DeferredRegister<MapCodec<? extends RankBasedValue>> registry) {

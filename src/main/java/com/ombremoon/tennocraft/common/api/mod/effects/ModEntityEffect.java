@@ -1,7 +1,8 @@
 package com.ombremoon.tennocraft.common.api.mod.effects;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
@@ -13,14 +14,19 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface ModEntityEffect extends ModLocationEffect {
     ResourceKey<Registry<MapCodec<? extends ModEntityEffect>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("mod_entity_effect_types"));
     Registry<MapCodec<? extends ModEntityEffect>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
     DeferredRegister<MapCodec<? extends ModEntityEffect>> MOD_ENTITY_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
+    Codec<ModEntityEffect> CODEC = REGISTRY
+            .byNameCodec()
+            .dispatch(ModEntityEffect::codec, Function.identity());
 
     static Supplier<MapCodec<? extends ModEntityEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModEntityEffect>> registry) {
+        registry.register("modify_value", () -> ModifyItemValue.CODEC);
         return null;
     }
 

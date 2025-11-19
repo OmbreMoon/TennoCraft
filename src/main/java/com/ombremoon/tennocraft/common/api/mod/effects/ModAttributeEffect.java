@@ -3,7 +3,7 @@ package com.ombremoon.tennocraft.common.api.mod.effects;
 import com.google.common.collect.HashMultimap;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;

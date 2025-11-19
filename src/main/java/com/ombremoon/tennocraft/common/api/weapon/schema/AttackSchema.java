@@ -16,7 +16,7 @@ import java.util.List;
 public class AttackSchema {
     public static final Codec<AttackSchema> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
-                    DamageValue.CODEC.listOf().fieldOf("damage").forGetter(schema -> schema.damage),
+                    DamageValue.CODEC.codec().listOf().fieldOf("damage").forGetter(schema -> schema.damage),
                     Codec.FLOAT.fieldOf("critChance").forGetter(schema -> schema.critChance),
                     Codec.FLOAT.fieldOf("critMultiplier").forGetter(schema -> schema.critMultiplier),
                     Codec.FLOAT.fieldOf("status").forGetter(schema -> schema.status),

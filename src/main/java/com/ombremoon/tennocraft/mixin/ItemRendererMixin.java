@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.mixin;
 
+import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
 import com.ombremoon.tennocraft.main.CommonClass;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -24,8 +24,8 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "getModel(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;I)Lnet/minecraft/client/resources/model/BakedModel;", at = @At("RETURN"), cancellable = true)
     private void getModelMixin(ItemStack stack, Level level, LivingEntity entity, int seed, CallbackInfoReturnable<BakedModel> cir) {
-        if (stack.getItem() instanceof IModHolder<?> modHolder && modHolder.usesCustomItemModel()) {
-            SchemaHolder schema = modHolder.schema(stack);
+        if (stack.getItem() instanceof IWeaponModHolder<?> modHolder) {
+            SchemaHolder<?> schema = modHolder.schemaHolder(stack);
             if (schema != null) {
                 ResourceLocation location = CommonClass.customLocation(schema.location().getPath().replace(schema.type(), "schema"));
                 cir.setReturnValue(this.getItemModelShaper().getModelManager().getModel(ModelResourceLocation.standalone(location)));

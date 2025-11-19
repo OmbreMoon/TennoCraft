@@ -21,6 +21,7 @@ public class CommonClass {
         TCModEffectComponents.register(modEventBus);
         TCProjectileSerializers.register(modEventBus);
         TCSchemas.register(modEventBus);
+        TCStatusEffects.register(modEventBus);
 
         registerSimple(RankBasedValue.RANK_BASED_VALUE_TYPES, modEventBus, RankBasedValue::bootstrap);
         registerSimple(ModLocationEffect.MOD_LOCATION_EFFECT_TYPES, modEventBus, ModLocationEffect::bootstrap);

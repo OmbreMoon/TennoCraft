@@ -6,16 +6,16 @@
       "critMultiplier": 1.5,
       "damage": [
         {
-          "amount": 27.75,
-          "damageType": "tennocraft:impact"
+          "type": "tennocraft:impact",
+          "amount": 27.75
         },
         {
-          "amount": 27.75,
-          "damageType": "tennocraft:puncture"
+          "type": "tennocraft:puncture",
+          "amount": 27.75
         },
         {
-          "amount": 129.5,
-          "damageType": "tennocraft:slash"
+          "type": "tennocraft:slash",
+          "amount": 129.5
         }
       ],
       "noise": "silent",

@@ -12,16 +12,16 @@
   },
   "description": "",
   "effects": {
-    "tennocraft:attributes": [
+    "tennocraft:crit_chance": [
       {
-        "amount": {
-          "type": "tennocraft:linear",
-          "base": 0.2,
-          "per_rank": 0.2
-        },
-        "attribute": "tennocraft:crit_chance",
-        "id": "tennocraft:mod.pistol_gambit",
-        "operation": "add_multiplied_total"
+        "effect": {
+          "type": "tennocraft:add",
+          "value": {
+            "type": "tennocraft:linear",
+            "base": 0.2,
+            "per_rank": 0.2
+          }
+        }
       }
     ]
   },

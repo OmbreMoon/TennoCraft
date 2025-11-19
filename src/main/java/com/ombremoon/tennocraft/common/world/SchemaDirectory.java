@@ -6,6 +6,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
+import com.ombremoon.tennocraft.common.api.FrameSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
@@ -33,9 +36,9 @@ public class SchemaDirectory extends SimpleJsonResourceReloadListener {
     private static final Logger LOGGER = Constants.LOG;
     private final HolderLookup.Provider registries;
     private static Set<Schema> SCHEMAS = Set.of();
-    public static Map<ResourceLocation, SchemaHolder> MINEFRAMES = ImmutableMap.of();
-    private static Map<ResourceLocation, SchemaHolder> RANGED_WEAPONS = ImmutableMap.of();
-    private static Map<ResourceLocation, SchemaHolder> MELEE_WEAPONS = ImmutableMap.of();
+    public static Map<ResourceLocation, SchemaHolder<FrameSchema>> MINEFRAMES = ImmutableMap.of();
+    private static Map<ResourceLocation, SchemaHolder<RangedWeaponSchema>> RANGED_WEAPONS = ImmutableMap.of();
+    private static Map<ResourceLocation, SchemaHolder<MeleeWeaponSchema>> MELEE_WEAPONS = ImmutableMap.of();
 
     private static SchemaDirectory instance;
 
@@ -54,20 +57,20 @@ public class SchemaDirectory extends SimpleJsonResourceReloadListener {
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> object, ResourceManager resourceManager, ProfilerFiller profiler) {
         Set<Schema> schemas = new ObjectOpenHashSet<>();
-        ImmutableMap.Builder<ResourceLocation, SchemaHolder> frameBuilder = ImmutableMap.builder();
-        ImmutableMap.Builder<ResourceLocation, SchemaHolder> rangedBuilder = ImmutableMap.builder();
-        ImmutableMap.Builder<ResourceLocation, SchemaHolder> meleeBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<ResourceLocation, SchemaHolder<FrameSchema>> frameBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<ResourceLocation, SchemaHolder<RangedWeaponSchema>> rangedBuilder = ImmutableMap.builder();
+        ImmutableMap.Builder<ResourceLocation, SchemaHolder<MeleeWeaponSchema>> meleeBuilder = ImmutableMap.builder();
 
         for (var entry : object.entrySet()) {
             ResourceLocation location = entry.getKey();
             try {
-                Schema schema = Schema.DIRECT_CODEC.parse(JsonOps.INSTANCE, entry.getValue()).getOrThrow(JsonParseException::new);
+                Schema schema = Schema.DIRECT_CODEC.parse(this.registries.createSerializationContext(JsonOps.INSTANCE), entry.getValue()).getOrThrow(JsonParseException::new);
                 ResourceKey<Schema> schemaKey = ResourceKey.create(Keys.SCHEMA, location);
                 String type = location.getPath().split("/")[0];
                 switch (type) {
-                    case "frame" -> frameBuilder.put(location, new SchemaHolder(schemaKey, schema, type));
-                    case "ranged_weapon" -> rangedBuilder.put(location, new SchemaHolder(schemaKey, schema, type));
-                    case "melee_weapon" -> meleeBuilder.put(location, new SchemaHolder(schemaKey, schema, type));
+                    case "frame" -> frameBuilder.put(location, new SchemaHolder<>(schemaKey, (FrameSchema) schema, type));
+                    case "ranged_weapon" -> rangedBuilder.put(location, new SchemaHolder<>(schemaKey, (RangedWeaponSchema) schema, type));
+                    case "melee_weapon" -> meleeBuilder.put(location, new SchemaHolder<>(schemaKey, (MeleeWeaponSchema) schema, type));
                 }
 
                 schemas.add(schema);
@@ -83,39 +86,39 @@ public class SchemaDirectory extends SimpleJsonResourceReloadListener {
         LOGGER.info("Loaded {} schemas", SCHEMAS.size());
     }
 
-    public static SchemaHolder getFrame(ResourceLocation id) {
+    public static SchemaHolder<FrameSchema> getFrame(ResourceLocation id) {
         return MINEFRAMES.get(id);
     }
 
-    public static SchemaHolder getFrame(ResourceKey<Schema> key) {
+    public static SchemaHolder<FrameSchema> getFrame(ResourceKey<Schema> key) {
         return getFrame(key.location());
     }
 
-    public static Collection<SchemaHolder> getFrames() {
+    public static Collection<SchemaHolder<FrameSchema>> getFrames() {
         return MINEFRAMES.values();
     }
 
-    public static SchemaHolder getRangedWeapon(ResourceLocation id) {
+    public static SchemaHolder<RangedWeaponSchema> getRangedWeapon(ResourceLocation id) {
         return RANGED_WEAPONS.get(id);
     }
 
-    public static SchemaHolder getRangedWeapon(ResourceKey<Schema> key) {
+    public static SchemaHolder<RangedWeaponSchema> getRangedWeapon(ResourceKey<Schema> key) {
         return getRangedWeapon(key.location());
     }
 
-    public static Collection<SchemaHolder> getRangedWeapons() {
+    public static Collection<SchemaHolder<RangedWeaponSchema>> getRangedWeapons() {
         return RANGED_WEAPONS.values();
     }
 
-    public static SchemaHolder getMeleeWeapon(ResourceLocation id) {
+    public static SchemaHolder<MeleeWeaponSchema> getMeleeWeapon(ResourceLocation id) {
         return MELEE_WEAPONS.get(id);
     }
 
-    public static SchemaHolder getMeleeWeapon(ResourceKey<Schema> key) {
+    public static SchemaHolder<MeleeWeaponSchema> getMeleeWeapon(ResourceKey<Schema> key) {
         return getMeleeWeapon(key.location());
     }
 
-    public static Collection<SchemaHolder> getMeleeWeapons() {
+    public static Collection<SchemaHolder<MeleeWeaponSchema>> getMeleeWeapons() {
         return MELEE_WEAPONS.values();
     }
 

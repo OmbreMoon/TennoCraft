@@ -1,11 +1,10 @@
 package com.ombremoon.tennocraft.common.world.item.weapon;
 
 import com.ombremoon.tennocraft.client.renderer.WeaponRenderer;
-import com.ombremoon.tennocraft.common.api.handler.ModHandler;
-import com.ombremoon.tennocraft.common.init.TCData;
+import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
+import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
 import com.ombremoon.tennocraft.util.Loggable;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.network.chat.Component;
@@ -22,7 +21,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.function.Consumer;
 
-public abstract class AbstractWeaponItem<T extends ModHandler> extends Item implements GeoItem, IModHolder<T>, Loggable {
+public abstract class AbstractWeaponItem<T extends WeaponSchema> extends Item implements GeoItem, IWeaponModHolder<T>, Loggable {
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public AbstractWeaponItem(Properties properties) {
@@ -32,7 +31,7 @@ public abstract class AbstractWeaponItem<T extends ModHandler> extends Item impl
 
     @Override
     public Component getName(ItemStack stack) {
-        SchemaHolder schema = stack.get(TCData.SCHEMA);
+        SchemaHolder<?> schema = stack.get(TCData.SCHEMA);
         if (schema != null) {
             ResourceLocation id = schema.location();
             String namespace = id.getNamespace();
@@ -68,8 +67,4 @@ public abstract class AbstractWeaponItem<T extends ModHandler> extends Item impl
         return this.cache;
     }
 
-    @Override
-    public boolean usesCustomItemModel() {
-        return true;
-    }
 }

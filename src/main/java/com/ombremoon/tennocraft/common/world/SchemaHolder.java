@@ -10,17 +10,17 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-public record SchemaHolder(ResourceKey<Schema> schemaKey, Schema schema, String type) {
-    public static final Codec<SchemaHolder> CODEC = RecordCodecBuilder.create(
+public record SchemaHolder<T>(ResourceKey<Schema> schemaKey, T schema, String type) {
+    public static final Codec<SchemaHolder<?>> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     ResourceKey.codec(Keys.SCHEMA).fieldOf("key").forGetter(SchemaHolder::schemaKey),
-                    Schema.DIRECT_CODEC.fieldOf("schema").forGetter(SchemaHolder::schema),
+                    Schema.DIRECT_CODEC.fieldOf("schema").forGetter(schemaHolder -> (Schema) schemaHolder.schema),
                     Codec.STRING.fieldOf("type").forGetter(SchemaHolder::type)
             ).apply(instance, SchemaHolder::new)
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, SchemaHolder> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<RegistryFriendlyByteBuf, SchemaHolder<?>> STREAM_CODEC = StreamCodec.composite(
             ResourceKey.streamCodec(Keys.SCHEMA), SchemaHolder::schemaKey,
-            Schema.STREAM_CODEC, SchemaHolder::schema,
+            Schema.STREAM_CODEC, schemaHolder -> (Schema) schemaHolder.schema,
             ByteBufCodecs.STRING_UTF8, SchemaHolder::type,
             SchemaHolder::new
     );
@@ -34,7 +34,7 @@ public record SchemaHolder(ResourceKey<Schema> schemaKey, Schema schema, String 
         if (this == other) {
             return true;
         } else {
-            return other instanceof SchemaHolder holder && this.schemaKey.equals(holder.schemaKey);
+            return other instanceof SchemaHolder<?> holder && this.schemaKey.equals(holder.schemaKey);
         }
     }
 

@@ -4,7 +4,6 @@ import com.ombremoon.tennocraft.common.init.TCAttributes;
 import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
-import com.ombremoon.tennocraft.common.world.item.IModHolder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -14,12 +13,13 @@ import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
-public class MineFrame implements IModHolder<FrameHandler>, INBTSerializable<CompoundTag> {
+public class MineFrame implements IModHolder<FrameSchema>, INBTSerializable<CompoundTag> {
     private final FrameSchema schema;
     private final FrameHandler handler;
     private final List<AbilityType<?>> abilities = new ObjectArrayList<>();
@@ -37,7 +37,7 @@ public class MineFrame implements IModHolder<FrameHandler>, INBTSerializable<Com
         this.abilities.addAll(schema.abilities());
         this.passive = schema.passive().orElse(null);
         this.description = schema.description();
-        this.mods = new ModContainer(Modification.Compatibility.FRAME);
+        this.mods = new ModContainer(Modification.Compatibility.FRAME, schema);
         this.stats = new AttributeMap(createFrameAttributes(schema));
     }
 
@@ -64,13 +64,18 @@ public class MineFrame implements IModHolder<FrameHandler>, INBTSerializable<Com
     }
 
     @Override
+    public FrameSchema schema(ItemStack stack) {
+        return this.schema;
+    }
+
+    @Override
     public ModContainer getMods(ItemStack stack) {
         return this.mods;
     }
 
     @Override
-    public void confirmModChanges(ItemStack stack) {
-        this.mods.confirmMods(this, stack);
+    public void confirmModChanges(Level level, ItemStack stack) {
+        this.mods.confirmMods(level, this, stack);
     }
 
     @Override

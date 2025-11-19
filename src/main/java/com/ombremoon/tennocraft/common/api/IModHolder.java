@@ -1,7 +1,6 @@
-package com.ombremoon.tennocraft.common.world.item;
+package com.ombremoon.tennocraft.common.api;
 
 
-import com.ombremoon.tennocraft.common.api.handler.ModHandler;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
@@ -9,19 +8,23 @@ import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public interface IModHolder<T extends ModHandler> {
+@SuppressWarnings("unchecked")
+public interface IModHolder<T extends Schema> {
 
     Modification.Compatibility getModType();
 
-    default SchemaHolder schema(ItemStack itemStack) {
-        return itemStack.get(TCData.SCHEMA);
+    default SchemaHolder<T> schemaHolder(ItemStack itemStack) {
+        return (SchemaHolder<T>) itemStack.get(TCData.SCHEMA);
     }
+
+    T schema(ItemStack stack);
 
     ModContainer getMods(@Nullable ItemStack stack);
 
-    void confirmModChanges(ItemStack stack);
+    void confirmModChanges(Level level, ItemStack stack);
 
     default ModContainer getMods() {
         return this.getMods(null);
@@ -31,10 +34,6 @@ public interface IModHolder<T extends ModHandler> {
 
     default AttributeMap getStats() {
         return this.getStats(null);
-    }
-
-    default boolean usesCustomItemModel() {
-        return false;
     }
 
 }

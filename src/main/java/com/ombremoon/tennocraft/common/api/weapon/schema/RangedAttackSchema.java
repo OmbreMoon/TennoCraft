@@ -15,7 +15,7 @@ public class RangedAttackSchema extends AttackSchema {
     public static final Codec<RangedAttackSchema> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     RangedAttack.CODEC.fieldOf("attack").forGetter(schema -> schema.attack),
-                    DamageValue.CODEC.listOf().fieldOf("damage").forGetter(schema -> schema.damage),
+                    DamageValue.CODEC.codec().listOf().fieldOf("damage").forGetter(schema -> schema.damage),
                     Codec.FLOAT.fieldOf("critChance").forGetter(schema -> schema.critChance),
                     Codec.FLOAT.fieldOf("critMultiplier").forGetter(schema -> schema.critMultiplier),
                     Codec.FLOAT.fieldOf("status").forGetter(schema -> schema.status),

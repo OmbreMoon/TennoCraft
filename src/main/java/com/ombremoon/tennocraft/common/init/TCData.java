@@ -1,10 +1,12 @@
 package com.ombremoon.tennocraft.common.init;
 
+import com.ombremoon.tennocraft.common.world.TennoSlots;
 import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
 import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
 import com.ombremoon.tennocraft.common.api.mod.ModInstance;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
+import com.ombremoon.tennocraft.common.world.effect.StatusEffect;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +15,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.HashMap;
 import java.util.function.Supplier;
 
 public class TCData {
@@ -26,8 +29,15 @@ public class TCData {
     public static final Supplier<AttachmentType<FrameHandler>> FRAME_HANDLER = ATTACHMENT_TYPES.register(
             "frame_handler", () -> AttachmentType.serializable(FrameHandler::new).copyOnDeath().build());
 
+
+    public static final Supplier<AttachmentType<TennoSlots>> TENNO_SLOTS = ATTACHMENT_TYPES.register(
+            "tenno_slots", () -> AttachmentType.builder(TennoSlots::new).build());
+
+    public static final Supplier<AttachmentType<StatusEffect.ProcEntries>> STATUS_PROCS = ATTACHMENT_TYPES.register(
+            "status_procs", () -> AttachmentType.builder(() -> new StatusEffect.ProcEntries(new HashMap<>())).serialize(StatusEffect.ProcEntries.CODEC).build());
+
     //Components
-    public static final Supplier<DataComponentType<SchemaHolder>> SCHEMA = COMPONENT_TYPES.registerComponentType("schema",
+    public static final Supplier<DataComponentType<SchemaHolder<?>>> SCHEMA = COMPONENT_TYPES.registerComponentType("schema",
             builder -> builder.persistent(SchemaHolder.CODEC).networkSynchronized(SchemaHolder.STREAM_CODEC).cacheEncoding());
 
     public static final Supplier<DataComponentType<RangedWeaponHandler>> RANGED_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("ranged_weapon_handler",

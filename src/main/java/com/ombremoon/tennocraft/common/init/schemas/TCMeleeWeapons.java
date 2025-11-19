@@ -14,8 +14,11 @@ import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.world.item.weapon.WeaponSlot;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 
 public interface TCMeleeWeapons {
@@ -23,6 +26,7 @@ public interface TCMeleeWeapons {
     ResourceKey<Schema> ORTHOS = key("orthos");
 
     static void bootstrap(BootstrapContext<Schema> context) {
+        HolderGetter<DamageType> damageTypes = context.lookup(Registries.DAMAGE_TYPE);
         register(
                 context,
                 ORTHOS,
@@ -48,9 +52,9 @@ public interface TCMeleeWeapons {
                                             1.5F,
                                             0.18F,
                                             NoiseLevel.SILENT,
-                                            new DamageValue(TCDamageTypes.IMPACT, 27.75F),
-                                            new DamageValue(TCDamageTypes.PUNCTURE, 27.75F),
-                                            new DamageValue(TCDamageTypes.SLASH, 129.5F)
+                                            new DamageValue(damageTypes.getOrThrow(TCDamageTypes.IMPACT), 27.75F),
+                                            new DamageValue(damageTypes.getOrThrow(TCDamageTypes.PUNCTURE), 27.75F),
+                                            new DamageValue(damageTypes.getOrThrow(TCDamageTypes.SLASH), 129.5F)
                                     ),
                                     18,
                                     new SlamAttack(

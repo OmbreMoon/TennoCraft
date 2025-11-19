@@ -3,8 +3,10 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
+import com.ombremoon.tennocraft.common.world.level.loot.ModContextParamSets;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
@@ -30,8 +32,10 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 public record Modification(Component name, Component description, ModDefinition definition, HolderSet<Modification> exclusiveSet, DataComponentMap effects) {
@@ -65,7 +69,7 @@ public record Modification(Component name, Component description, ModDefinition 
 
     public static ModDefinition definition(
             HolderSet<Schema> supportedSchemas,
-//            HolderSet<Schema> incompatibleSchemas,
+            HolderSet<Schema> incompatibleSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
@@ -73,22 +77,22 @@ public record Modification(Component name, Component description, ModDefinition 
             ModRarity rarity,
             Variant variant
     ) {
-        return new ModDefinition(supportedSchemas, /*Optional.of(incompatibleSchemas), */type, polarity, drain, maxRank, rarity, Optional.of(variant));
+        return new ModDefinition(supportedSchemas, Optional.of(incompatibleSchemas), type, polarity, drain, maxRank, rarity, Optional.of(variant));
     }
 
     public static ModDefinition definition(
             HolderSet<Schema> supportedSchemas,
-//            HolderSet<Schema> incompatibleSchemas,
+            HolderSet<Schema> incompatibleSchemas,
             ModType type,
             ModPolarity polarity,
             Drain drain,
             int maxRank,
             ModRarity rarity
     ) {
-        return new ModDefinition(supportedSchemas, /*Optional.of(incompatibleSchemas), */type, polarity, drain, maxRank, rarity, Optional.empty());
+        return new ModDefinition(supportedSchemas, Optional.of(incompatibleSchemas), type, polarity, drain, maxRank, rarity, Optional.empty());
     }
 
-/*    public static ModDefinition definition(
+    public static ModDefinition definition(
             HolderSet<Schema> supportedSchemas,
             ModType type,
             ModPolarity polarity,
@@ -109,9 +113,9 @@ public record Modification(Component name, Component description, ModDefinition 
             ModRarity rarity
     ) {
         return new ModDefinition(supportedSchemas, Optional.empty(), type, polarity, drain, maxRank, rarity, Optional.empty());
-    }*/
+    }
 
-    /*public HolderSet<Schema> getSupportedSchemas() {
+    public HolderSet<Schema> getSupportedSchemas() {
         return this.definition.supportedSchemas;
     }
 
@@ -121,7 +125,7 @@ public record Modification(Component name, Component description, ModDefinition 
 
     public boolean isIncompatibleSchema(Holder<Schema> schema) {
         return this.definition.incompatibleSchemas.map(holders -> holders.contains(schema)).orElse(false);
-    }*/
+    }
 
     public ModType getType() {
         return this.definition.type;
@@ -157,6 +161,51 @@ public record Modification(Component name, Component description, ModDefinition 
         return this.effects.getOrDefault(component, List.of());
     }
 
+    public void modifyWeaponDamage(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, entity, damage);
+    }
+
+    public void modifyCritChance(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, entity, damage);
+    }
+
+    public void modifyCritDamage(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, entity, damage);
+    }
+
+    public void modifyStatusChance(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, entity, damage);
+    }
+
+    public void modifyEntityFilteredValue(
+            DataComponentType<List<ConditionalModEffect<ModValueEffect>>> type,
+            ServerLevel level,
+            int modRank,
+            Entity entity,
+            MutableFloat value
+    ) {
+        applyEffects(
+                this.getEffects(type),
+                entityContext(level, modRank, entity, entity.position()),
+                valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
+        );
+    }
+
+    public void modifyDamageFilteredValue(
+            DataComponentType<List<ConditionalModEffect<ModValueEffect>>> type,
+            ServerLevel level,
+            int modRank,
+            Entity entity,
+            DamageSource source,
+            MutableFloat value
+    ) {
+        applyEffects(
+                this.getEffects(type),
+                damageContext(level, modRank, entity, source),
+                valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
+        );
+    }
+
     public static LootContext damageContext(ServerLevel level, int modRank, Entity entity, DamageSource damageSource) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
@@ -165,7 +214,7 @@ public record Modification(Component name, Component description, ModDefinition 
                 .withParameter(LootContextParams.DAMAGE_SOURCE, damageSource)
                 .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, damageSource.getEntity())
                 .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, damageSource.getDirectEntity())
-                .create(LootContextParamSets.ENCHANTED_DAMAGE);
+                .create(ModContextParamSets.MODDED_DAMAGE);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
@@ -192,7 +241,7 @@ public record Modification(Component name, Component description, ModDefinition 
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
                 .withParameter(Keys.MOD_RANK, modRank)
                 .withParameter(LootContextParams.ORIGIN, origin)
-                .create(LootContextParamSets.ENCHANTED_ENTITY);
+                .create(ModContextParamSets.MODDED_ENTITY);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
@@ -204,6 +253,14 @@ public record Modification(Component name, Component description, ModDefinition 
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(LootContextParamSets.HIT_BLOCK);
         return new LootContext.Builder(lootparams).create(Optional.empty());
+    }
+
+    public static <T> void applyEffects(List<ConditionalModEffect<T>> effects, LootContext context, Consumer<T> applier) {
+        for (ConditionalModEffect<T> effect : effects) {
+            if (effect.matches(context)) {
+                applier.accept(effect.effect());
+            }
+        }
     }
 
     public static Modification.Builder mod(ModDefinition definition) {
@@ -289,11 +346,11 @@ public record Modification(Component name, Component description, ModDefinition 
         }
     }
 
-    public record ModDefinition(HolderSet<Schema> supportedSchemas, /*Optional<HolderSet<Schema>> incompatibleSchemas, */ModType type, ModPolarity polarity, Drain drain, int maxRank, ModRarity rarity, Optional<Variant> variant) {
+    public record ModDefinition(HolderSet<Schema> supportedSchemas, Optional<HolderSet<Schema>> incompatibleSchemas, ModType type, ModPolarity polarity, Drain drain, int maxRank, ModRarity rarity, Optional<Variant> variant) {
         public static final MapCodec<ModDefinition> CODEC = RecordCodecBuilder.mapCodec(
                 instance -> instance.group(
                         RegistryCodecs.homogeneousList(Keys.SCHEMA).fieldOf("supports").forGetter(ModDefinition::supportedSchemas),
-//                        RegistryCodecs.homogeneousList(Keys.SCHEMA, Schema.DIRECT_CODEC, false).optionalFieldOf("incompatible").forGetter(ModDefinition::incompatibleSchemas),
+                        RegistryCodecs.homogeneousList(Keys.SCHEMA, Schema.DIRECT_CODEC, false).optionalFieldOf("incompatible").forGetter(ModDefinition::incompatibleSchemas),
                         ModType.CODEC.fieldOf("type").forGetter(ModDefinition::type),
                         ModPolarity.CODEC.fieldOf("polarity").forGetter(ModDefinition::polarity),
                         Drain.CODEC.fieldOf("drain").forGetter(ModDefinition::drain),
@@ -303,7 +360,7 @@ public record Modification(Component name, Component description, ModDefinition 
                 ).apply(instance, ModDefinition::new)
         );
 
-        private static final ModDefinition EMPTY = new ModDefinition(HolderSet.empty(), /*Optional.empty(), */ModType.STANDARD, ModPolarity.ANY, constantDrain(0), 0, ModRarity.COMMON, Optional.empty());
+        private static final ModDefinition EMPTY = new ModDefinition(HolderSet.empty(), Optional.empty(), ModType.STANDARD, ModPolarity.ANY, constantDrain(0), 0, ModRarity.COMMON, Optional.empty());
     }
 
     public record Drain(int base, int perRank) {
@@ -321,26 +378,32 @@ public record Modification(Component name, Component description, ModDefinition 
     }
 
     public enum Compatibility implements StringRepresentable {
-        FRAME("frame", 10),
-        PRIMARY("primary", 9),
-        SECONDARY("secondary", 9),
-        MELEE("melee", 10),
-        ARCHWING("archwing", 8),
-        ARCHGUN("archgun", 8),
-        ARCHMELEE("archmelee", 8),
-        COMPANION("companion", 10),
-        COMPANION_WEAPON("companion_weapon", 8),
-        K_DRIVE("k_drive", 8),
-        EXALTED_WEAPON("exalted_weapon", 8),
-        NECRAMECH("necramech", 12);
+        FRAME("frame", 10, false),
+        PRIMARY("primary", 9, true),
+        SECONDARY("secondary", 9, true),
+        MELEE("melee", 10, true),
+        ARCHWING("archwing", 8, true),
+        ARCHGUN("archgun", 8, true),
+        ARCHMELEE("archmelee", 8, false),
+        COMPANION("companion", 10, false),
+        COMPANION_WEAPON("companion_weapon", 8, true),
+        K_DRIVE("k_drive", 8, false),
+        EXALTED_WEAPON("exalted_weapon", 8, true),
+        NECRAMECH("necramech", 12, false);
 
         public static final Codec<Compatibility> CODEC = StringRepresentable.fromEnum(Compatibility::values);
         private final String name;
         private final int maxSlots;
+        private final boolean isWeapon;
 
-        Compatibility(String name, int maxSlots) {
+        Compatibility(String name, int maxSlots, boolean isWeapon) {
             this.name = name;
             this.maxSlots = maxSlots;
+            this.isWeapon = isWeapon;
+        }
+
+        public boolean isWeapon() {
+            return this.isWeapon;
         }
 
         @Override

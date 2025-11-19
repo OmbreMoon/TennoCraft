@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.datagen;
 
+import com.ombremoon.tennocraft.common.init.TCStatusEffects;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
 import com.ombremoon.tennocraft.common.init.schemas.TCMeleeWeapons;
@@ -7,6 +8,7 @@ import com.ombremoon.tennocraft.common.init.schemas.TCSecondaryWeapons;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -15,6 +17,7 @@ import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -69,6 +72,41 @@ public class ModTagProvider {
         @Override
         protected void addTags(HolderLookup.Provider provider) {
 
+        }
+    }
+
+    public static class MobEffects extends TagsProvider<MobEffect> {
+        public MobEffects(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
+            super(output, Registries.MOB_EFFECT, provider, Constants.MOD_ID, existingFileHelper);
+        }
+
+        @Override
+        protected void addTags(HolderLookup.Provider provider) {
+            populateTag(TCTags.MobEffects.STATUS_EFFECT,
+                    TCStatusEffects.KNOCKBACK
+//                    TCStatusEffects.WEAKENED,
+//                    TCStatusEffects.BLEED,
+//                    TCStatusEffects.IGNITE,
+//                    TCStatusEffects.FREEZE,
+//                    TCStatusEffects.TESLA_CHAIN,
+//                    TCStatusEffects.POISON,
+//                    TCStatusEffects.DETONATE,
+//                    TCStatusEffects.CORROSION,
+//                    TCStatusEffects.DISRUPT,
+//                    TCStatusEffects.GAS_CLOUD,
+//                    TCStatusEffects.CONFUSION,
+//                    TCStatusEffects.VIRUS
+            );
+        }
+
+        public void populateTag(TagKey<MobEffect> tag, Holder<MobEffect>... effects){
+            for (Holder<MobEffect> effect : effects) {
+                tag(tag).add(effect.getKey());
+            }
+        }
+
+        public void populateTag(TagKey<MobEffect> tag, TagKey<MobEffect> effect){
+            tag(tag).addTags(effect);
         }
     }
 

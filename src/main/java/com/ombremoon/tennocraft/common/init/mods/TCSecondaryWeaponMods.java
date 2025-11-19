@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.common.init.mods;
 
+import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.common.init.TCAttributes;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.api.mod.*;
@@ -31,13 +32,8 @@ public interface TCSecondaryWeaponMods {
                         )
                 )
                 .withEffect(
-                        TCModEffectComponents.ATTRIBUTES.get(),
-                        new ModAttributeEffect(
-                                CommonClass.customLocation("mod.pistol_gambit"),
-                                TCAttributes.CRIT_CHANCE,
-                                RankBasedValue.perLevel(0.2F),
-                                AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL
-                        )
+                        TCModEffectComponents.CRIT_CHANCE.get(),
+                        new AddValue(RankBasedValue.perLevel(0.2F))
                 )
         );
     }

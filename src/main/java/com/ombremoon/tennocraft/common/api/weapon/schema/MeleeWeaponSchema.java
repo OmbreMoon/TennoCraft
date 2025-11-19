@@ -1,21 +1,41 @@
 package com.ombremoon.tennocraft.common.api.weapon.schema;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
+import com.ombremoon.tennocraft.util.ModHelper;
+import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class MeleeWeaponSchema extends WeaponSchema {
     private final MeleeUtilitySchema utility;
     private final MeleeAttackProperties attacks;
+    private final int baseDamage;
+    private final WeaponDamageResult.Distribution distribution;
 
     public MeleeWeaponSchema(GeneralSchema generalSchema, MeleeUtilitySchema utility, MeleeAttackProperties attacks) {
         super(generalSchema);
         this.utility = utility;
         this.attacks = attacks;
+
+        var values = attacks.attack().damage;
+        float f = 0;
+        for (DamageValue damage : values) {
+            f += damage.amount();
+        }
+
+        this.baseDamage = (int) f;
+        this.distribution = WeaponDamageResult.createDistribution(values);
     }
 
     public MeleeUtilitySchema getUtility() {
@@ -33,13 +53,33 @@ public class MeleeWeaponSchema extends WeaponSchema {
 
     @Override
     public int getBaseDamage(TriggerType triggerType) {
-        var values = attacks.attack().damage;
-        float f = 0;
-        for (DamageValue damage : values) {
-            f += damage.amount();
-        }
+        return this.baseDamage;
+    }
 
-        return (int) f;
+    @Override
+    public WeaponDamageResult.Distribution getBaseDamageDistribution(@Nullable TriggerType triggerType) {
+        return this.distribution;
+    }
+
+    @Override
+    public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+        float critChance = this.attacks.attack().getCritChance();
+        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, target, 0.0F)));
+    }
+
+    @Override
+    public float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 0;
+    }
+
+    @Override
+    public float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 0;
+    }
+
+    @Override
+    public float getModdedRivenDisposition(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 0;
     }
 
     public static class Serializer implements SchemaSerializer<MeleeWeaponSchema> {
