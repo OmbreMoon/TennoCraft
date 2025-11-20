@@ -36,7 +36,7 @@ public interface ModifyItemEffect extends ModEntityEffect {
     DeferredRegister<MapCodec<? extends ModifyItemEffect>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
     Codec<ModifyItemEffect> CODEC = REGISTRY
             .byNameCodec()
-            .dispatch(ModifyItemEffect::codec, Function.identity())
+            .dispatch(ModifyItemEffect::codec, codec -> codec))
             .validate(ModifyItemEffect::validate);
 
     private static DataResult<ModifyItemEffect> validate(ModifyItemEffect modifyItemValue) {
