@@ -26,10 +26,21 @@ public record DamageValue(Holder<DamageType> damageType, float amount) {
                     Codec.FLOAT.fieldOf("amount").forGetter(DamageValue::amount)
             ).apply(instance, DamageValue::new)
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, DamageValue> STREAM_CODEC = StreamCodec.composite(
-            DamageType.STREAM_CODEC, DamageValue::damageType,
-            ByteBufCodecs.FLOAT, DamageValue::amount,
-            DamageValue::new
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, DamageValue> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public DamageValue decode(RegistryFriendlyByteBuf buffer) {
+            ResourceKey<DamageType> key = ResourceKey.streamCodec(Registries.DAMAGE_TYPE).decode(buffer);
+            float amount = ByteBufCodecs.FLOAT.decode(buffer);
+            Holder<DamageType> holder = buffer.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key);
+            return new DamageValue(holder, amount);
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf buffer, DamageValue value) {
+            ResourceKey<DamageType> key = value.damageType().unwrapKey().orElseThrow();
+            ResourceKey.streamCodec(Registries.DAMAGE_TYPE).encode(buffer, key);
+            ByteBufCodecs.FLOAT.encode(buffer, value.amount());
+        }
+    };
 
 }

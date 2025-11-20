@@ -19,6 +19,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -47,6 +50,11 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
                             Schema.DIRECT_CODEC.fieldOf("schema").forGetter(handler -> handler.schema)
                     ).apply(instance, RangedWeaponHandler::forCodec)
             )
+    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, RangedWeaponHandler> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.COMPOUND_TAG, handler -> handler.tag,
+            Schema.STREAM_CODEC, handler -> handler.schema,
+            RangedWeaponHandler::forCodec
     );
 
     private final CompoundTag tag;

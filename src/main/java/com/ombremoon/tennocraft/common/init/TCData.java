@@ -41,10 +41,10 @@ public class TCData {
             builder -> builder.persistent(SchemaHolder.CODEC).networkSynchronized(SchemaHolder.STREAM_CODEC).cacheEncoding());
 
     public static final Supplier<DataComponentType<RangedWeaponHandler>> RANGED_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("ranged_weapon_handler",
-            builder -> builder.persistent(RangedWeaponHandler.CODEC));
+            builder -> builder.persistent(RangedWeaponHandler.CODEC).networkSynchronized(RangedWeaponHandler.STREAM_CODEC));
 
     public static final Supplier<DataComponentType<MeleeWeaponHandler>> MELEE_WEAPON_HANDLER = COMPONENT_TYPES.registerComponentType("melee_weapon_handler",
-            builder -> builder.persistent(MeleeWeaponHandler.CODEC));
+            builder -> builder.persistent(MeleeWeaponHandler.CODEC).networkSynchronized(MeleeWeaponHandler.STREAM_CODEC));
 
     public static final Supplier<DataComponentType<ModInstance>> MOD = COMPONENT_TYPES.registerComponentType("mod",
             builder -> builder.persistent(ModInstance.CODEC).networkSynchronized(ModInstance.STREAM_CODEC));

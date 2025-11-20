@@ -36,12 +36,13 @@ public interface ModifyItemEffect<T extends ModValueEffect> extends ModEntityEff
     ResourceKey<Registry<MapCodec<? extends ModifyItemEffect<?>>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("modify_item_effect_types"));
     Registry<MapCodec<? extends ModifyItemEffect<?>>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
     DeferredRegister<MapCodec<? extends ModifyItemEffect<?>>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
-    Codec<ModifyItemEffect<?>> CODEC = REGISTRY
+    @SuppressWarnings("unchecked")
+    Codec<ModifyItemEffect<?>> CODEC = ((Codec<ModifyItemEffect<?>>) REGISTRY
             .byNameCodec()
-            .dispatch(ModifyItemEffect::codec, Function.identity())
+            .dispatch(ModifyItemEffect::codec, codec -> codec))
             .validate(ModifyItemEffect::validate);
 
-    private static DataResult<ModifyItemEffect<?>> validate(ModifyItemEffect<?> modifyItemValue) {
+    private static <E extends ModifyItemEffect<?>> DataResult<E> validate(E modifyItemValue) {
         return !modifyItemValue.items().stream().allMatch(Modification.Compatibility::isWeapon) ? DataResult.error(() -> "Encountered non-weapon mod compatibility: " + modifyItemValue.items()) : DataResult.success(modifyItemValue);
     }
 

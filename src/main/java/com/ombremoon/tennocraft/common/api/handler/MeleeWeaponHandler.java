@@ -3,7 +3,6 @@ package com.ombremoon.tennocraft.common.api.handler;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
-import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
@@ -16,6 +15,9 @@ import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -41,6 +43,11 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
                             Schema.DIRECT_CODEC.fieldOf("schema").forGetter(handler -> handler.schema)
                     ).apply(instance, MeleeWeaponHandler::forCodec)
             )
+    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, MeleeWeaponHandler> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.COMPOUND_TAG, handler -> handler.tag,
+            Schema.STREAM_CODEC, handler -> handler.schema,
+            MeleeWeaponHandler::forCodec
     );
 
     private final CompoundTag tag;
