@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.common.api.mod;
 
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
@@ -18,6 +19,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.HashMap;
@@ -43,7 +45,13 @@ public class WeaponModContainer extends ModContainer {
         this.itemModifiers = new Object2ObjectOpenHashMap<>();
     }
 
-    public void collectItemModifiers(ItemStack oldItem, ItemStack newItem) {
+    @Override
+    public void confirmMods(Level level, IModHolder<?> holder, ItemStack stack) {
+//        this.collectItemModifiers();
+        super.confirmMods(level, holder, stack);
+    }
+
+    public void collectItemModifiers(ItemModifiers oldModifiers, ItemModifiers newModifiers) {
 
     }
 
