@@ -6,12 +6,10 @@ import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.effects.EnchantmentLocationBasedEffect;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.RegistryBuilder;
@@ -28,7 +26,7 @@ public interface ModLocationEffect {
             .dispatch(ModLocationEffect::codec, Function.identity());
 
     static Supplier<MapCodec<? extends ModLocationEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModLocationEffect>> registry) {
-        registry.register("modify_value", () -> ModifyItemValue.CODEC);
+        registry.register("modify_crit", () -> ModifyCritChance.CODEC);
         return registry.register("attribute", () -> ModAttributeEffect.CODEC);
     }
 

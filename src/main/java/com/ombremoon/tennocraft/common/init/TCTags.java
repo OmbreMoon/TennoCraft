@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.common.init;
 
+import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
@@ -87,6 +88,14 @@ public class TCTags {
 
         private static TagKey<Schema> tag(String name) {
             return TagKey.create(Keys.SCHEMA, CommonClass.customLocation(name));
+        }
+    }
+
+    public static class Mods {
+        public static final TagKey<Modification> MODIFIES_ELEMENTAL_DAMAGE = tag("modifies_elemental_damage");
+
+        private static TagKey<Modification> tag(String name) {
+            return TagKey.create(Keys.MOD, CommonClass.customLocation(name));
         }
     }
 }

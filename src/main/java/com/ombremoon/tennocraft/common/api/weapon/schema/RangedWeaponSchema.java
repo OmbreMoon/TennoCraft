@@ -91,7 +91,7 @@ public class RangedWeaponSchema extends WeaponSchema {
 
     @Override
     public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, target, 0.0F));
+        return 1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, target, 0.0F));
     }
 
     @Override

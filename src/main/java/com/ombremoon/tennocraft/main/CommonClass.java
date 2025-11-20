@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.main;
 
+import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
 import com.ombremoon.tennocraft.common.init.*;
 import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
 import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
@@ -27,6 +28,7 @@ public class CommonClass {
         registerSimple(ModLocationEffect.MOD_LOCATION_EFFECT_TYPES, modEventBus, ModLocationEffect::bootstrap);
         registerSimple(ModValueEffect.MOD_VALUE_EFFECT_TYPES, modEventBus, ModValueEffect::bootstrap);
         registerSimple(ModEntityEffect.MOD_ENTITY_EFFECT_TYPES, modEventBus, ModEntityEffect::bootstrap);
+        registerSimple(ModifyItemEffect.MOD_ITEM_EFFECT_TYPES, modEventBus, ModifyItemEffect::bootstrap);
     }
 
     private static <T> void registerSimple(DeferredRegister<T> registry, IEventBus modEventBus, DeferredBootstrap<T> bootstrap) {

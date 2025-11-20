@@ -26,11 +26,15 @@ public interface ModEntityEffect extends ModLocationEffect {
             .dispatch(ModEntityEffect::codec, Function.identity());
 
     static Supplier<MapCodec<? extends ModEntityEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModEntityEffect>> registry) {
-        registry.register("modify_value", () -> ModifyItemValue.CODEC);
+        registry.register("modify_crit", () -> ModifyCritChance.CODEC);
         return null;
     }
 
     void apply(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 origin);
+
+    default void applyAura(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 origin) {
+
+    }
 
     @Override
     default void onChangedBlock(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 pos, boolean applyTransientEffects) {

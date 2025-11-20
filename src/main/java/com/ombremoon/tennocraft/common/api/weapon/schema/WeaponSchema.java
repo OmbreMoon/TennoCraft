@@ -1,5 +1,7 @@
 package com.ombremoon.tennocraft.common.api.weapon.schema;
 
+import com.ombremoon.tennocraft.common.api.mod.ModLayout;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.server.level.ServerLevel;
@@ -16,6 +18,14 @@ public abstract class WeaponSchema implements Schema {
 
     public GeneralSchema getGeneral() {
         return this.general;
+    }
+
+    public ModLayout getDefaultLayout() {
+        return this.general.layout();
+    }
+
+    public Modification.Compatibility getCompatibility() {
+        return this.getDefaultLayout().compatibility();
     }
 
     public abstract int getBaseDamage(@Nullable TriggerType triggerType);

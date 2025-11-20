@@ -14,14 +14,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class StatusHelper {
 
-    public static boolean procEffect(@Nullable LivingEntity attacker, LivingEntity entity, ResourceKey<DamageType> damageType, float damage) {
-        WorldStatus worldStatus = StatusEffect.getStatusFromType(damageType);
+    public static boolean procEffect(@Nullable LivingEntity attacker, LivingEntity entity, Holder<DamageType> damageType, float damage) {
+        WorldStatus worldStatus = StatusEffect.getStatusFromType(damageType.getKey());
         Holder<MobEffect> mobEffect = worldStatus.statusEffect();
         if (entity.getType().is(worldStatus.immuneToTag())) {
             return false;
         }
 
-        StatusEffect.Proc proc = new StatusEffect.Proc(damageType, damage, entity.level().getGameTime());
+        StatusEffect.Proc proc = new StatusEffect.Proc(damageType.getKey(), damage, entity.level().getGameTime());
         StatusEffect effect = (StatusEffect) mobEffect.value();
         MobEffectInstance oldInstance = entity.getEffect(mobEffect);
         int duration = entity instanceof Player ? effect.getPlayerDuration() : effect.getEntityDuration();
@@ -33,7 +33,7 @@ public class StatusHelper {
         return entity.addEffect(instance, attacker);
     }
 
-    public static boolean procEffect(LivingEntity entity, ResourceKey<DamageType> damageType, float damage) {
+    public static boolean procEffect(LivingEntity entity, Holder<DamageType> damageType, float damage) {
         return procEffect(null, entity, damageType, damage);
     }
 }

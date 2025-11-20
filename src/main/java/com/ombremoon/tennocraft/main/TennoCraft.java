@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.main;
 
+import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCAbilities;
 import com.ombremoon.tennocraft.common.init.TCProjectileSerializers;
@@ -41,6 +42,7 @@ public class TennoCraft {
         event.register(ModEntityEffect.REGISTRY);
         event.register(ModLocationEffect.REGISTRY);
         event.register(ModValueEffect.REGISTRY);
+        event.register(ModifyItemEffect.REGISTRY);
         event.register(RankBasedValue.REGISTRY);
         event.register(TCAbilities.REGISTRY);
         event.register(TCModEffectComponents.REGISTRY);

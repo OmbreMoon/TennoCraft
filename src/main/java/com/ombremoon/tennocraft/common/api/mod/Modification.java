@@ -6,7 +6,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
-import com.ombremoon.tennocraft.common.world.level.loot.ModContextParamSets;
+import com.ombremoon.tennocraft.common.world.WorldStatus;
+import com.ombremoon.tennocraft.common.world.level.loot.ModContextParams;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
@@ -161,32 +162,40 @@ public record Modification(Component name, Component description, ModDefinition 
         return this.effects.getOrDefault(component, List.of());
     }
 
-    public void modifyWeaponDamage(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, entity, damage);
+    public void modifyWeaponDamage(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, schema, entity, damage);
     }
 
-    public void modifyCritChance(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, entity, damage);
+    public void modifyTypeDamage(ServerLevel level, WorldStatus status, int modRank, Schema schema, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(status.getDataComponentType().get(), level, modRank, schema, entity, damage);
     }
 
-    public void modifyCritDamage(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, entity, damage);
+    public void modifyCritChance(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, entity, damage);
     }
 
-    public void modifyStatusChance(ServerLevel level, int modRank, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, entity, damage);
+    public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, entity, damage);
+        //modifyWithItemModifiers
+    }
+
+    //public void modifyElementalDamage (Data component type from status)
+
+    public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
+        this.modifyEntityFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, entity, damage);
     }
 
     public void modifyEntityFilteredValue(
             DataComponentType<List<ConditionalModEffect<ModValueEffect>>> type,
             ServerLevel level,
             int modRank,
+            Schema schema,
             Entity entity,
             MutableFloat value
     ) {
         applyEffects(
                 this.getEffects(type),
-                entityContext(level, modRank, entity, entity.position()),
+                entityContext(level, schema, modRank, entity, entity.position()),
                 valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
         );
     }
@@ -195,60 +204,55 @@ public record Modification(Component name, Component description, ModDefinition 
             DataComponentType<List<ConditionalModEffect<ModValueEffect>>> type,
             ServerLevel level,
             int modRank,
+            Schema schema,
             Entity entity,
             DamageSource source,
             MutableFloat value
     ) {
         applyEffects(
                 this.getEffects(type),
-                damageContext(level, modRank, entity, source),
+                damageContext(level, schema, modRank, entity, source),
                 valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
         );
     }
 
-    public static LootContext damageContext(ServerLevel level, int modRank, Entity entity, DamageSource damageSource) {
+    public static LootContext damageContext(ServerLevel level, Schema schema, int modRank, Entity entity, DamageSource damageSource) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
-                .withParameter(Keys.MOD_RANK, modRank)
+                .withParameter(ModContextParams.MOD_RANK, modRank)
                 .withParameter(LootContextParams.ORIGIN, entity.position())
                 .withParameter(LootContextParams.DAMAGE_SOURCE, damageSource)
                 .withOptionalParameter(LootContextParams.ATTACKING_ENTITY, damageSource.getEntity())
                 .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, damageSource.getDirectEntity())
-                .create(ModContextParamSets.MODDED_DAMAGE);
-        return new LootContext.Builder(lootparams).create(Optional.empty());
-    }
-
-    public static LootContext itemContext(ServerLevel level, int modRank, ItemStack tool) {
-        LootParams lootparams = new LootParams.Builder(level)
-                .withParameter(LootContextParams.TOOL, tool)
-                .withParameter(Keys.MOD_RANK, modRank)
-                .create(LootContextParamSets.ENCHANTED_ITEM);
+                .withOptionalParameter(ModContextParams.SCHEMA, schema)
+                .create(ModContextParams.MODDED_DAMAGE);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
     public static LootContext locationContext(ServerLevel level, int modRank, Entity entity, boolean enchantmentActive) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
-                .withParameter(Keys.MOD_RANK, modRank)
+                .withParameter(ModContextParams.MOD_RANK, modRank)
                 .withParameter(LootContextParams.ORIGIN, entity.position())
                 .withParameter(LootContextParams.ENCHANTMENT_ACTIVE, enchantmentActive)
                 .create(LootContextParamSets.ENCHANTED_LOCATION);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
-    public static LootContext entityContext(ServerLevel level, int modRank, Entity entity, Vec3 origin) {
+    public static LootContext entityContext(ServerLevel level, Schema schema, int modRank, Entity entity, Vec3 origin) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
-                .withParameter(Keys.MOD_RANK, modRank)
+                .withParameter(ModContextParams.MOD_RANK, modRank)
                 .withParameter(LootContextParams.ORIGIN, origin)
-                .create(ModContextParamSets.MODDED_ENTITY);
+                .withOptionalParameter(ModContextParams.SCHEMA, schema)
+                .create(ModContextParams.MODDED_ENTITY);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
     public static LootContext blockHitContext(ServerLevel level, int modRank, Entity entity, Vec3 origin, BlockState state) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
-                .withParameter(Keys.MOD_RANK, modRank)
+                .withParameter(ModContextParams.MOD_RANK, modRank)
                 .withParameter(LootContextParams.ORIGIN, origin)
                 .withParameter(LootContextParams.BLOCK_STATE, state)
                 .create(LootContextParamSets.HIT_BLOCK);

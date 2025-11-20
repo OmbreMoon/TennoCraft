@@ -1,32 +1,19 @@
 package com.ombremoon.tennocraft.common.api.mod;
 
-import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
-import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
-import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.IModHolder;
+import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.util.ModHelper;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
-
-import java.util.List;
-import java.util.Map;
 
 public class ModContainer implements INBTSerializable<CompoundTag> {
     public static final int AURA_SLOT = 0;
@@ -35,8 +22,6 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
     public final NonNullList<ModInstance> mods;
     public final Modification.Compatibility type;
     protected final Schema schema;
-    public final List<DamageValue> damageModifiers = new ObjectArrayList<>();
-    public final Map<DataComponentType<List<ModValueEffect>>, Float> absoluteModifiers = new Object2FloatOpenHashMap<>();
     public ModContainer modCache;
     private int maxCapacity;
     private int capacity;
@@ -44,7 +29,7 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
     public ModContainer(Modification.Compatibility type, Schema schema) {
         this(type, schema, false);
     }
-/**/
+
     ModContainer(Modification.Compatibility type, Schema schema, boolean cache) {
         this.type = type;
         this.mods = NonNullList.withSize(type.getMaxSlots(), ModInstance.EMPTY);
@@ -91,16 +76,6 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
             }
         }
         compoundTag.put("Mods", modList);
-
-        ListTag modifierList = new ListTag();
-        for (var modifier : this.damageModifiers) {
-            CompoundTag tag = new CompoundTag();
-            ResourceKey<DamageType> resourcekey = modifier.damageType().getKey();
-            tag.putString("DamageType", resourcekey.location().toString());
-            tag.putFloat("Modifier", modifier.amount());
-            modifierList.add(tag);
-        }
-        compoundTag.put("Damage Modifiers", modifierList);
         return compoundTag;
     }
 
@@ -117,16 +92,6 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
                     if (!mod.isEmpty())
                         this.mods.set(compoundTag.getByte("Slot"), mod);
                 }
-            }
-        }
-
-        if (nbt.contains("Damage Modifiers", 9)) {
-            ListTag listTag = nbt.getList("Damage Modifiers", 10);
-            for (int i = 0; i < listTag.size(); i++) {
-                CompoundTag compoundTag = listTag.getCompound(i);
-                ResourceKey<DamageType> damageType = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.parse(compoundTag.getString("DamageType")));
-                float modifier = compoundTag.getFloat("Modifier");
-                this.damageModifiers.add(new DamageValue(provider.holderOrThrow(damageType), modifier));
             }
         }
     }
@@ -168,6 +133,7 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
         this.collectModdedAttributes(holder, stack);
         this.clearCachedMods();
     }
+
 
     public void collectModdedAttributes(IModHolder<?> holder, ItemStack stack) {
         if (stack != null) {

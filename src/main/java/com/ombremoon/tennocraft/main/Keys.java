@@ -15,7 +15,4 @@ public class Keys {
     public static final ResourceKey<Registry<Modification>> MOD = ResourceKey.createRegistryKey(ResourceLocation.withDefaultNamespace("mod"));
     public static final ResourceKey<Registry<ComboSet>> COMBO_SET = ResourceKey.createRegistryKey(ResourceLocation.withDefaultNamespace("combo_set"));
 
-    public static final LootContextParam<Integer> MOD_RANK = new LootContextParam<>(ResourceLocation.withDefaultNamespace("mod_rank"));
-    public static final LootContextParam<Modification.Compatibility> COMPATIBILITY = new LootContextParam<>(ResourceLocation.withDefaultNamespace("compatibility"));
-
 }

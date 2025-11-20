@@ -5,7 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
 import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
-import com.ombremoon.tennocraft.common.api.mod.ModContainer;
+import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
@@ -42,12 +42,12 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
     //Handle Mutlishot Damage
     //Implement Damage Falloff
 
-    public static WeaponDamageResult calculateRanged(IWeaponModHolder<?> modHolder, ItemStack stack, LivingEntity target) {
+    public static WeaponDamageResult calculateRanged(ItemStack stack, LivingEntity target) {
         RangedWeaponHandler handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
         if (handler != null) {
             RangedWeaponSchema schema = handler.getSchema();
-            ModContainer mods = handler.getMods();
-            Partial partial = quantizeAndNormalize(target, schema, handler.getTriggerType(), mods);
+            WeaponModContainer mods = handler.getMods();
+            Partial partial = quantizeAndNormalize(stack, target, schema, handler.getTriggerType(), mods);
             return resultFromPartial(stack, target, partial, schema, handler.getTriggerType(), handler::handleBulletDamage);
         }
 
@@ -58,8 +58,8 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
         if (handler != null) {
             MeleeWeaponSchema schema = handler.getSchema();
-            ModContainer mods = handler.getMods();
-            Partial partial = quantizeAndNormalize(target, schema, null, mods);
+            WeaponModContainer mods = handler.getMods();
+            Partial partial = quantizeAndNormalize(stack, target, schema, null, mods);
             return resultFromPartial(stack, target, partial, schema, null, handler::handleComboModifiers);
         }
 
@@ -71,7 +71,7 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         float f = partial.damage;
 
         ServerLevel level = (ServerLevel) target.level();
-        float modifiedDamage = 1.0F + Math.max(0.0F, ModHelper.modifyDamage(level, stack, target, 0.0F));
+        float modifiedDamage = 1.0F + Math.max(0.0F, ModHelper.modifyDamage(level, stack, schema, target));
         f *= modifiedDamage;
 
         float modifiedCritChance = schema.getModdedCritChance(level, stack, target, type);
@@ -105,7 +105,8 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         return new WeaponDamageResult(damageValue, procs);
     }
 
-    private static Partial quantizeAndNormalize(LivingEntity target, WeaponSchema schema, @Nullable TriggerType type, ModContainer mods) {
+    private static Partial quantizeAndNormalize(ItemStack stack, LivingEntity target, WeaponSchema schema, @Nullable TriggerType type, WeaponModContainer mods) {
+        ServerLevel level = (ServerLevel) target.level();
         Distribution distribution = schema.getBaseDamageDistribution(type);
         int baseDamage = schema.getBaseDamage(type);
         float scale = (float) baseDamage / 16;
@@ -114,24 +115,25 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         List<DamageValue> weightedDamage = new ArrayList<>();
         List<DamageValue> quantizedValues = new ArrayList<>(baseValue.getFirst());
         float f = baseValue.getSecond();
-        for (DamageValue modifier : mods.damageModifiers) {
-            Holder<DamageType> damageType = modifier.damageType();
-            ResourceKey<DamageType> damageKey = damageType.getKey();
+        for (Holder<DamageType> modifier : mods.damageModifiers) {
+            ResourceKey<DamageType> damageKey = modifier.getKey();
+            WorldStatus status = StatusEffect.getStatusFromType(damageKey);
+            float modifiedTypeDamage = Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, schema, target));
 //            ResourceKey<DamageType> damageKey = modifier.damageType();
 //            Holder<DamageType> damageType = target.registryAccess().holderOrThrow(damageKey);
             float quantizedValue;
-            if (distribution.contains(damageType)) {
-                float baseType = distribution.getAmount(damageType);
-                quantizedValue = Math.round((baseType * modifier.amount()) / scale) * scale;
-            } else if (damageType.is(TCTags.DamageTypes.PHYSICAL)) {
+            if (distribution.contains(modifier)) {
+                float baseType = distribution.getAmount(modifier);
+                quantizedValue = Math.round((baseType * modifiedTypeDamage) / scale) * scale;
+            } else if (modifier.is(TCTags.DamageTypes.PHYSICAL)) {
                 continue;
             } else {
-                quantizedValue = Math.round((baseDamage * modifier.amount()) / scale) * scale;
+                quantizedValue = Math.round((baseDamage * modifiedTypeDamage) / scale) * scale;
             }
 
-            float healthModifier = getHealthModifier(target, damageType);
+            float healthModifier = getHealthModifier(target, status);
             f += quantizedValue * healthModifier;
-            quantizedValues.add(new DamageValue(modifier.damageType(), quantizedValue));
+            quantizedValues.add(new DamageValue(modifier, quantizedValue));
         }
 
         for (DamageValue value : quantizedValues) {
@@ -146,18 +148,17 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         List<DamageValue> quantizedBases = new ArrayList<>();
         Distribution distribution = createDistribution(values);
         MutableFloat mutableFloat = new MutableFloat();
-        distribution.forEach((key, amount) -> {
-            float healthModifier = getHealthModifier(target, key);
+        distribution.forEach((type, amount) -> {
+            float healthModifier = getHealthModifier(target, type);
             float quantizedBase = Math.round(amount / scale) * scale;
             mutableFloat.add(quantizedBase * healthModifier);
-            quantizedBases.add(new DamageValue(key, quantizedBase));
+            quantizedBases.add(new DamageValue(type, quantizedBase));
         });
 
         return Pair.of(quantizedBases, mutableFloat.floatValue());
     }
 
-    private static float getHealthModifier(LivingEntity target, Holder<DamageType> damageType) {
-        WorldStatus status = StatusEffect.getStatusFromType(damageType.getKey());
+    private static float getHealthModifier(LivingEntity target, WorldStatus status) {
         if (target.getType().is(status.resistantToTag())) {
             return 1.5F;
         } else if (target.getType().is(status.weakToTag())) {
@@ -165,6 +166,10 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         } else {
             return 1.0F;
         }
+    }
+
+    private static float getHealthModifier(LivingEntity target, Holder<DamageType> damageType) {
+        return getHealthModifier(target, StatusEffect.getStatusFromType(damageType.getKey()));
     }
 
     private static DamageValue getWeightedDamage(List<DamageValue> entries, float weightedIndex) {

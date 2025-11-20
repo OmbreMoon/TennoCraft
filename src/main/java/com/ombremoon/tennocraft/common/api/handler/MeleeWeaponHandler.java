@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeUtilitySchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
@@ -45,7 +46,7 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
     private final CompoundTag tag;
     private final MeleeWeaponSchema schema;
     private final AttackSchema attacks;
-    private final ModContainer mods;
+    private final WeaponModContainer mods;
     private final AttributeMap stats;
     @Nullable
     private HolderLookup.Provider registries;
@@ -61,7 +62,7 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.attacks = this.schema.getAttacks().attack();
-        this.mods = new ModContainer(compatibility, this.schema);
+        this.mods = new WeaponModContainer(compatibility, this.schema);
         this.stats = new AttributeMap(createMeleeWeaponAttributes(this.schema.getUtility(), this.attacks));
 
         if (registries != null && tag.contains("Mods")) {
@@ -110,7 +111,7 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         return this.schema;
     }
 
-    public ModContainer getMods() {
+    public WeaponModContainer getMods() {
         return this.mods;
     }
 
@@ -146,18 +147,18 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(Level level, ItemStack stack, ModContainer mods, AttributeMap stats) {
+        public void confirmModChanges(Level level, ItemStack stack, WeaponModContainer mods, AttributeMap stats) {
             mods.confirmMods(level,
                     (IModHolder<?>) stack.getItem(), stack);
             this.saveChanges(mods, stats);
         }
 
-        private void saveChanges(ModContainer mods, AttributeMap stats) {
+        private void saveChanges(WeaponModContainer mods, AttributeMap stats) {
             this.saveMods(mods);
             this.saveStats(stats);
         }
 
-        private void saveMods(ModContainer mods) {
+        private void saveMods(WeaponModContainer mods) {
             if (this.registries != null)
                 this.tag.put("Mods", mods.serializeNBT(this.registries));
         }

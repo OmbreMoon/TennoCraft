@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedAttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
@@ -51,7 +52,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
     private final CompoundTag tag;
     private final RangedWeaponSchema schema;
     private final List<RangedAttackSchema> attacks = new ObjectArrayList<>();
-    private final ModContainer mods;
+    private final WeaponModContainer mods;
     private final AttributeMap stats;
     private TriggerType triggerType;
     @Nullable
@@ -69,7 +70,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.triggerType = this.getTriggerType();
         this.attacks.addAll(this.schema.getProperties().getAttacks(this.triggerType));
-        this.mods = new ModContainer(compatibility, this.schema);
+        this.mods = new WeaponModContainer(compatibility, this.schema);
         this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
         this.loadFromTag(tag, schema, registries);
     }
@@ -113,7 +114,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         return this.schema;
     }
 
-    public ModContainer getMods() {
+    public WeaponModContainer getMods() {
         return this.mods;
     }
 
@@ -179,7 +180,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(Level level, ItemStack stack, ModContainer mods, AttributeMap stats, TriggerType triggerType) {
+        public void confirmModChanges(Level level, ItemStack stack, WeaponModContainer mods, AttributeMap stats, TriggerType triggerType) {
             mods.confirmMods(level, (IModHolder<?>) stack.getItem(), stack);
             this.saveChanges(mods, stats, triggerType);
         }
@@ -231,12 +232,12 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
             return list.isEmpty() ? current : list.iterator().next();
         }
 
-        private void saveChanges(ModContainer mods, AttributeMap stats, TriggerType triggerType) {
+        private void saveChanges(WeaponModContainer mods, AttributeMap stats, TriggerType triggerType) {
             this.saveMods(mods);
             this.saveStats(stats, triggerType);
         }
 
-        private void saveMods(ModContainer mods) {
+        private void saveMods(WeaponModContainer mods) {
             if (this.registries != null)
                 this.tag.put("Mods", mods.serializeNBT(this.registries));
         }

@@ -3,8 +3,8 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.mojang.serialization.Codec;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemValue;
-import com.ombremoon.tennocraft.common.world.level.loot.ModContextParamSets;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
+import com.ombremoon.tennocraft.common.world.level.loot.ModContextParams;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
@@ -30,29 +30,81 @@ public class TCModEffectComponents {
             "attributes",
             builder -> builder.persistent(ModAttributeEffect.CODEC.codec().listOf())
     );
-    public static final Supplier<DataComponentType<List<ModAttributeEffect>>> DAMAGE_ATTRIBUTES = register(
-            "damage_attributes",
-            builder -> builder.persistent(ModAttributeEffect.CODEC.codec().listOf())
-    );
-    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemValue>>>> MODIFY_ITEM = register(
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect<?>>>>> MODIFY_ITEM = register(
             "modify_item",
-            builder -> builder.persistent(ConditionalModEffect.codec(ModifyItemValue.CODEC.codec(), ModContextParamSets.MODDED_ITEM).listOf())
+            builder -> builder.persistent(ConditionalModEffect.codec(ModifyItemEffect.CODEC, ModContextParams.MODDED_ITEM).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect<?>>>>> MODIFY_ITEM_DAMAGE = register(
+            "modify_item_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModifyItemEffect.CODEC, ModContextParams.MODDED_ITEM).listOf())
     );
     public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> DAMAGE = register(
             "damage",
-            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParamSets.MODDED_DAMAGE).listOf())
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> IMPACT = register(
+            "impact_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> PUNCTURE = register(
+            "puncture_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> SLASH = register(
+            "slash_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> HEAT = register(
+            "heat_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> COLD = register(
+            "cold_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> ELECTRICITY = register(
+            "electricity_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> TOXIC = register(
+            "toxic_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> BLAST = register(
+            "blast_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> CORROSIVE = register(
+            "corrosion_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> MAGNETIC = register(
+            "magnetic_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> GAS = register(
+            "gas_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> RADIATION = register(
+            "radiation_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> VIRAL = register(
+            "viral_damage",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
     );
     public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> CRIT_CHANCE = register(
             "crit_chance",
-            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParamSets.MODDED_DAMAGE).listOf())
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
     );
     public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> CRIT_MULTIPLIER = register(
             "crit_multiplier",
-            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParamSets.MODDED_DAMAGE).listOf())
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
     );
     public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> STATUS_CHANCE = register(
             "status_chance",
-            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParamSets.MODDED_DAMAGE).listOf())
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ENTITY).listOf())
     );
 
     private static <T> Supplier<DataComponentType<T>> register(String name, UnaryOperator<DataComponentType.Builder<T>> operator) {

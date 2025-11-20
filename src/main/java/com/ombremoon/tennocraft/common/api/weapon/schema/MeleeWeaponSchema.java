@@ -1,6 +1,5 @@
 package com.ombremoon.tennocraft.common.api.weapon.schema;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
@@ -14,8 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public class MeleeWeaponSchema extends WeaponSchema {
     private final MeleeUtilitySchema utility;
@@ -64,7 +61,7 @@ public class MeleeWeaponSchema extends WeaponSchema {
     @Override
     public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
         float critChance = this.attacks.attack().getCritChance();
-        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, target, 0.0F)));
+        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, target, 0.0F)));
     }
 
     @Override
