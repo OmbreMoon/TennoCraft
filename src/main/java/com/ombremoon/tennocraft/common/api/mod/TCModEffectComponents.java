@@ -30,11 +30,11 @@ public class TCModEffectComponents {
             "attributes",
             builder -> builder.persistent(ModAttributeEffect.CODEC.codec().listOf())
     );
-    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect<?>>>>> MODIFY_ITEM = register(
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect>>>> MODIFY_ITEM = register(
             "modify_item",
             builder -> builder.persistent(ConditionalModEffect.codec(ModifyItemEffect.CODEC, ModContextParams.MODDED_ITEM).listOf())
     );
-    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect<?>>>>> MODIFY_ITEM_DAMAGE = register(
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModifyItemEffect>>>> MODIFY_ITEM_DAMAGE = register(
             "modify_item_damage",
             builder -> builder.persistent(ConditionalModEffect.codec(ModifyItemEffect.CODEC, ModContextParams.MODDED_ITEM).listOf())
     );

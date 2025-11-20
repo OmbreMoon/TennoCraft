@@ -14,7 +14,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import java.util.List;
 import java.util.Optional;
 
-public record ModifyCritChance(List<Modification.Compatibility> items, ModValueEffect value, Optional<LootItemCondition> requirements, Optional<Integer> duration, ResourceLocation id) implements ModifyItemEffect<ModValueEffect> {
+public record ModifyCritChance(List<Modification.Compatibility> items, ModValueEffect value, Optional<LootItemCondition> requirements, Optional<Integer> duration, ResourceLocation id) implements ModifyItemEffect {
     public static final MapCodec<ModifyCritChance> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     Modification.Compatibility.CODEC.listOf().fieldOf("items").forGetter(ModifyCritChance::items),
@@ -30,7 +30,7 @@ public record ModifyCritChance(List<Modification.Compatibility> items, ModValueE
     }
 
     @Override
-    public MapCodec<? extends ModifyItemEffect<?>> codec() {
+    public MapCodec<? extends ModifyItemEffect> codec() {
         return CODEC;
     }
 }

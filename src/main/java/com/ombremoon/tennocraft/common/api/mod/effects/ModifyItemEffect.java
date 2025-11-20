@@ -3,12 +3,10 @@ package com.ombremoon.tennocraft.common.api.mod.effects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.mod.ConditionalModEffect;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
-import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.TennoSlots;
@@ -32,20 +30,20 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface ModifyItemEffect<T extends ModValueEffect> extends ModEntityEffect {
-    ResourceKey<Registry<MapCodec<? extends ModifyItemEffect<?>>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("modify_item_effect_types"));
-    Registry<MapCodec<? extends ModifyItemEffect<?>>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
-    DeferredRegister<MapCodec<? extends ModifyItemEffect<?>>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
-    Codec<ModifyItemEffect<?>> CODEC = REGISTRY
+public interface ModifyItemEffect extends ModEntityEffect {
+    ResourceKey<Registry<MapCodec<? extends ModifyItemEffect>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("modify_item_effect_types"));
+    Registry<MapCodec<? extends ModifyItemEffect>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
+    DeferredRegister<MapCodec<? extends ModifyItemEffect>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
+    Codec<ModifyItemEffect> CODEC = REGISTRY
             .byNameCodec()
             .dispatch(ModifyItemEffect::codec, Function.identity())
             .validate(ModifyItemEffect::validate);
 
-    private static DataResult<ModifyItemEffect<?>> validate(ModifyItemEffect<?> modifyItemValue) {
+    private static DataResult<ModifyItemEffect> validate(ModifyItemEffect modifyItemValue) {
         return !modifyItemValue.items().stream().allMatch(Modification.Compatibility::isWeapon) ? DataResult.error(() -> "Encountered non-weapon mod compatibility: " + modifyItemValue.items()) : DataResult.success(modifyItemValue);
     }
 
-    static Supplier<MapCodec<? extends ModifyItemEffect<?>>> bootstrap(DeferredRegister<MapCodec<? extends ModifyItemEffect<?>>> registry) {
+    static Supplier<MapCodec<? extends ModifyItemEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModifyItemEffect>> registry) {
         registry.register("modify_crit", () -> ModifyCritChance.CODEC);
         return null;
     }
@@ -54,7 +52,7 @@ public interface ModifyItemEffect<T extends ModValueEffect> extends ModEntityEff
         return new ModifyCritChance(Arrays.asList(compatibilities), effect, Optional.empty(), Optional.empty(), id);
     }
 
-    DataComponentType<List<ConditionalModEffect<T>>> withComponent();
+    DataComponentType<List<ConditionalModEffect<ModValueEffect>>> withComponent();
 
     List<Modification.Compatibility> items();
 
@@ -64,7 +62,7 @@ public interface ModifyItemEffect<T extends ModValueEffect> extends ModEntityEff
 
     ResourceLocation id();
 
-    T value();
+    ModValueEffect value();
 
     @Override
     default void apply(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 origin) {
@@ -93,5 +91,5 @@ public interface ModifyItemEffect<T extends ModValueEffect> extends ModEntityEff
     }
 
     @Override
-    MapCodec<? extends ModifyItemEffect<?>> codec();
+    MapCodec<? extends ModifyItemEffect> codec();
 }
