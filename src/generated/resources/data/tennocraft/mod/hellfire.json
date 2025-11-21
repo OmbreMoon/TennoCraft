@@ -1,0 +1,31 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 6,
+      "per_rank": 1
+    },
+    "maxRank": 5,
+    "polarity": "naramon",
+    "rarity": "uncommon",
+    "supports": "#tennocraft:rifle"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:heat_damage": [
+      {
+        "effect": {
+          "type": "tennocraft:add",
+          "value": {
+            "type": "tennocraft:linear",
+            "base": 0.15,
+            "per_rank": 0.15
+          }
+        }
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.hellfire"
+  }
+}

@@ -1,12 +1,9 @@
 package com.ombremoon.tennocraft.main;
 
-import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.*;
 import com.ombremoon.tennocraft.common.init.*;
 import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
-import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModEntityEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModLocationEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.loading.FMLLoader;
@@ -29,6 +26,7 @@ public class CommonClass {
         registerSimple(ModValueEffect.MOD_VALUE_EFFECT_TYPES, modEventBus, ModValueEffect::bootstrap);
         registerSimple(ModEntityEffect.MOD_ENTITY_EFFECT_TYPES, modEventBus, ModEntityEffect::bootstrap);
         registerSimple(ModifyItemEffect.MOD_ITEM_EFFECT_TYPES, modEventBus, ModifyItemEffect::bootstrap);
+        registerSimple(ModifyDamageEffect.MOD_DAMAGE_EFFECT_TYPES, modEventBus, ModifyDamageEffect::bootstrap);
     }
 
     private static <T> void registerSimple(DeferredRegister<T> registry, IEventBus modEventBus, DeferredBootstrap<T> bootstrap) {

@@ -10,12 +10,13 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
 
-public class ModContainer implements INBTSerializable<CompoundTag> {
+public abstract class ModContainer implements INBTSerializable<CompoundTag> {
     public static final int AURA_SLOT = 0;
     public static final int EXILUS_SLOT = 1;
     public static final int STANCE_SLOT = 0;
@@ -26,7 +27,7 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
     private int maxCapacity;
     private int capacity;
 
-    public ModContainer(Modification.Compatibility type, Schema schema) {
+    ModContainer(Modification.Compatibility type, Schema schema) {
         this(type, schema, false);
     }
 
@@ -36,13 +37,15 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
         this.schema = schema;
 
         if (!cache) {
-            this.modCache = new ModContainer(type, schema, true);
+            this.modCache = this.createCache();
         }
     }
 
     public Modification.Compatibility getCompatibility() {
         return this.type;
     }
+
+    protected abstract ModContainer createCache();
 
     public int getFreeSlot() {
         for(int i = 0; i < this.mods.size(); ++i) {
@@ -124,61 +127,13 @@ public class ModContainer implements INBTSerializable<CompoundTag> {
         }
     }
 
-    public void confirmMods(Level level, IModHolder<?> holder) {
-        this.confirmMods(level, holder, null);
+    public void confirmMods(Player player, IModHolder<?> holder) {
+        this.confirmMods(player, holder, null);
     }
 
-    public void confirmMods(Level level, IModHolder<?> holder, ItemStack stack) {
+    public void confirmMods(Player player, IModHolder<?> holder, ItemStack stack) {
         this.replaceWith(this.modCache);
-        this.collectModdedAttributes(holder, stack);
         this.clearCachedMods();
-    }
-
-
-    public void collectModdedAttributes(IModHolder<?> holder, ItemStack stack) {
-        if (stack != null) {
-            AttributeMap attributes = holder.getStats(stack);
-            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = attributes.getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier);
-                }
-
-                //Stop Location Based Effects
-            });
-            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = holder.getStats(stack).getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier.id());
-                    instance.addPermanentModifier(attributeModifier);
-                }
-
-                //Run Location Changed Effects
-            });
-
-            //Run Elemental Attribute Visitor
-            //Add Elemental Attributes to list
-            //Compare Attribute to previous Attribute
-        } else {
-            AttributeMap attributes = holder.getStats();
-            ModHelper.forEachModifier(holder, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = attributes.getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier);
-                }
-
-                //Stop Location Based Effects
-            });
-            ModHelper.forEachModifier(holder, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = holder.getStats().getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier.id());
-                    instance.addPermanentModifier(attributeModifier);
-                }
-
-                //Run Location Changed Effects
-            });
-        }
     }
 
     public void clearMods() {

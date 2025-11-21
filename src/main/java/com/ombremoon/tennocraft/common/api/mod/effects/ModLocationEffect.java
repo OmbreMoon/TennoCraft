@@ -3,12 +3,15 @@ package com.ombremoon.tennocraft.common.api.mod.effects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.ombremoon.tennocraft.common.api.IModHolder;
+import com.ombremoon.tennocraft.common.api.mod.effects.damage.HeatDamage;
+import com.ombremoon.tennocraft.common.api.mod.effects.item.ModifyCritChance;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -27,12 +30,13 @@ public interface ModLocationEffect {
 
     static Supplier<MapCodec<? extends ModLocationEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModLocationEffect>> registry) {
         registry.register("modify_crit", () -> ModifyCritChance.CODEC);
+        registry.register("heat_damage", () -> HeatDamage.CODEC);
         return registry.register("attribute", () -> ModAttributeEffect.CODEC);
     }
 
-    void onChangedBlock(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 pos, boolean applyTransientEffects);
+    void onChangedBlock(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, LivingEntity attacker, Entity entity, Vec3 pos, boolean applyTransientEffects);
 
-    default void onDeactivated(IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 pos, int modRank) {
+    default void onDeactivated(IModHolder<?> modHolder, ItemStack stack, LivingEntity attacker, Entity entity, Vec3 pos, int modRank) {
     }
 
     MapCodec<? extends ModLocationEffect> codec();

@@ -5,14 +5,18 @@ import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
 import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.ModInstance;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
+import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
 import com.ombremoon.tennocraft.common.init.TCAttributes;
+import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCItems;
 import com.ombremoon.tennocraft.common.init.mods.TCMeleeWeaponMods;
+import com.ombremoon.tennocraft.common.init.mods.TCPrimaryWeaponMods;
 import com.ombremoon.tennocraft.common.init.mods.TCSecondaryWeaponMods;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
+import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -44,12 +48,12 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
         if (!level.isClientSide) {
             MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
             if (handler != null) {
-                ModContainer mods = this.getMods(stack);
-//                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCSecondaryWeaponMods.PISTOL_GAMBIT);
-//                mods.modCache.setMod(0, new ModInstance(mod, 3));
-//                this.confirmModChanges(stack);
-                log(mods);
-                log(handler.getSchema().getModdedCritChance((ServerLevel) level, stack, player, null));
+                WeaponModContainer mods = (WeaponModContainer) this.getMods(stack);
+                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCPrimaryWeaponMods.HELLFIRE);
+                mods.modCache.setMod(0, new ModInstance(mod, 3));
+                this.confirmModChanges(player, stack);
+                log(mods.modCache);
+                log(handler.getSchema().getModdedTypeDamage((ServerLevel) level, stack, WorldStatus.HEAT, player, null, null));
 //                log(this.getMods(stack));
                 log(handler.getTag());
             }
@@ -59,11 +63,9 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
 
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-//        WeaponDamageResult result = WeaponDamageResult.calculateMeleeResult(this, stack, target);
-        MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
-        if (handler != null) {
-            ModContainer mods = this.getMods(stack);
-            log(mods);
+        if (!target.level().isClientSide) {
+            WeaponDamageResult result = WeaponDamageResult.calculateMelee(stack, attacker, target);
+            log(result);
         }
         return super.hurtEnemy(stack, target, attacker);
     }
@@ -79,21 +81,11 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
     }
 
     @Override
-    public AttributeMap getStats(ItemStack stack) {
+    public void confirmModChanges(Player player, ItemStack stack) {
         var handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
         if (handler != null) {
             handler.ensureRegistryAccess();
-            return handler.getStats();
-        }
-        return null;
-    }
-
-    @Override
-    public void confirmModChanges(Level level, ItemStack stack) {
-        var handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
-        if (handler != null) {
-            handler.ensureRegistryAccess();
-            handler.confirmModChanges(level, stack);
+            handler.confirmModChanges(player, stack);
         }
     }
 

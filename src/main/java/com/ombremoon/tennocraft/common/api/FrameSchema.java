@@ -5,9 +5,11 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.mod.ModLayout;
+import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.schema.*;
 import com.ombremoon.tennocraft.common.init.TCAbilities;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
+import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.util.IntPair;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -34,6 +36,11 @@ public record FrameSchema(
     @Override
     public SchemaSerializer<?> getSerializer() {
         return TCSchemas.FRAME_SCHEMA.get();
+    }
+
+    @Override
+    public SlotGroup getType() {
+        return SlotGroup.FRAME;
     }
 
     public static class Serializer implements SchemaSerializer<FrameSchema> {

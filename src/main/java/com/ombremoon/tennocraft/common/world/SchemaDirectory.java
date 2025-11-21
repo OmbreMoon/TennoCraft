@@ -67,10 +67,11 @@ public class SchemaDirectory extends SimpleJsonResourceReloadListener {
                 Schema schema = Schema.DIRECT_CODEC.parse(this.registries.createSerializationContext(JsonOps.INSTANCE), entry.getValue()).getOrThrow(JsonParseException::new);
                 ResourceKey<Schema> schemaKey = ResourceKey.create(Keys.SCHEMA, location);
                 String type = location.getPath().split("/")[0];
-                switch (type) {
-                    case "frame" -> frameBuilder.put(location, new SchemaHolder<>(schemaKey, (FrameSchema) schema, type));
-                    case "ranged_weapon" -> rangedBuilder.put(location, new SchemaHolder<>(schemaKey, (RangedWeaponSchema) schema, type));
-                    case "melee_weapon" -> meleeBuilder.put(location, new SchemaHolder<>(schemaKey, (MeleeWeaponSchema) schema, type));
+                switch (schema) {
+                    case FrameSchema frameSchema -> frameBuilder.put(location, new SchemaHolder<>(schemaKey, frameSchema, type));
+                    case RangedWeaponSchema rangedWeaponSchema -> rangedBuilder.put(location, new SchemaHolder<>(schemaKey, rangedWeaponSchema, type));
+                    case MeleeWeaponSchema meleeWeaponSchema -> meleeBuilder.put(location, new SchemaHolder<>(schemaKey, meleeWeaponSchema, type));
+                    default -> throw new IllegalStateException("Unexpected schema type: " + schema);
                 }
 
                 schemas.add(schema);

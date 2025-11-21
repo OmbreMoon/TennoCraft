@@ -2,7 +2,6 @@ package com.ombremoon.tennocraft.util;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;
-import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
 import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
@@ -11,6 +10,7 @@ import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
+import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
@@ -42,50 +42,50 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
     //Handle Mutlishot Damage
     //Implement Damage Falloff
 
-    public static WeaponDamageResult calculateRanged(ItemStack stack, LivingEntity target) {
+    public static WeaponDamageResult calculateRanged(ItemStack stack, LivingEntity attacker, LivingEntity target) {
         RangedWeaponHandler handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
         if (handler != null) {
             RangedWeaponSchema schema = handler.getSchema();
             WeaponModContainer mods = handler.getMods();
-            Partial partial = quantizeAndNormalize(stack, target, schema, handler.getTriggerType(), mods);
-            return resultFromPartial(stack, target, partial, schema, handler.getTriggerType(), handler::handleBulletDamage);
+            Partial partial = quantizeAndNormalize(stack, attacker, target, schema, handler.getTriggerType(), mods);
+            return resultFromPartial(stack, attacker, target, partial, schema, handler.getTriggerType(), handler::handleBulletDamage);
         }
 
         return null;
     }
 
-    public static WeaponDamageResult calculateMelee(ItemStack stack, LivingEntity target) {
+    public static WeaponDamageResult calculateMelee(ItemStack stack, LivingEntity attacker, LivingEntity target) {
         MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
         if (handler != null) {
             MeleeWeaponSchema schema = handler.getSchema();
             WeaponModContainer mods = handler.getMods();
-            Partial partial = quantizeAndNormalize(stack, target, schema, null, mods);
-            return resultFromPartial(stack, target, partial, schema, null, handler::handleComboModifiers);
+            Partial partial = quantizeAndNormalize(stack, attacker, target, schema, null, mods);
+            return resultFromPartial(stack, attacker, target, partial, schema, null, handler::handleComboModifiers);
         }
 
         return null;
     }
 
-    private static WeaponDamageResult resultFromPartial(ItemStack stack, LivingEntity target, Partial partial, WeaponSchema schema, @Nullable TriggerType type, PartialOutput output) {
+    private static WeaponDamageResult resultFromPartial(ItemStack stack, LivingEntity attacker, LivingEntity target, Partial partial, WeaponSchema schema, @Nullable TriggerType type, PartialOutput output) {
         output.accept(stack, target, partial);
         float f = partial.damage;
 
         ServerLevel level = (ServerLevel) target.level();
-        float modifiedDamage = 1.0F + Math.max(0.0F, ModHelper.modifyDamage(level, stack, schema, target));
+        float modifiedDamage = 1.0F + Math.max(0.0F, ModHelper.modifyDamage(level, stack, schema, attacker, target));
         f *= modifiedDamage;
 
-        float modifiedCritChance = schema.getModdedCritChance(level, stack, target, type);
+        float modifiedCritChance = schema.getModdedCritChance(level, stack, attacker, target, type);
         int tier = Mth.floor(modifiedCritChance);
         float potentialCrit = modifiedCritChance % 1.0F;
         if (potentialCrit != 0 && RandomUtil.percentChance(potentialCrit)) {
             tier++;
         }
 
-        float modifiedCritMult = schema.getModdedCritDamage(level, stack, target, type);;
+        float modifiedCritMult = schema.getModdedCritDamage(level, stack, attacker, target, type);;
         f *= 1 + tier * (modifiedCritMult - 1);
 
         List<Holder<DamageType>> procs = new ArrayList<>();
-        float modifiedStatus = schema.getModdedStatusChance(level, stack, target, type);
+        float modifiedStatus = schema.getModdedStatusChance(level, stack, attacker, target, type);
         int procCount = Mth.floor(modifiedStatus);
         float potentialProc = modifiedStatus % 1.0F;
         if (potentialProc != 0 && RandomUtil.percentChance(potentialProc)) {
@@ -96,7 +96,6 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         DamageValue hitValue = getWeightedDamage(weightedValues, RandomUtil.randomValueUpTo(1.0F));
         for (int i = 0; i < procCount; i++) {
             DamageValue proc = getWeightedDamage(weightedValues, RandomUtil.randomValueUpTo(1.0F));
-//            Holder<DamageType> holder = level.holderOrThrow(proc.damageType());
             Holder<DamageType> holder = proc.damageType();
             procs.add(holder);
         }
@@ -105,7 +104,7 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         return new WeaponDamageResult(damageValue, procs);
     }
 
-    private static Partial quantizeAndNormalize(ItemStack stack, LivingEntity target, WeaponSchema schema, @Nullable TriggerType type, WeaponModContainer mods) {
+    private static Partial quantizeAndNormalize(ItemStack stack, LivingEntity attacker, LivingEntity target, WeaponSchema schema, @Nullable TriggerType type, WeaponModContainer mods) {
         ServerLevel level = (ServerLevel) target.level();
         Distribution distribution = schema.getBaseDamageDistribution(type);
         int baseDamage = schema.getBaseDamage(type);
@@ -115,17 +114,16 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         List<DamageValue> weightedDamage = new ArrayList<>();
         List<DamageValue> quantizedValues = new ArrayList<>(baseValue.getFirst());
         float f = baseValue.getSecond();
-        for (Holder<DamageType> modifier : mods.damageModifiers) {
-            ResourceKey<DamageType> damageKey = modifier.getKey();
+        for (DamageValue modifier : mods.weaponDamageTypes) {
+            Holder<DamageType> damageType = modifier.damageType();
+            ResourceKey<DamageType> damageKey = damageType.getKey();
             WorldStatus status = StatusEffect.getStatusFromType(damageKey);
-            float modifiedTypeDamage = Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, schema, target));
-//            ResourceKey<DamageType> damageKey = modifier.damageType();
-//            Holder<DamageType> damageType = target.registryAccess().holderOrThrow(damageKey);
+            float modifiedTypeDamage = Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, schema, attacker, target, modifier.amount()));
             float quantizedValue;
-            if (distribution.contains(modifier)) {
-                float baseType = distribution.getAmount(modifier);
+            if (distribution.contains(damageType)) {
+                float baseType = distribution.getAmount(damageType);
                 quantizedValue = Math.round((baseType * modifiedTypeDamage) / scale) * scale;
-            } else if (modifier.is(TCTags.DamageTypes.PHYSICAL)) {
+            } else if (damageType.is(TCTags.DamageTypes.PHYSICAL)) {
                 continue;
             } else {
                 quantizedValue = Math.round((baseDamage * modifiedTypeDamage) / scale) * scale;
@@ -133,7 +131,7 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
 
             float healthModifier = getHealthModifier(target, status);
             f += quantizedValue * healthModifier;
-            quantizedValues.add(new DamageValue(modifier, quantizedValue));
+            quantizedValues.add(new DamageValue(damageType, quantizedValue));
         }
 
         for (DamageValue value : quantizedValues) {
@@ -199,6 +197,14 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
             return this.distribution.containsKey(key);
         }
 
+        public void ifElementalPresent(BiConsumer<Holder<DamageType>, Float> consumer) {
+            this.forEach((damageType, amount) -> {
+                if (damageType.is(TCTags.DamageTypes.ELEMENTAL)) {
+                    consumer.accept(damageType, amount);
+                }
+            });
+        }
+
         public float getAmount(Holder<DamageType> key) {
             return this.distribution.get(key);
         }
@@ -215,6 +221,11 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
 
             return values;
         }
+
+        @Override
+        public String toString() {
+            return this.distribution.toString();
+        }
     }
 
     public static class Partial {
@@ -226,20 +237,12 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
             this.damage = damage;
         }
 
-        Partial(Distribution distribution) {
-            this(distribution, 0.0F);
-        }
-
         public void setDamage(float damage) {
             this.damage = damage;
         }
 
         public float getDamage() {
             return this.damage;
-        }
-
-        public Distribution getDistribution() {
-            return this.distribution;
         }
     }
 

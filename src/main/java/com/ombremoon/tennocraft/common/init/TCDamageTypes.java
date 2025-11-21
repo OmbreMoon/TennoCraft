@@ -6,20 +6,25 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface TCDamageTypes {
-    ResourceKey<DamageType> IMPACT = register("impact");
-    ResourceKey<DamageType> PUNCTURE = register("puncture");
-    ResourceKey<DamageType> SLASH = register("slash");
-    ResourceKey<DamageType> HEAT = register("heat");
-    ResourceKey<DamageType> COLD = register("cold");
-    ResourceKey<DamageType> ELECTRICITY = register("electricity");
-    ResourceKey<DamageType> TOXIC = register("toxic");
-    ResourceKey<DamageType> BLAST = register("blast");
-    ResourceKey<DamageType> CORROSIVE = register("corrosive");
-    ResourceKey<DamageType> GAS = register("gas");
-    ResourceKey<DamageType> MAGNETIC = register("magnetic");
-    ResourceKey<DamageType> RADIATION = register("radiation");
-    ResourceKey<DamageType> VIRAL = register("viral");
+    List<ResourceKey<DamageType>> ELEMENTAL_TYPES = new ArrayList<>();
+
+    ResourceKey<DamageType> IMPACT = key("impact");
+    ResourceKey<DamageType> PUNCTURE = key("puncture");
+    ResourceKey<DamageType> SLASH = key("slash");
+    ResourceKey<DamageType> HEAT = elementalKey("heat");
+    ResourceKey<DamageType> COLD = elementalKey("cold");
+    ResourceKey<DamageType> ELECTRICITY = elementalKey("electricity");
+    ResourceKey<DamageType> TOXIC = elementalKey("toxic");
+    ResourceKey<DamageType> BLAST = elementalKey("blast");
+    ResourceKey<DamageType> CORROSIVE = elementalKey("corrosive");
+    ResourceKey<DamageType> GAS = elementalKey("gas");
+    ResourceKey<DamageType> MAGNETIC = elementalKey("magnetic");
+    ResourceKey<DamageType> RADIATION = elementalKey("radiation");
+    ResourceKey<DamageType> VIRAL = elementalKey("viral");
 
     static void bootstrap(BootstrapContext<DamageType> context) {
         register(context, IMPACT);
@@ -37,8 +42,14 @@ public interface TCDamageTypes {
         register(context, VIRAL);
     }
 
-    private static ResourceKey<DamageType> register(String name) {
+    private static ResourceKey<DamageType> key(String name) {
         return ResourceKey.create(Registries.DAMAGE_TYPE, CommonClass.customLocation(name));
+    }
+
+    private static ResourceKey<DamageType> elementalKey(String name) {
+        var key = ResourceKey.create(Registries.DAMAGE_TYPE, CommonClass.customLocation(name));
+        ELEMENTAL_TYPES.add(key);
+        return key;
     }
 
     private static void register(BootstrapContext<DamageType> context, ResourceKey<DamageType> key) {

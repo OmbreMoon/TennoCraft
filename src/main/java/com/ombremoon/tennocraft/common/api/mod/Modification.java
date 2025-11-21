@@ -3,9 +3,13 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModConditions;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
+import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.common.world.level.loot.ModContextParams;
 import com.ombremoon.tennocraft.main.Keys;
@@ -25,7 +29,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -162,41 +166,38 @@ public record Modification(Component name, Component description, ModDefinition 
         return this.effects.getOrDefault(component, List.of());
     }
 
-    public void modifyWeaponDamage(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, schema, entity, damage);
+    public void modifyWeaponDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
-    public void modifyTypeDamage(ServerLevel level, WorldStatus status, int modRank, Schema schema, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(status.getDataComponentType().get(), level, modRank, schema, entity, damage);
+    public void modifyCritChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
-    public void modifyCritChance(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, entity, damage);
-    }
-
-    public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, entity, damage);
+    public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, attacker, entity, damage);
         //modifyWithItemModifiers
     }
 
     //public void modifyElementalDamage (Data component type from status)
 
-    public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, Entity entity, MutableFloat damage) {
-        this.modifyEntityFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, entity, damage);
+    public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
-    public void modifyEntityFilteredValue(
+    public void modifyAttackFilteredValue(
             DataComponentType<List<ConditionalModEffect<ModValueEffect>>> type,
             ServerLevel level,
             int modRank,
             Schema schema,
+            LivingEntity attacker,
             Entity entity,
             MutableFloat value
     ) {
         applyEffects(
                 this.getEffects(type),
-                entityContext(level, schema, modRank, entity, entity.position()),
-                valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
+                moddedAttackContext(level, schema, modRank, attacker, entity),
+                valueEffect -> value.setValue(valueEffect.process(modRank, attacker.getRandom(), value.floatValue()))
         );
     }
 
@@ -214,6 +215,17 @@ public record Modification(Component name, Component description, ModDefinition 
                 damageContext(level, schema, modRank, entity, source),
                 valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
         );
+    }
+
+    public static LootContext moddedAttackContext(ServerLevel level, Schema schema, int modRank, LivingEntity attacker, Entity entity) {
+        LootParams lootparams = new LootParams.Builder(level)
+                .withParameter(LootContextParams.ATTACKING_ENTITY, attacker)
+                .withParameter(ModContextParams.MOD_RANK, modRank)
+                .withParameter(ModContextParams.SCHEMA, schema)
+                .withOptionalParameter(LootContextParams.THIS_ENTITY, entity)
+                .withOptionalParameter(LootContextParams.ORIGIN, entity!= null ? entity.position() : null)
+                .create(ModContextParams.MODDED_ATTACK);
+        return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
     public static LootContext damageContext(ServerLevel level, Schema schema, int modRank, Entity entity, DamageSource damageSource) {
@@ -236,16 +248,6 @@ public record Modification(Component name, Component description, ModDefinition 
                 .withParameter(LootContextParams.ORIGIN, entity.position())
                 .withParameter(LootContextParams.ENCHANTMENT_ACTIVE, enchantmentActive)
                 .create(LootContextParamSets.ENCHANTED_LOCATION);
-        return new LootContext.Builder(lootparams).create(Optional.empty());
-    }
-
-    public static LootContext entityContext(ServerLevel level, Schema schema, int modRank, Entity entity, Vec3 origin) {
-        LootParams lootparams = new LootParams.Builder(level)
-                .withParameter(LootContextParams.THIS_ENTITY, entity)
-                .withParameter(ModContextParams.MOD_RANK, modRank)
-                .withParameter(LootContextParams.ORIGIN, origin)
-                .withOptionalParameter(ModContextParams.SCHEMA, schema)
-                .create(ModContextParams.MODDED_ENTITY);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
@@ -289,32 +291,42 @@ public record Modification(Component name, Component description, ModDefinition 
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect, AuraEffect aura, int duration, LootItemCondition.Builder requirements) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(requirements.build()), Optional.of(aura), Optional.of(duration)));
+            ModConditions conditions = new ModConditions(Optional.of(requirements.build()), Optional.of(aura), Optional.of(duration));
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(conditions)));
             return this;
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect, AuraEffect aura, LootItemCondition.Builder requirements) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(requirements.build()), Optional.of(aura), Optional.empty()));
+            ModConditions conditions = new ModConditions(Optional.of(requirements.build()), Optional.of(aura), Optional.empty());
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(conditions)));
             return this;
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect, AuraEffect aura, int duration) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.empty(), Optional.of(aura), Optional.of(duration)));
+            ModConditions conditions = new ModConditions(Optional.empty(), Optional.of(aura), Optional.of(duration));
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(conditions)));
             return this;
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect, AuraEffect aura) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.empty(), Optional.of(aura), Optional.empty()));
+            ModConditions conditions = new ModConditions(Optional.empty(), Optional.of(aura), Optional.empty());
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(conditions)));
             return this;
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect, LootItemCondition.Builder requirements) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(requirements.build()), Optional.empty(), Optional.empty()));
+            ModConditions conditions = new ModConditions(Optional.of(requirements.build()), Optional.empty(), Optional.empty());
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.of(conditions)));
             return this;
         }
 
         public <E> Builder withEffect(DataComponentType<List<ConditionalModEffect<E>>> componentType, E effect) {
-            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.empty(), Optional.empty(), Optional.empty()));
+            this.getEffectsList(componentType).add(new ConditionalModEffect<>(effect, Optional.empty()));
+            return this;
+        }
+
+        public Builder withItemEffect(DataComponentType<List<ModifyItemEffect>> componentType, ModifyItemEffect effect) {
+            this.getEffectsList(componentType).add(effect);
             return this;
         }
 
@@ -382,32 +394,32 @@ public record Modification(Component name, Component description, ModDefinition 
     }
 
     public enum Compatibility implements StringRepresentable {
-        FRAME("frame", 10, false),
-        PRIMARY("primary", 9, true),
-        SECONDARY("secondary", 9, true),
-        MELEE("melee", 10, true),
-        ARCHWING("archwing", 8, true),
-        ARCHGUN("archgun", 8, true),
-        ARCHMELEE("archmelee", 8, false),
-        COMPANION("companion", 10, false),
-        COMPANION_WEAPON("companion_weapon", 8, true),
-        K_DRIVE("k_drive", 8, false),
-        EXALTED_WEAPON("exalted_weapon", 8, true),
-        NECRAMECH("necramech", 12, false);
+        FRAME("frame", 10, SlotGroup.FRAME),
+        PRIMARY("primary", 9, SlotGroup.WEAPON),
+        SECONDARY("secondary", 9, SlotGroup.WEAPON),
+        MELEE("melee", 10, SlotGroup.WEAPON),
+        ARCHWING("archwing", 8, SlotGroup.VEHICLE),
+        ARCHGUN("archgun", 8, SlotGroup.WEAPON),
+        ARCHMELEE("archmelee", 8, SlotGroup.WEAPON),
+        COMPANION("companion", 10, SlotGroup.COMPANION),
+        COMPANION_WEAPON("companion_weapon", 8, SlotGroup.COMPANION_WEAPON),
+        K_DRIVE("k_drive", 8, SlotGroup.VEHICLE),
+        EXALTED_WEAPON("exalted_weapon", 8, SlotGroup.WEAPON),
+        NECRAMECH("necramech", 12, SlotGroup.VEHICLE);
 
         public static final Codec<Compatibility> CODEC = StringRepresentable.fromEnum(Compatibility::values);
         private final String name;
         private final int maxSlots;
-        private final boolean isWeapon;
+        private final SlotGroup group;
 
-        Compatibility(String name, int maxSlots, boolean isWeapon) {
+        Compatibility(String name, int maxSlots, SlotGroup group) {
             this.name = name;
             this.maxSlots = maxSlots;
-            this.isWeapon = isWeapon;
+            this.group = group;
         }
 
         public boolean isWeapon() {
-            return this.isWeapon;
+            return this.group == SlotGroup.WEAPON;
         }
 
         @Override
@@ -417,6 +429,10 @@ public record Modification(Component name, Component description, ModDefinition 
 
         public int getMaxSlots() {
             return this.maxSlots;
+        }
+
+        public SlotGroup getGroup() {
+            return this.group;
         }
     }
 

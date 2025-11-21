@@ -27,8 +27,6 @@ public class DebugItem extends Item implements Loggable {
         if (!pLevel.isClientSide) {
             Map<Integer, List<Float>> map = new HashMap<>();
             var list = map.computeIfAbsent(0, integer -> new ArrayList<>());
-            list.add(2.0F);
-            log(map);
         } else {
         }
         FrameHandler handler = FrameUtil.getFrameHandler(pPlayer);

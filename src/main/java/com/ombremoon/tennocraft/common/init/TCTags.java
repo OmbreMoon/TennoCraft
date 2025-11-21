@@ -81,6 +81,8 @@ public class TCTags {
 
     public static class Schemas {
         public static final TagKey<Schema> FRAME = tag("frame");
+        public static final TagKey<Schema> WEAPON = tag("weapon");
+        public static final TagKey<Schema> RANGED_WEAPON = tag("ranged_weapon");
         public static final TagKey<Schema> RIFLE = tag("rifle");
         public static final TagKey<Schema> SHOTGUN = tag("shotgun");
         public static final TagKey<Schema> PISTOL = tag("pistol");

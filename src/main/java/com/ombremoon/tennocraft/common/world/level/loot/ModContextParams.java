@@ -21,12 +21,12 @@ public class ModContextParams {
                     .optional(LootContextParams.ATTACKING_ENTITY)
     );
 
-    public static final LootContextParamSet MODDED_ENTITY = register(
+    public static final LootContextParamSet MODDED_ATTACK = register(
             builder -> builder
-                    .required(LootContextParams.THIS_ENTITY)
                     .required(MOD_RANK)
-                    .required(LootContextParams.ORIGIN)
-                    .optional(SCHEMA)
+                    .required(SCHEMA)
+                    .optional(LootContextParams.THIS_ENTITY)
+                    .optional(LootContextParams.ORIGIN)
     );
 
     public static final LootContextParamSet MODDED_ITEM = register(

@@ -63,16 +63,6 @@ public abstract class RangedWeaponItem extends AbstractWeaponItem<RangedWeaponSc
     }
 
     @Override
-    public AttributeMap getStats(ItemStack stack) {
-        var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
-        if (handler != null) {
-            handler.ensureRegistryAccess();
-            return handler.getStats();
-        }
-        return null;
-    }
-
-    @Override
     public TriggerType getTriggerType(ItemStack stack) {
         var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
         if (handler != null) {
@@ -83,11 +73,11 @@ public abstract class RangedWeaponItem extends AbstractWeaponItem<RangedWeaponSc
     }
 
     @Override
-    public void confirmModChanges(Level level, ItemStack stack) {
+    public void confirmModChanges(Player player, ItemStack stack) {
         var handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
         if (handler != null) {
             handler.ensureRegistryAccess();
-            handler.confirmModChanges(level, stack);
+            handler.confirmModChanges(player, stack);
         }
     }
 

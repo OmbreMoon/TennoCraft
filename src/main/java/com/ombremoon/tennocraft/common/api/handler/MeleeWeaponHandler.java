@@ -23,6 +23,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -104,9 +105,9 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
 
     }
 
-    public void confirmModChanges(Level level, ItemStack stack) {
+    public void confirmModChanges(Player player, ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(level, stack, this.mods, this.stats);
+        mutable.confirmModChanges(player, stack, this.mods, this.stats);
         stack.set(TCData.MELEE_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -154,9 +155,8 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(Level level, ItemStack stack, WeaponModContainer mods, AttributeMap stats) {
-            mods.confirmMods(level,
-                    (IModHolder<?>) stack.getItem(), stack);
+        public void confirmModChanges(Player player, ItemStack stack, WeaponModContainer mods, AttributeMap stats) {
+            mods.confirmMods(player, (IModHolder<?>) stack.getItem(), stack);
             this.saveChanges(mods, stats);
         }
 
