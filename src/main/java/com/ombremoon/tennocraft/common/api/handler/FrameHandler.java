@@ -3,6 +3,7 @@ package com.ombremoon.tennocraft.common.api.handler;
 import com.ombremoon.tennocraft.common.api.FrameSchema;
 import com.ombremoon.tennocraft.common.api.MineFrame;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import com.ombremoon.tennocraft.common.world.item.TransferenceKeyItem;
 import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
@@ -63,9 +64,9 @@ public class FrameHandler implements ModHandler, INBTSerializable<CompoundTag>, 
         return this.initialized;
     }
 
-    public void unlockFrame(Holder<Schema> holder) {
-        if (holder.value() instanceof FrameSchema schema && !this.frames.containsKey(holder.getKey())) {
-            this.frames.put(holder.getKey(), new MineFrame(schema, this));
+    public void unlockFrame(SchemaHolder<FrameSchema> holder) {
+        if (!this.frames.containsKey(holder.schemaKey())) {
+            this.frames.put(holder.schemaKey(), new MineFrame(holder, this));
         }
     }
 
@@ -130,7 +131,7 @@ public class FrameHandler implements ModHandler, INBTSerializable<CompoundTag>, 
                 ResourceKey<Schema> key = ResourceKey.create(Keys.SCHEMA, location);
                 MineFrame frame = provider.lookup(Keys.SCHEMA)
                         .flatMap(lookup -> lookup.get(key))
-                        .map(holder -> new MineFrame((FrameSchema) holder.value(), this))
+                        .map(holder -> new MineFrame(new SchemaHolder<>(holder.getKey(), (FrameSchema) holder.value(), "frame"), this))
                         .orElseGet(() -> {
                             LOGGER.warn("Failed to load schema with key: {}", key.location());
                             return null;

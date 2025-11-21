@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.datagen;
 
+import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCStatusEffects;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
@@ -17,6 +18,7 @@ import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -75,6 +77,44 @@ public class ModTagProvider {
         }
     }
 
+    public static class DamageTypes extends TagsProvider<DamageType> {
+
+        public DamageTypes(PackOutput pGenerator, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
+            super(pGenerator, Registries.DAMAGE_TYPE, provider, Constants.MOD_ID, existingFileHelper);
+        }
+
+        @Override
+        protected void addTags(HolderLookup.Provider pProvider) {
+            populateTag(TCTags.DamageTypes.PHYSICAL,
+                    TCDamageTypes.IMPACT,
+                    TCDamageTypes.PUNCTURE,
+                    TCDamageTypes.SLASH
+            );
+            populateTag(TCTags.DamageTypes.ELEMENTAL,
+                    TCDamageTypes.HEAT,
+                    TCDamageTypes.COLD,
+                    TCDamageTypes.ELECTRICITY,
+                    TCDamageTypes.TOXIC,
+                    TCDamageTypes.BLAST,
+                    TCDamageTypes.CORROSIVE,
+                    TCDamageTypes.MAGNETIC,
+                    TCDamageTypes.GAS,
+                    TCDamageTypes.RADIATION,
+                    TCDamageTypes.VIRAL
+            );
+        }
+
+        public void populateTag(TagKey<DamageType> tag, ResourceKey<DamageType>... schemas){
+            for (ResourceKey<DamageType> schema : schemas) {
+                tag(tag).add(schema);
+            }
+        }
+
+        public void populateTags(TagKey<DamageType> tag, TagKey<DamageType>... effect){
+            tag(tag).addTags(effect);
+        }
+    }
+
     public static class MobEffects extends TagsProvider<MobEffect> {
         public MobEffects(PackOutput output, CompletableFuture<HolderLookup.Provider> provider, @Nullable ExistingFileHelper existingFileHelper) {
             super(output, Registries.MOB_EFFECT, provider, Constants.MOD_ID, existingFileHelper);
@@ -119,6 +159,11 @@ public class ModTagProvider {
         @Override
         protected void addTags(HolderLookup.Provider pProvider) {
             populateTag(TCTags.Schemas.FRAME, TCFrames.VOLT);
+
+            populateTags(TCTags.Schemas.WEAPON,
+                    TCTags.Schemas.RANGED_WEAPON,
+                    TCTags.Schemas.MELEE);
+
             populateTag(TCTags.Schemas.PISTOL, TCSecondaryWeapons.ATOMOS);
             populateTag(TCTags.Schemas.MELEE, TCMeleeWeapons.ORTHOS);
         }
@@ -127,6 +172,10 @@ public class ModTagProvider {
             for (ResourceKey<Schema> schema : schemas) {
                 tag(tag).add(schema);
             }
+        }
+
+        public void populateTags(TagKey<Schema> tag, TagKey<Schema>... effect){
+            tag(tag).addTags(effect);
         }
     }
 }

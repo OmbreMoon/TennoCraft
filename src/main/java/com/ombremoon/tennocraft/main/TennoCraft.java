@@ -1,16 +1,13 @@
 package com.ombremoon.tennocraft.main;
 
-import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.*;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCAbilities;
 import com.ombremoon.tennocraft.common.init.TCProjectileSerializers;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
-import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModEntityEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModLocationEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
+import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -43,6 +40,7 @@ public class TennoCraft {
         event.register(ModLocationEffect.REGISTRY);
         event.register(ModValueEffect.REGISTRY);
         event.register(ModifyItemEffect.REGISTRY);
+        event.register(ModifyDamageEffect.REGISTRY);
         event.register(RankBasedValue.REGISTRY);
         event.register(TCAbilities.REGISTRY);
         event.register(TCModEffectComponents.REGISTRY);

@@ -5,6 +5,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
+import com.ombremoon.tennocraft.common.world.SlotGroup;
+import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.util.ModHelper;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -49,6 +51,11 @@ public class MeleeWeaponSchema extends WeaponSchema {
     }
 
     @Override
+    public SlotGroup getType() {
+        return SlotGroup.WEAPON;
+    }
+
+    @Override
     public int getBaseDamage(TriggerType triggerType) {
         return this.baseDamage;
     }
@@ -59,23 +66,28 @@ public class MeleeWeaponSchema extends WeaponSchema {
     }
 
     @Override
-    public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+    public float getModdedTypeDamage(ServerLevel level, ItemStack stack, WorldStatus status, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
+        return Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, this, attacker, target, 0.0F));
+    }
+
+    @Override
+    public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
         float critChance = this.attacks.attack().getCritChance();
-        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, target, 0.0F)));
+        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override
-    public float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+    public float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
         return 0;
     }
 
     @Override
-    public float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+    public float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
         return 0;
     }
 
     @Override
-    public float getModdedRivenDisposition(ServerLevel level, ItemStack stack, LivingEntity target, @Nullable TriggerType triggerType) {
+    public float getModdedRivenDisposition(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
         return 0;
     }
 

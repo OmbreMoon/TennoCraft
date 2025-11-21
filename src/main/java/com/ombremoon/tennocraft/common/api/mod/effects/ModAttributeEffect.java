@@ -3,12 +3,15 @@ package com.ombremoon.tennocraft.common.api.mod.effects;
 import com.google.common.collect.HashMultimap;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.IEntityModHolder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.RankBasedValue;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -29,13 +32,15 @@ public record ModAttributeEffect(ResourceLocation id, Holder<Attribute> attribut
     }
 
     @Override
-    public void onChangedBlock(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 pos, boolean applyTransientEffects) {
-        modHolder.getStats(stack).addTransientAttributeModifiers(this.makeAttributeMap(modRank));
+    public void onChangedBlock(ServerLevel level, int modRank, IModHolder<?> modHolder, ItemStack stack, LivingEntity attacker, Entity entity, Vec3 pos, boolean applyTransientEffects) {
+        if (modHolder instanceof IEntityModHolder<?> entityModHolder)
+            entityModHolder.getStats().addTransientAttributeModifiers(this.makeAttributeMap(modRank));
     }
 
     @Override
-    public void onDeactivated(IModHolder<?> modHolder, ItemStack stack, Entity entity, Vec3 pos, int modRank) {
-        modHolder.getStats(stack).removeAttributeModifiers(this.makeAttributeMap(modRank));
+    public void onDeactivated(IModHolder<?> modHolder, ItemStack stack, LivingEntity attacker, Entity entity, Vec3 pos, int modRank) {
+        if (modHolder instanceof IEntityModHolder<?> entityModHolder)
+            entityModHolder.getStats().removeAttributeModifiers(this.makeAttributeMap(modRank));
     }
 
     private HashMultimap<Holder<Attribute>, AttributeModifier> makeAttributeMap(int rank) {

@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.common.world;
 
 import com.ombremoon.tennocraft.common.api.mod.ConditionalModEffect;
-import com.ombremoon.tennocraft.common.api.mod.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCStatusEffects;

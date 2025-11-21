@@ -27,6 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -70,7 +71,6 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
     private final RangedWeaponSchema schema;
     private final List<RangedAttackSchema> attacks = new ObjectArrayList<>();
     private final WeaponModContainer mods;
-    private final AttributeMap stats;
     private TriggerType triggerType;
     @Nullable
     private HolderLookup.Provider registries;
@@ -88,8 +88,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         this.triggerType = this.getTriggerType();
         this.attacks.addAll(this.schema.getProperties().getAttacks(this.triggerType));
         this.mods = new WeaponModContainer(compatibility, this.schema);
-        this.stats = new AttributeMap(createRangedWeaponAttributes(this.attacks.getFirst()));
-        this.loadFromTag(tag, schema, registries);
+        this.loadFromTag(tag, registries);
     }
 
     public void setRegistries(HolderLookup.Provider registries) {
@@ -112,16 +111,16 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
 
     public void cycleAlternateFire(ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.cycleAlternateFire(stack, this.triggerType);
+        mutable.cycleAlternateFire(this.triggerType);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
     public void handleBulletDamage(ItemStack stack, LivingEntity target, WeaponDamageResult.Partial partial) {
     }
 
-    public void confirmModChanges(Level level, ItemStack stack) {
+    public void confirmModChanges(Player player, ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(level, stack, this.mods, this.stats, this.triggerType);
+        mutable.confirmModChanges(player, stack, this.mods);
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -135,10 +134,6 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
 
     public WeaponModContainer getMods() {
         return this.mods;
-    }
-
-    public AttributeMap getStats() {
-        return this.stats;
     }
 
     public TriggerType getTriggerType() {
@@ -157,24 +152,9 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
                 .orElse(TriggerType.AUTO);
     }
 
-    private static AttributeSupplier createRangedWeaponAttributes(RangedAttackSchema schema) {
-        return AttributeSupplier.builder()
-                .add(TCAttributes.CRIT_CHANCE, schema.getCritChance())
-                .build();
-    }
-
     private void loadFromTag(CompoundTag tag, Schema schema, HolderLookup.Provider registries) {
         if (registries != null && tag.contains("Mods")) {
             this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
-        }
-
-        if (tag.contains("Stats")) {
-            CompoundTag nbt = tag.getCompound("Stats");
-            String trigger = this.triggerType.getSerializedName();
-            if (nbt.contains(trigger, 9)) {
-                ListTag listTag = nbt.getList(this.triggerType.getSerializedName(), 10);
-                this.stats.load(listTag);
-            }
         }
     }
 
@@ -199,41 +179,16 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(Level level, ItemStack stack, WeaponModContainer mods, AttributeMap stats, TriggerType triggerType) {
-            mods.confirmMods(level, (IModHolder<?>) stack.getItem(), stack);
-            this.saveChanges(mods, stats, triggerType);
+        public void confirmModChanges(Player player, ItemStack stack, WeaponModContainer mods) {
+            mods.confirmMods(player, (IModHolder<?>) stack.getItem(), stack);
+            this.saveChanges(mods);
         }
 
-        public <T extends TriggerType> void cycleAlternateFire(ItemStack stack, T triggerType) {
+        public <T extends TriggerType> void cycleAlternateFire(T triggerType) {
             var type = findNextTypeInList(this.schema.getProperties().triggers(), triggerType);
             if (type != triggerType) {
                 this.tag.putString("TriggerType", type.getSerializedName());
-                this.setAlternateFireAttributes(stack, type);
             }
-        }
-
-        private void setAlternateFireAttributes(ItemStack stack, TriggerType type) {
-            var attacks = this.schema.getProperties().getAttacks(type);
-            var stats = new AttributeMap(createRangedWeaponAttributes(attacks.getFirst()));
-            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = stats.getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier);
-                }
-
-                //Stop Location Based Effects
-            });
-            ModHelper.forEachModifier(stack, (attributeHolder, attributeModifier) -> {
-                AttributeInstance instance = stats.getInstance(attributeHolder);
-                if (instance != null) {
-                    instance.removeModifier(attributeModifier.id());
-                    instance.addPermanentModifier(attributeModifier);
-                }
-
-                //Run Location Changed Effects
-            });
-
-            this.saveStats(stats, type);
         }
 
         private static <T> T findNextTypeInList(Collection<T> list, T current) {
@@ -251,21 +206,9 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
             return list.isEmpty() ? current : list.iterator().next();
         }
 
-        private void saveChanges(WeaponModContainer mods, AttributeMap stats, TriggerType triggerType) {
-            this.saveMods(mods);
-            this.saveStats(stats, triggerType);
-        }
-
-        private void saveMods(WeaponModContainer mods) {
+        private void saveChanges(WeaponModContainer mods) {
             if (this.registries != null)
                 this.tag.put("Mods", mods.serializeNBT(this.registries));
-        }
-
-        private void saveStats(AttributeMap stats, TriggerType triggerType) {
-            CompoundTag nbt = new CompoundTag();
-            ListTag statList = stats.save();
-            nbt.put(triggerType.getSerializedName(), statList);
-            this.tag.put("Stats", nbt);
         }
 
         public RangedWeaponHandler toImmutable() {
