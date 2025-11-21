@@ -51,11 +51,20 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
                     ).apply(instance, RangedWeaponHandler::forCodec)
             )
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, RangedWeaponHandler> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.COMPOUND_TAG, handler -> handler.tag,
-            Schema.STREAM_CODEC, handler -> handler.schema,
-            RangedWeaponHandler::forCodec
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, RangedWeaponHandler> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public RangedWeaponHandler decode(RegistryFriendlyByteBuf buffer) {
+            CompoundTag tag = ByteBufCodecs.COMPOUND_TAG.decode(buffer);
+            Schema schema = Schema.STREAM_CODEC.decode(buffer);
+            return new RangedWeaponHandler(tag, schema, buffer.registryAccess());
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf buffer, RangedWeaponHandler handler) {
+            ByteBufCodecs.COMPOUND_TAG.encode(buffer, handler.tag);
+            Schema.STREAM_CODEC.encode(buffer, handler.schema);
+        }
+    };
 
     private final CompoundTag tag;
     private final RangedWeaponSchema schema;
@@ -86,7 +95,9 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
     public void setRegistries(HolderLookup.Provider registries) {
         if (this.registries == null) {
             this.registries = registries;
-            this.mods.deserializeNBT(registries, this.tag);
+            if (this.tag.contains("Mods")) {
+                this.mods.deserializeNBT(registries, this.tag.getCompound("Mods"));
+            }
         }
     }
 
@@ -153,8 +164,8 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
     }
 
     private void loadFromTag(CompoundTag tag, Schema schema, HolderLookup.Provider registries) {
-        if (registries != null) {
-            this.mods.deserializeNBT(registries, tag);
+        if (registries != null && tag.contains("Mods")) {
+            this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
         }
 
         if (tag.contains("Stats")) {

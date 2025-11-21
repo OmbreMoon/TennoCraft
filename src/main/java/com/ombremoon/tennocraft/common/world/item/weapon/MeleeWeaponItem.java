@@ -45,12 +45,11 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
             MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
             if (handler != null) {
                 ModContainer mods = this.getMods(stack);
-//                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCSecondaryWeaponMods.PISTOL_GAMBIT);
-//                mods.modCache.setMod(0, new ModInstance(mod, 3));
-//                this.confirmModChanges(stack);
+                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCMeleeWeaponMods.FURY);
+                mods.modCache.setMod(0, new ModInstance(mod, 3));
+                this.confirmModChanges(level, stack);
                 log(mods);
                 log(handler.getSchema().getModdedCritChance((ServerLevel) level, stack, player, null));
-//                log(this.getMods(stack));
                 log(handler.getTag());
             }
         }
