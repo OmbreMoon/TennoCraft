@@ -45,11 +45,20 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
                     ).apply(instance, MeleeWeaponHandler::forCodec)
             )
     );
-    public static final StreamCodec<RegistryFriendlyByteBuf, MeleeWeaponHandler> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.COMPOUND_TAG, handler -> handler.tag,
-            Schema.STREAM_CODEC, handler -> handler.schema,
-            MeleeWeaponHandler::forCodec
-    );
+    public static final StreamCodec<RegistryFriendlyByteBuf, MeleeWeaponHandler> STREAM_CODEC = new StreamCodec<>() {
+        @Override
+        public MeleeWeaponHandler decode(RegistryFriendlyByteBuf buffer) {
+            CompoundTag tag = ByteBufCodecs.COMPOUND_TAG.decode(buffer);
+            Schema schema = Schema.STREAM_CODEC.decode(buffer);
+            return new MeleeWeaponHandler(tag, schema, buffer.registryAccess());
+        }
+
+        @Override
+        public void encode(RegistryFriendlyByteBuf buffer, MeleeWeaponHandler handler) {
+            ByteBufCodecs.COMPOUND_TAG.encode(buffer, handler.tag);
+            Schema.STREAM_CODEC.encode(buffer, handler.schema);
+        }
+    };
 
     private final CompoundTag tag;
     private final MeleeWeaponSchema schema;
