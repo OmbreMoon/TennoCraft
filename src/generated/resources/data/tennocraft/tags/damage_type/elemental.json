@@ -1,0 +1,14 @@
+{
+  "values": [
+    "tennocraft:heat",
+    "tennocraft:cold",
+    "tennocraft:electricity",
+    "tennocraft:toxic",
+    "tennocraft:blast",
+    "tennocraft:corrosive",
+    "tennocraft:magnetic",
+    "tennocraft:gas",
+    "tennocraft:radiation",
+    "tennocraft:viral"
+  ]
+}

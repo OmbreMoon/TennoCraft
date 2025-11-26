@@ -1,0 +1,5 @@
+{
+  "effects": {},
+  "model": "tennocraft:geo/entity/test_bullet.geo.json",
+  "texture": "tennocraft:textures/entity/test_bullet.png"
+}

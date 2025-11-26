@@ -22,7 +22,7 @@ public record ModAttributeEffect(ResourceLocation id, Holder<Attribute> attribut
             instance -> instance.group(
                     ResourceLocation.CODEC.fieldOf("id").forGetter(ModAttributeEffect::id),
                     Attribute.CODEC.fieldOf("attribute").forGetter(ModAttributeEffect::attribute),
-                    RankBasedValue.CODEC.fieldOf("amount").forGetter(ModAttributeEffect::amount),
+                    RankBasedValue.CODEC.fieldOf("maxFalloff").forGetter(ModAttributeEffect::amount),
                     AttributeModifier.Operation.CODEC.fieldOf("operation").forGetter(ModAttributeEffect::operation)
             ).apply(instance, ModAttributeEffect::new)
     );

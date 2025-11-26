@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.common.init;
 
+import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.main.CommonClass;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -8,6 +9,7 @@ import net.minecraft.world.damagesource.DamageType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public interface TCDamageTypes {
     List<ResourceKey<DamageType>> ELEMENTAL_TYPES = new ArrayList<>();

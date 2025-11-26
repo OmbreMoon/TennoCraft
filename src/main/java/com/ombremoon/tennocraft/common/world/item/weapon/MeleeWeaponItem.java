@@ -8,6 +8,7 @@ import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboType;
 import com.ombremoon.tennocraft.common.init.TCAttributes;
 import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCData;
@@ -17,10 +18,12 @@ import com.ombremoon.tennocraft.common.init.mods.TCPrimaryWeaponMods;
 import com.ombremoon.tennocraft.common.init.mods.TCSecondaryWeaponMods;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
+import com.ombremoon.tennocraft.util.StatusHelper;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -30,6 +33,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import software.bernie.geckolib.animation.AnimatableManager;
 
 public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
 
@@ -49,11 +53,12 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
             MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
             if (handler != null) {
                 ModContainer mods = this.getMods(stack);
-                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCMeleeWeaponMods.FURY);
-                mods.modCache.setMod(0, new ModInstance(mod, 3));
-                this.confirmModChanges(level, stack);
+                Holder<Modification> mod = level.registryAccess().holderOrThrow(TCPrimaryWeaponMods.CRYO_ROUNDS);
+//                mods.loadCache();
+//                mods.modCache.setMod(2, new ModInstance(mod, 3));
+//                this.confirmModChanges(player, stack);
                 log(mods);
-                log(handler.getSchema().getModdedCritChance((ServerLevel) level, stack, player, null));
+                log(handler.getComboSet().value().combos().get(ComboType.NEUTRAL));
                 log(handler.getTag());
             }
         }
@@ -93,5 +98,10 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
         weapon.set(TCData.SCHEMA, schema);
         weapon.set(TCData.MELEE_WEAPON_HANDLER, new MeleeWeaponHandler(new CompoundTag(), schema.schema(), registries));
         return weapon;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
     }
 }

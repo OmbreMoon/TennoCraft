@@ -38,7 +38,7 @@ public class IntPair implements IntIntPair {
     }
 
     /**
-     * Returns a new type-specific mutable {@link it.unimi.dsi.fastutil.Pair Pair} with given left and
+     * Returns a new projectileType-specific mutable {@link it.unimi.dsi.fastutil.Pair Pair} with given left and
      * right value.
      *
      * @param first the left value.

@@ -1,0 +1,44 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 4,
+      "per_rank": 1
+    },
+    "maxRank": 3,
+    "polarity": "madurai",
+    "rarity": "rare",
+    "supports": "#tennocraft:rifle"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:modify_damage_type": [
+      {
+        "type": "tennocraft:heat",
+        "id": "tennocraft:mod.thermite_rounds",
+        "value": {
+          "value": {
+            "type": "tennocraft:linear",
+            "base": 0.15,
+            "per_rank": 0.15
+          }
+        }
+      }
+    ],
+    "tennocraft:status_chance": [
+      {
+        "effect": {
+          "type": "tennocraft:add",
+          "value": {
+            "type": "tennocraft:linear",
+            "base": 0.15,
+            "per_rank": 0.15
+          }
+        }
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.thermite_rounds"
+  }
+}

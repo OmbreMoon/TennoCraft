@@ -1,29 +1,15 @@
 package com.ombremoon.tennocraft.common.api.mod.effects;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.EitherCodec;
 import com.ombremoon.tennocraft.common.api.IModHolder;
-import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.mod.AuraEffect;
 import com.ombremoon.tennocraft.common.api.mod.ConditionalModEffect;
-import com.ombremoon.tennocraft.common.api.mod.Modification;
-import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
-import com.ombremoon.tennocraft.common.api.mod.effects.item.ItemModifiers;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.ModifyCritChance;
-import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.common.init.TCData;
-import com.ombremoon.tennocraft.common.init.TCTags;
-import com.ombremoon.tennocraft.common.world.SlotGroup;
-import com.ombremoon.tennocraft.common.world.TennoSlots;
+import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
-import com.ombremoon.tennocraft.main.Keys;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -43,9 +29,9 @@ import java.util.function.Supplier;
 
 public interface ModifyItemEffect extends ModEntityEffect {
     ResourceKey<Registry<MapCodec<? extends ModifyItemEffect>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("modify_item_effect_types"));
-    Registry<MapCodec<? extends ModifyItemEffect>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
-    DeferredRegister<MapCodec<? extends ModifyItemEffect>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
-    Codec<ModifyItemEffect> CODEC = REGISTRY
+    Registry<MapCodec<? extends ModifyItemEffect>> ITEM_REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
+    DeferredRegister<MapCodec<? extends ModifyItemEffect>> MOD_ITEM_EFFECT_TYPES = DeferredRegister.create(ITEM_REGISTRY, Constants.MOD_ID);
+    Codec<ModifyItemEffect> CODEC = ITEM_REGISTRY
             .byNameCodec()
             .dispatch(ModifyItemEffect::codec, Function.identity());
 

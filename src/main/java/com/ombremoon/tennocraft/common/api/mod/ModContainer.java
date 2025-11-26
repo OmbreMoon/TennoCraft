@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.api.mod;
 
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.util.ModHelper;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -15,8 +16,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import org.jetbrains.annotations.UnknownNullability;
+import org.slf4j.Logger;
 
 public abstract class ModContainer implements INBTSerializable<CompoundTag> {
+    protected static final Logger LOGGER = Constants.LOG;
     public static final int AURA_SLOT = 0;
     public static final int EXILUS_SLOT = 1;
     public static final int STANCE_SLOT = 0;
@@ -79,6 +82,9 @@ public abstract class ModContainer implements INBTSerializable<CompoundTag> {
             }
         }
         compoundTag.put("Mods", modList);
+
+        compoundTag.putInt("Capacity", this.capacity);
+        compoundTag.putInt("Max Capacity", this.maxCapacity);
         return compoundTag;
     }
 
@@ -97,6 +103,9 @@ public abstract class ModContainer implements INBTSerializable<CompoundTag> {
                 }
             }
         }
+
+        this.capacity = nbt.getInt("Capacity");
+        this.maxCapacity = nbt.getInt("Max Capacity");
     }
 
     public void loadCache() {

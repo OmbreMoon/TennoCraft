@@ -27,10 +27,11 @@ public interface ModValueEffect {
 
     static Supplier<MapCodec<? extends ModValueEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModValueEffect>> registry) {
         registry.register("add", () -> AddValue.CODEC);
-        return registry.register("multiply", () -> MultiplyValue.CODEC);
+        return null;
     }
 
     float process(int modRank, RandomSource random, float value);
 
     MapCodec<? extends ModValueEffect> codec();
 }
+

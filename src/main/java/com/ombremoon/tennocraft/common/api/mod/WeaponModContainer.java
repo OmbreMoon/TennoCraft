@@ -3,24 +3,28 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.IRangedModHolder;
 import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
-import com.ombremoon.tennocraft.common.api.mod.effects.damage.DamageModifiers;
+import com.ombremoon.tennocraft.common.api.mod.effects.item.DamageModifiers;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.ItemModifiers;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
+import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.common.world.effect.StatusEffect;
 import com.ombremoon.tennocraft.util.ModHelper;
-import com.ombremoon.tennocraft.util.StatusHelper;
+import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +50,36 @@ public class WeaponModContainer extends ModContainer {
     @Override
     protected ModContainer createCache() {
         return new WeaponModContainer(this.type, this.schema, true);
+    }
+
+    @Override
+    public @UnknownNullability CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        CompoundTag compoundTag = super.serializeNBT(provider);
+        ListTag damageTypes = new ListTag();
+        for (DamageValue value : this.weaponDamageTypes) {
+            CompoundTag valueTag = new CompoundTag();
+            CompoundTag damageTag = value.save();
+            valueTag.put("Damage Value", damageTag);
+            damageTypes.add(valueTag);
+        }
+        compoundTag.put("Weapon Damage Types", damageTypes);
+        return compoundTag;
+    }
+
+    @Override
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        super.deserializeNBT(provider, nbt);
+
+        if (nbt.contains("Weapon Damage Types", 9)) {
+            ListTag damageList = nbt.getList("Weapon Damage Types", 10);
+            for (int i = 0; i < damageList.size(); i++) {
+                CompoundTag compoundTag = damageList.getCompound(i);
+                if (compoundTag.contains("Damage Value")) {
+                    DamageValue value = DamageValue.load(compoundTag.getCompound("Damage Value"), provider);
+                    this.weaponDamageTypes.add(value);
+                }
+            }
+        }
     }
 
     @Override
@@ -76,7 +110,7 @@ public class WeaponModContainer extends ModContainer {
         List<DamageValue> orderedValues = new ArrayList<>();
         IWeaponModHolder<?> modHolder = (IWeaponModHolder<?>) stack.getItem();
         ModHelper.forEachDamageModifier(stack, (effect, modRank) -> {
-            Holder<DamageType> damageType = player.registryAccess().holderOrThrow(effect.damageType());
+            Holder<DamageType> damageType = effect.damageType();
             if (effect.conditions().isPresent()) {
                 DamageModifiers modifiers = this.getDamageModifiers(damageType);
                 modifiers.put(effect.id(), modRank, effect, false);
@@ -93,7 +127,10 @@ public class WeaponModContainer extends ModContainer {
 
         this.weaponDamageTypes.addAll(reorderDamageTypes(player.registryAccess(), orderedValues));
 
-        //Loop through external mod containers (sans current group) and add to map
+        ModHelper.forEachDamageModifier(stack, player, SlotGroup.WEAPON, (effect, modRank) ->  {
+            DamageModifiers modifiers = this.getDamageModifiers(effect.damageType());
+            modifiers.put(effect.id(), modRank, effect, false);
+        });
     }
 
     public static List<DamageValue> reorderDamageTypes(RegistryAccess registryAccess, List<DamageValue> orderedValues) {

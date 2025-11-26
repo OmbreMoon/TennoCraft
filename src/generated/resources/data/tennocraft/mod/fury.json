@@ -14,13 +14,13 @@
   "effects": {
     "tennocraft:attributes": [
       {
-        "amount": {
+        "attribute": "minecraft:generic.attack_speed",
+        "id": "tennocraft:mod.fury",
+        "maxFalloff": {
           "type": "tennocraft:linear",
           "base": 0.05,
           "per_rank": 0.05
         },
-        "attribute": "minecraft:generic.attack_speed",
-        "id": "tennocraft:mod.fury",
         "operation": "add_multiplied_total"
       }
     ]

@@ -14,13 +14,13 @@
   "effects": {
     "tennocraft:attributes": [
       {
-        "amount": {
+        "attribute": "tennocraft:ability_duration",
+        "id": "tennocraft:mod.continuity",
+        "maxFalloff": {
           "type": "tennocraft:linear",
           "base": 0.05,
           "per_rank": 0.05
         },
-        "attribute": "tennocraft:ability_duration",
-        "id": "tennocraft:mod.continuity",
         "operation": "add_multiplied_total"
       }
     ]

@@ -1,29 +1,27 @@
 package com.ombremoon.tennocraft.common.world.effect;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.init.TCDamageTypes;
-import com.ombremoon.tennocraft.common.init.TCStatusEffects;
-import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ColorParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public abstract class StatusEffect extends MobEffect {
     private static final Map<ResourceKey<DamageType>, WorldStatus> STATUS_BY_DAMAGE_TYPE;
@@ -48,6 +46,25 @@ public abstract class StatusEffect extends MobEffect {
 
     public abstract ResourceKey<DamageType> damageProc();
 
+    public void onEffectAdded(LivingEntity livingEntity, IModHolder<?> modHolder, int amplifier) {
+    }
+
+    public void onEffectStarted(LivingEntity livingEntity, IModHolder<?> modHolder, int amplifier) {
+    }
+
+    public boolean applyEffectTick(LivingEntity livingEntity, IModHolder<?> modHolder, int amplifier) {
+        return true;
+    }
+
+    public void onEffectRemoved(LivingEntity livingEntity, IModHolder<?> modHolder) {
+
+    }
+
+    @Override
+    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+        return duration % 20 == 0;
+    }
+
     public boolean canStackInfinitely() {
         return this.maxStacks <= 0;
     }
@@ -64,42 +81,90 @@ public abstract class StatusEffect extends MobEffect {
         return STATUS_BY_DAMAGE_TYPE.getOrDefault(damageType, WorldStatus.IMPACT);
     }
 
-    public record ProcEntries(Map<ResourceKey<DamageType>, List<Proc>> procs) {
-        public static final Codec<ProcEntries> CODEC = Codec.unboundedMap(
-                ResourceKey.codec(Registries.DAMAGE_TYPE), Proc.CODEC.listOf()
-        ).xmap(ProcEntries::new, ProcEntries::procs);
+    public static Proc proc(IModHolder<?> modHolder, LivingEntity attacker, @Nullable ItemStack stack, float damage, long gameTime) {
+        return new Proc(modHolder, attacker, stack, damage, gameTime);
+    }
 
+    public record ProcEntries(Map<ResourceKey<DamageType>, List<Proc>> procs) {
 
         public void addEntry(StatusEffect effect, Proc proc) {
-            var list = this.procs.computeIfAbsent(effect.damageProc(), key -> new ArrayList<>());
-            if (effect.canStackInfinitely() || list.size() < effect.maxStacks) {
-                list.add(proc);
-            } else {
-                list.set(0, proc);
-            }
-        }
+            var procs = this.getProcs(effect);
+            if (!effect.canStackInfinitely()) {
+                List<Proc> newProcs = new ArrayList<>(procs);
+                newProcs.add(proc);
+                if (newProcs.size() >= effect.maxStacks) {
+                    newProcs.removeFirst();
+                }
 
-        public List<Proc> getProcs(StatusEffect effect) {
-            return this.procs.computeIfAbsent(effect.damageProc(), key -> new ArrayList<>());
+                this.procs.put(effect.damageProc(), newProcs);
+            } else {
+                List<Proc> newProcs;
+                if (effect.damageProc() == TCDamageTypes.HEAT) {
+                    newProcs = new ArrayList<>();
+                    for (Proc proc1 : procs) {
+                        Proc newProc = new Proc(proc1.modHolder, proc1.attacker, proc1.stack, proc1.damage, proc.endTime);
+                        newProcs.add(newProc);
+                    }
+                } else {
+                    newProcs = new ArrayList<>(procs);
+                }
+
+                newProcs.add(proc);
+                this.procs.put(effect.damageProc(), newProcs);
+            }
         }
 
         public void decrementProc(StatusEffect effect) {
-            var list = this.procs.computeIfAbsent(effect.damageProc(), key -> new ArrayList<>());
-            if (!list.isEmpty()) {
-                list.removeFirst();
+            var procs = this.getProcs(effect);
+            if (!procs.isEmpty()) {
+                List<Proc> newProcs = new ArrayList<>(procs);
+                newProcs.removeFirst();
+
+                this.procs.put(effect.damageProc(), newProcs);
             }
+        }
+
+        public void tickStatusProcs(Level level, StatusEffect effect) {
+            var procs = this.getProcs(effect);
+            for (var proc : procs) {
+                long procEndTick = proc.endTime();
+                if (procEndTick <= level.getGameTime()) {
+                    this.decrementProc(effect);
+                }
+            }
+        }
+
+        public boolean hasProcsFor(StatusEffect effect) {
+            return !this.getProcs(effect).isEmpty();
+        }
+
+        public Proc getLastProc(StatusEffect effect) {
+            var procs = this.getProcs(effect);
+            return procs.getLast();
+        }
+
+        public Proc getOldestProc(StatusEffect effect) {
+            var procs = this.getProcs(effect);
+            return procs.getFirst();
+        }
+
+        public void forEachProc(StatusEffect effect, Consumer<Proc> action) {
+            var procs = this.getProcs(effect);
+            for (Proc proc : procs) {
+                action.accept(proc);
+            }
+        }
+
+        private List<Proc> getProcs(StatusEffect effect) {
+            return this.procs.computeIfAbsent(effect.damageProc(), key -> new ArrayList<>());
+        }
+
+        public int getProcAmount(StatusEffect effect) {
+            return this.getProcs(effect).size();
         }
     }
 
-    public record Proc(ResourceKey<DamageType> damageType, float damage, long gameTime) {
-        public static final Codec<Proc> CODEC = RecordCodecBuilder.create(
-                instance -> instance.group(
-                        ResourceKey.codec(Registries.DAMAGE_TYPE).fieldOf("damageType").forGetter(Proc::damageType),
-                        Codec.FLOAT.fieldOf("damage").forGetter(Proc::damage),
-                        Codec.LONG.fieldOf("gameTime").forGetter(Proc::gameTime)
-                ).apply(instance, Proc::new)
-        );
-    }
+    public record Proc(IModHolder<?> modHolder, LivingEntity attacker, @Nullable ItemStack stack, float damage, long endTime) {}
 
     static {
         Object2ObjectOpenHashMap<ResourceKey<DamageType>, WorldStatus> statusMap = new Object2ObjectOpenHashMap<>();

@@ -2,18 +2,18 @@ package com.ombremoon.tennocraft.util;
 
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
-import com.ombremoon.tennocraft.common.api.mod.ConditionalModEffect;
-import com.ombremoon.tennocraft.common.api.mod.ModContainer;
-import com.ombremoon.tennocraft.common.api.mod.Modification;
-import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
+import com.ombremoon.tennocraft.common.api.mod.*;
+import com.ombremoon.tennocraft.common.api.mod.effects.ModDamageEffect;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModifyDamageEffect;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.damage.DamageModifiers;
+import com.ombremoon.tennocraft.common.api.mod.effects.item.DamageModifiers;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.ItemModifiers;
+import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
+import com.ombremoon.tennocraft.common.init.TCStatusEffects;
+import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.common.world.TennoSlots;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
@@ -26,6 +26,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -71,21 +72,44 @@ public class ModHelper {
     public static void runIterationOnSlots(ItemStack stack, LivingEntity entity, SlotGroup group, ModInSlotVisitor visitor) {
         TennoSlots slots = entity.getData(TCData.TENNO_SLOTS);
         for (var slot : slots.entrySet()) {
-            if (group == null || slot.getKey() != group) {
+            if (group == null || slot.getKey() != group && !slots.isDisabled(group)) {
                 runIterationOnModHolder(stack, slot.getValue(), visitor);
             }
         }
     }
 
-    public static float modifyDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, Entity entity) {
-        MutableFloat mutableFloat = new MutableFloat();
-        runIterationOnWeapon(
-                stack, (mod, rank) -> mod.value().modifyWeaponDamage(level, rank, schema, attacker, entity, mutableFloat)
-        );
-        return mutableFloat.floatValue();
+    public static float modifyDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity) {
+        int punctureProcs = StatusHelper.getProcAmount(entity, TCStatusEffects.WEAKENED);
+        return modifyBaseDamage(level, stack, schema, attacker, entity)
+                * modifyFactionDamage(level, stack, schema, attacker, entity)
+                * 1.0F - 0.4F * (0.1F * (punctureProcs - 1));
     }
 
-    public static float modifyTypeDamage(ServerLevel level, WorldStatus status, ItemStack stack, Schema schema, LivingEntity attacker, Entity entity, float damage) {
+    public static float modifyBaseDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity) {
+        MutableFloat damageFloat = new MutableFloat();
+        runIterationOnSlots(
+                stack, attacker, (mod, rank, modHolder) -> mod.value().modifyWeaponDamage(level, rank, schema, attacker, entity, damageFloat)
+        );
+        return 1.0F + damageFloat.floatValue();
+    }
+
+    public static float modifyFactionDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity) {
+        MutableFloat factionFloat = new MutableFloat();
+        runIterationOnSlots(
+                stack, attacker, (mod, rank, modHolder) -> mod.value().modifyFactionDamage(level, rank, schema, attacker, entity, factionFloat)
+        );
+
+        //ADD HOOKS TO ADD ADDITIONAL OF DIFFERENT TYPES
+        //RegisterDamageHookEvent (.Faction, .Base, .Type, .Total)
+        //event.register(DamageHookListener listener, DamageHook hook)
+        //Damage Hook -> Functional Interface of ^^^ method parameters and mutable float
+        //Adds to list of damage hooks
+        //Iterate through hooks and run
+
+        return 1.0F + factionFloat.floatValue();
+    }
+
+    public static float modifyTypeDamage(ServerLevel level, WorldStatus status, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         modifyDamageWithAdditionalModifiers(
                 level.holderOrThrow(status.getDamageType()), level, stack, schema, attacker, entity, mutableFloat
@@ -93,7 +117,7 @@ public class ModHelper {
         return mutableFloat.floatValue();
     }
 
-    public static float modifyCritChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, Entity entity, float damage) {
+    public static float modifyCritChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
                 stack, (mod, rank) -> mod.value().modifyCritChance(level, rank, schema, attacker, entity, mutableFloat)
@@ -104,18 +128,35 @@ public class ModHelper {
         return mutableFloat.floatValue();
     }
 
-    public static float modifyCritDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, Entity entity, float damage) {
+    public static float modifyCritDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
                 stack, (mod, rank) -> mod.value().modifyCritDamage(level, rank, schema, attacker, entity, mutableFloat)
         );
+        modifyStatWithAdditionalModifiers(
+                TCModEffectComponents.CRIT_MULTIPLIER.get(), level, stack, schema, attacker, entity, mutableFloat
+        );
         return mutableFloat.floatValue();
     }
 
-    public static float modifyStatusChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, Entity entity, float damage) {
+    public static float modifyStatusChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
                 stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
+        );
+        modifyStatWithAdditionalModifiers(
+                TCModEffectComponents.STATUS_CHANCE.get(), level, stack, schema, attacker, entity, mutableFloat
+        );
+        return mutableFloat.floatValue();
+    }
+
+    public static float modifyStatusDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity) {
+        MutableFloat mutableFloat = new MutableFloat();
+        runIterationOnWeapon(
+                stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
+        );
+        modifyStatWithAdditionalModifiers(
+                TCModEffectComponents.STATUS_DAMAGE.get(), level, stack, schema, attacker, entity, mutableFloat
         );
         return mutableFloat.floatValue();
     }
@@ -126,7 +167,7 @@ public class ModHelper {
             ItemStack stack,
             Schema schema,
             LivingEntity attacker,
-            Entity entity,
+            LivingEntity entity,
             MutableFloat value
     ) {
         IWeaponModHolder<?> holder = (IWeaponModHolder<?>) stack.getItem();
@@ -176,17 +217,17 @@ public class ModHelper {
         });
     }
 
-    public static void forEachDamageModifier(ItemStack stack, BiConsumer<ModifyDamageEffect, Integer> modifier) {
+    public static void forEachDamageModifier(ItemStack stack, BiConsumer<ModDamageEffect, Integer> modifier) {
         runIterationOnWeapon(stack, (mod, rank) -> {
-            mod.value().getEffects(TCModEffectComponents.MODIFY_ITEM_DAMAGE.get()).forEach(effect -> {
+            mod.value().getEffects(TCModEffectComponents.MODIFY_DAMAGE_TYPE.get()).forEach(effect -> {
                 modifier.accept(effect, rank);
             });
         });
     }
 
-    public static void forEachDamageModifier(ItemStack stack, LivingEntity entity, SlotGroup group, BiConsumer<ModifyDamageEffect, Integer> modifier) {
+    public static void forEachDamageModifier(ItemStack stack, LivingEntity entity, SlotGroup group, BiConsumer<ModDamageEffect, Integer> modifier) {
         runIterationOnSlots(stack, entity, group, (mod, rank, modHolder) -> {
-            mod.value().getEffects(TCModEffectComponents.MODIFY_ITEM_DAMAGE.get()).forEach(effect -> {
+            mod.value().getEffects(TCModEffectComponents.MODIFY_DAMAGE_TYPE.get()).forEach(effect -> {
                 modifier.accept(effect, rank);
             });
         });
@@ -204,7 +245,7 @@ public class ModHelper {
             ModifyItemEffect itemEffect = entry.effect();
             ModValueEffect valueEffect = itemEffect.value();
             int modRank = entry.modRank();
-            if (itemEffect.matches(Modification.moddedAttackContext(level, schema, modRank, attacker, entity))) {
+            if (itemEffect.matches(Modification.preDamageContext(level, schema, modRank, attacker, entity))) {
                 value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()));
             }
         });
@@ -219,10 +260,10 @@ public class ModHelper {
             MutableFloat value
     ) {
         modifiers.forEach((location, entry) -> {
-            ModifyDamageEffect damageEffect = entry.effect();
+            ModDamageEffect damageEffect = entry.effect();
             ModValueEffect valueEffect = damageEffect.value();
             int modRank = entry.modRank();
-            if (damageEffect.matches(Modification.moddedAttackContext(level, schema, modRank, attacker, entity))) {
+            if (damageEffect.matches(Modification.preDamageContext(level, schema, modRank, attacker, entity))) {
                 value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()));
             }
         });

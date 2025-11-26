@@ -4,6 +4,7 @@ import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
@@ -64,6 +65,7 @@ public class TCTags {
         public static final TagKey<DamageType> BYPASSES_TECH_SHIELD = tag("bypasses_tech_shield");
         public static final TagKey<DamageType> PHYSICAL = tag("physical");
         public static final TagKey<DamageType> ELEMENTAL = tag("elemental");
+        public static final TagKey<DamageType> STATUS_DAMAGE = tag("status_damage");
 
         private static TagKey<DamageType> tag(String name) {
             return TagKey.create(Registries.DAMAGE_TYPE, CommonClass.customLocation(name));
@@ -94,7 +96,7 @@ public class TCTags {
     }
 
     public static class Mods {
-        public static final TagKey<Modification> MODIFIES_ELEMENTAL_DAMAGE = tag("modifies_elemental_damage");
+        public static final TagKey<Modification> FACTION_MOD = tag("faction_mod");
 
         private static TagKey<Modification> tag(String name) {
             return TagKey.create(Keys.MOD, CommonClass.customLocation(name));

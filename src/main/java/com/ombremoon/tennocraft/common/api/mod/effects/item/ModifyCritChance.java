@@ -7,6 +7,7 @@ import com.ombremoon.tennocraft.common.api.mod.ConditionalModEffect;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModConditions;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
 import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.world.level.loot.ModContextParams;
 import net.minecraft.core.component.DataComponentType;

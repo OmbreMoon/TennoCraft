@@ -6,7 +6,6 @@ import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.init.TCSchemas;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
-import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.util.ModHelper;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -32,14 +31,8 @@ public class RangedWeaponSchema extends WeaponSchema {
         this.utility = utility;
         this.attacks = attacks;
 
-        for (var entry : attacks.attacks().entrySet()) {
-            if (entry.getValue().size() > 2) {
-                throw new IllegalStateException("Cannot have more than 2 defined attacks per trigger type");
-            }
-        }
-
         if (general.triggerTypes().isEmpty()) {
-            throw new IllegalStateException("Ranged weapon schema must have at least 1 defined trigger type");
+            throw new IllegalStateException("Ranged weapon schema must have at least 1 defined trigger projectileType");
         }
 
         var types = general.triggerTypes().get();
@@ -53,8 +46,8 @@ public class RangedWeaponSchema extends WeaponSchema {
         }
 
         for (TriggerType type : types) {
-            var properties = this.attacks.getAttacks(type);
-            var values = properties.getFirst().damage;
+            var properties = this.attacks.getAttack(type);
+            var values = properties.damage;
             float f = 0.0F;
             for (DamageValue damage : values) {
                 f += damage.amount();
@@ -95,23 +88,26 @@ public class RangedWeaponSchema extends WeaponSchema {
     }
 
     @Override
-    public float getModdedTypeDamage(ServerLevel level, ItemStack stack, WorldStatus status, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 1.0F + Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, this, attacker, target, 0.0F));
+    public float getModdedBaseDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 0;
     }
 
     @Override
     public float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, attacker, target, 0.0F));
+        float critChance = this.attacks.getAttack(triggerType).critChance;
+        return critChance * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override
     public float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 0;
+        float critMultiplier = this.attacks.getAttack(triggerType).critMultiplier;
+        return critMultiplier * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override
     public float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 0;
+        float status = this.attacks.getAttack(triggerType).status;
+        return status * (1.0F + Math.max(0.0F, ModHelper.modifyCritChance(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override

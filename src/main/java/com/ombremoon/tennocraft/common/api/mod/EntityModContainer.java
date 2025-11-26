@@ -3,12 +3,8 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.ombremoon.tennocraft.common.api.IEntityModHolder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.util.ModHelper;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
 public class EntityModContainer extends ModContainer {
 

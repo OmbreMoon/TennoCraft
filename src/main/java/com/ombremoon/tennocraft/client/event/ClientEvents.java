@@ -1,6 +1,8 @@
 package com.ombremoon.tennocraft.client.event;
 
+import com.ombremoon.tennocraft.client.renderer.BulletRenderer;
 import com.ombremoon.tennocraft.client.renderer.layer.PlayerFrameLayer;
+import com.ombremoon.tennocraft.common.init.TCEntities;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.client.Minecraft;
@@ -16,6 +18,11 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
+
+    @SubscribeEvent
+    public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(TCEntities.BULLET_PROJECTILE.get(), BulletRenderer::new);
+    }
 
     @SubscribeEvent
     public static void registerEntityLayer(EntityRenderersEvent.AddLayers event) {

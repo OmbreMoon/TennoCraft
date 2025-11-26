@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.datagen;
 
+import com.ombremoon.tennocraft.common.init.TCBullets;
 import com.ombremoon.tennocraft.common.init.TCComboSets;
 import com.ombremoon.tennocraft.common.init.mods.Modifications;
 import com.ombremoon.tennocraft.common.init.schemas.Schemas;
@@ -20,6 +21,7 @@ public class DatapackRegistriesProvider extends DatapackBuiltinEntriesProvider {
             .add(Keys.SCHEMA, Schemas::bootstrap)
             .add(Keys.MOD, Modifications::bootstrap)
             .add(Keys.COMBO_SET, TCComboSets::bootstrap)
+            .add(Keys.BULLET, TCBullets::bootstrap)
             .add(Registries.DAMAGE_TYPE, TCDamageTypes::bootstrap);
 
     public DatapackRegistriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {

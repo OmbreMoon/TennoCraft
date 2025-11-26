@@ -7,15 +7,15 @@
       "damage": [
         {
           "type": "tennocraft:impact",
-          "amount": 27.75
+          "maxFalloff": 27.75
         },
         {
           "type": "tennocraft:puncture",
-          "amount": 27.75
+          "maxFalloff": 27.75
         },
         {
           "type": "tennocraft:slash",
-          "amount": 129.5
+          "maxFalloff": 129.5
         }
       ],
       "noise": "silent",

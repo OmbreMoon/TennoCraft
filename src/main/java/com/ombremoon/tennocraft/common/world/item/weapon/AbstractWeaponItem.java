@@ -58,11 +58,6 @@ public abstract class AbstractWeaponItem<T extends WeaponSchema> extends Item im
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
-    }
-
-    @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
     }

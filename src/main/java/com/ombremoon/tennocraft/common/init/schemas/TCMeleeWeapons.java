@@ -8,6 +8,7 @@ import com.ombremoon.tennocraft.common.api.weapon.NoiseLevel;
 import com.ombremoon.tennocraft.common.api.weapon.WeaponBuilder;
 import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.SlamAttack;
 import com.ombremoon.tennocraft.common.init.TCComboSets;
 import com.ombremoon.tennocraft.common.init.TCDamageTypes;
@@ -27,6 +28,7 @@ public interface TCMeleeWeapons {
 
     static void bootstrap(BootstrapContext<Schema> context) {
         HolderGetter<DamageType> damageTypes = context.lookup(Registries.DAMAGE_TYPE);
+        HolderGetter<ComboSet> comboSets = context.lookup(Keys.COMBO_SET);
         register(
                 context,
                 ORTHOS,
@@ -46,7 +48,7 @@ public interface TCMeleeWeapons {
                                     0.6F
                             )
                             .attackProperties(
-                                    TCComboSets.STAFF,
+                                    comboSets.getOrThrow(TCComboSets.STAFF),
                                     AttackSchema.createAttack(
                                             0.06F,
                                             1.5F,

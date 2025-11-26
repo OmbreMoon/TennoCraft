@@ -3,7 +3,6 @@ package com.ombremoon.tennocraft.common.api.mod.effects;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.ombremoon.tennocraft.common.api.IModHolder;
-import com.ombremoon.tennocraft.common.api.mod.effects.damage.HeatDamage;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.ModifyCritChance;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
@@ -22,15 +21,15 @@ import java.util.function.Supplier;
 
 public interface ModLocationEffect {
     ResourceKey<Registry<MapCodec<? extends ModLocationEffect>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("mod_location_effect_types"));
-    Registry<MapCodec<? extends ModLocationEffect>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
-    DeferredRegister<MapCodec<? extends ModLocationEffect>> MOD_LOCATION_EFFECT_TYPES = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
-    Codec<ModLocationEffect> CODEC = REGISTRY
+    Registry<MapCodec<? extends ModLocationEffect>> LOCATION_REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
+    DeferredRegister<MapCodec<? extends ModLocationEffect>> MOD_LOCATION_EFFECT_TYPES = DeferredRegister.create(LOCATION_REGISTRY, Constants.MOD_ID);
+    Codec<ModLocationEffect> CODEC = LOCATION_REGISTRY
             .byNameCodec()
             .dispatch(ModLocationEffect::codec, Function.identity());
 
     static Supplier<MapCodec<? extends ModLocationEffect>> bootstrap(DeferredRegister<MapCodec<? extends ModLocationEffect>> registry) {
         registry.register("modify_crit", () -> ModifyCritChance.CODEC);
-        registry.register("heat_damage", () -> HeatDamage.CODEC);
+        registry.register("modify_damage_type", () -> ModDamageEffect.CODEC);
         return registry.register("attribute", () -> ModAttributeEffect.CODEC);
     }
 

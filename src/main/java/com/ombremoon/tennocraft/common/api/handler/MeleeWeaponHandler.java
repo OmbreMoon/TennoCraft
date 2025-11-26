@@ -5,19 +5,28 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
+import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeUtilitySchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.AttackMultiplier;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboType;
 import com.ombremoon.tennocraft.common.init.TCData;
+import com.ombremoon.tennocraft.common.world.PlayerCombo;
+import com.ombremoon.tennocraft.main.Keys;
 import com.ombremoon.tennocraft.util.Loggable;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
@@ -27,8 +36,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
+import org.apache.commons.lang3.mutable.MutableFloat;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class MeleeWeaponHandler implements ModHandler, Loggable {
     public static final Codec<MeleeWeaponHandler> CODEC = Codec.withAlternative(
@@ -63,8 +74,8 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
     private final CompoundTag tag;
     private final MeleeWeaponSchema schema;
     private final AttackSchema attacks;
+    private Holder<ComboSet> comboSet;
     private final WeaponModContainer mods;
-    private final AttributeMap stats;
     @Nullable
     private HolderLookup.Provider registries;
 
@@ -79,25 +90,15 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.attacks = this.schema.getAttacks().attack();
+        this.comboSet = this.schema.getAttacks().combo();
         this.mods = new WeaponModContainer(compatibility, this.schema);
-        this.stats = new AttributeMap(createMeleeWeaponAttributes(this.schema.getUtility(), this.attacks));
-
-        if (registries != null && tag.contains("Mods")) {
-            this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
-        }
-
-        if (tag.contains("Stats", 9)) {
-            ListTag listTag = tag.getList("Stats", 10);
-            this.stats.load(listTag);
-        }
+        this.loadFromTag(tag, registries);
     }
 
     public void setRegistries(HolderLookup.Provider registries) {
         if (this.registries == null) {
             this.registries = registries;
-            if (this.tag.contains("Mods")) {
-                this.mods.deserializeNBT(registries, this.tag.getCompound("Mods"));
-            }
+            this.loadFromTag(this.tag, registries);
         }
     }
 
@@ -110,13 +111,44 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         }
     }
 
-    public void handleComboModifiers(ItemStack stack, LivingEntity target, WeaponDamageResult.Partial partial) {
+    //MAKE COMBO PREDICATE
 
+    public void handleComboModifiers(ItemStack stack, LivingEntity attacker, LivingEntity target, WeaponDamageResult.Partial partial) {
+        ComboSet comboSet = this.comboSet.value();
+        var distribution = partial.getDistribution();
+        float damage = partial.getDamage();
+
+        PlayerCombo combo = attacker.getData(TCData.PLAYER_COMBO);
+        ComboType comboType = combo.getComboType();
+        comboType = ComboType.NEUTRAL;
+        int comboCount = combo.getComboCount();
+        var comboValues = comboSet.combos().get(comboType);
+        AttackMultiplier multiplier = comboValues.get(combo.getComboIndex()).multipliers().get(combo.getHitIndex());
+        MutableFloat delta = new MutableFloat();
+        var physicalDistribution = multiplier.getDistribution();
+        if (physicalDistribution != null) {
+            physicalDistribution.forEach((damageType, amount) -> {
+                float modifier = distribution.getAmount(damageType) * (1.0F + amount);
+                distribution.replace(damageType, modifier);
+                delta.add(modifier);
+            });
+        }
+
+        damage += delta.floatValue();
+        damage *= multiplier.getMultiplier();
+        if (comboType == ComboType.HEAVY) {
+            float comboMultiplier = 1.0F + comboCount / 20.0F;
+            int comboCountReduction = comboCount - comboCount;
+            combo.setComboCount(comboCountReduction);
+            damage *= comboMultiplier;
+        }
+
+        partial.setDamage(damage);
     }
 
     public void confirmModChanges(Player player, ItemStack stack) {
         Mutable mutable = new Mutable(this);
-        mutable.confirmModChanges(player, stack, this.mods, this.stats);
+        mutable.confirmModChanges(player, stack, this.mods);
         stack.set(TCData.MELEE_WEAPON_HANDLER, mutable.toImmutable());
     }
 
@@ -132,14 +164,22 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         return this.mods;
     }
 
-    public AttributeMap getStats() {
-        return this.stats;
+    public Holder<ComboSet> getComboSet() {
+        return this.comboSet;
     }
 
-    private static AttributeSupplier createMeleeWeaponAttributes(MeleeUtilitySchema utility, AttackSchema attacks) {
-        return AttributeSupplier.builder()
-                .add(Attributes.ATTACK_SPEED, utility.attackSpeed())
-                .build();
+    private void loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
+        if (registries != null) {
+            if (tag.contains("Mods"))
+                this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
+
+            if (tag.contains("Combo")) {
+                ResourceLocation combo = ResourceLocation.tryParse(tag.getString("Combo"));
+                if (combo != null) {
+                    this.comboSet = registries.holderOrThrow(ResourceKey.create(Keys.COMBO_SET, combo));
+                }
+            }
+        }
     }
 
     @Override
@@ -164,24 +204,14 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
             this.registries = handler.registries;
         }
 
-        public void confirmModChanges(Player player, ItemStack stack, WeaponModContainer mods, AttributeMap stats) {
+        public void confirmModChanges(Player player, ItemStack stack, WeaponModContainer mods) {
             mods.confirmMods(player, (IModHolder<?>) stack.getItem(), stack);
-            this.saveChanges(mods, stats);
+            this.saveChanges(mods);
         }
 
-        private void saveChanges(WeaponModContainer mods, AttributeMap stats) {
-            this.saveMods(mods);
-            this.saveStats(stats);
-        }
-
-        private void saveMods(WeaponModContainer mods) {
+        private void saveChanges(WeaponModContainer mods) {
             if (this.registries != null)
                 this.tag.put("Mods", mods.serializeNBT(this.registries));
-        }
-
-        private void saveStats(AttributeMap stats) {
-            ListTag statList = stats.save();
-            this.tag.put("Stats", statList);
         }
 
         public MeleeWeaponHandler toImmutable() {

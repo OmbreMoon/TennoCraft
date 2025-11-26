@@ -10,7 +10,6 @@ import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
-import com.ombremoon.tennocraft.common.init.TCDamageTypes;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
@@ -37,11 +36,6 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         return !this.procs.isEmpty();
     }
 
-    //Implement Status Effects
-    //Implement Soft Combo System
-    //Handle Mutlishot Damage
-    //Implement Damage Falloff
-
     public static WeaponDamageResult calculateRanged(ItemStack stack, LivingEntity attacker, LivingEntity target) {
         RangedWeaponHandler handler = stack.get(TCData.RANGED_WEAPON_HANDLER);
         if (handler != null) {
@@ -67,11 +61,11 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
     }
 
     private static WeaponDamageResult resultFromPartial(ItemStack stack, LivingEntity attacker, LivingEntity target, Partial partial, WeaponSchema schema, @Nullable TriggerType type, PartialOutput output) {
-        output.accept(stack, target, partial);
+        output.accept(stack, attacker, target, partial);
         float f = partial.damage;
 
         ServerLevel level = (ServerLevel) target.level();
-        float modifiedDamage = 1.0F + Math.max(0.0F, ModHelper.modifyDamage(level, stack, schema, attacker, target));
+        float modifiedDamage = Math.max(0.0F, ModHelper.modifyDamage(level, stack, schema, attacker, target));
         f *= modifiedDamage;
 
         float modifiedCritChance = schema.getModdedCritChance(level, stack, attacker, target, type);
@@ -193,8 +187,12 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
 
     public record Distribution(Map<Holder<DamageType>, Float> distribution) {
 
-        public boolean contains(Holder<DamageType> key) {
-            return this.distribution.containsKey(key);
+        public boolean contains(Holder<DamageType> damageType) {
+            return this.distribution.containsKey(damageType);
+        }
+
+        public void replace(Holder<DamageType> damageType, float amount) {
+            this.distribution.replace(damageType, amount);
         }
 
         public void ifElementalPresent(BiConsumer<Holder<DamageType>, Float> consumer) {
@@ -205,8 +203,8 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
             });
         }
 
-        public float getAmount(Holder<DamageType> key) {
-            return this.distribution.get(key);
+        public float getAmount(Holder<DamageType> damageType) {
+            return this.distribution.get(damageType);
         }
 
         public void forEach(BiConsumer<Holder<DamageType>, Float> consumer) {
@@ -244,11 +242,15 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         public float getDamage() {
             return this.damage;
         }
+
+        public Distribution getDistribution() {
+            return this.distribution;
+        }
     }
 
     @FunctionalInterface
     public interface PartialOutput {
 
-        void accept(ItemStack stack, LivingEntity target, Partial partial);
+        void accept(ItemStack stack, LivingEntity attacker, LivingEntity target, Partial partial);
     }
 }

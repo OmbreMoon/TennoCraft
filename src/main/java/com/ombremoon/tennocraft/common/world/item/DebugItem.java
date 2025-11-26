@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.world.item;
 
 import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
 import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
+import com.ombremoon.tennocraft.common.world.entity.BulletProjectile;
 import com.ombremoon.tennocraft.util.FrameUtil;
 import com.ombremoon.tennocraft.util.Loggable;
 import net.minecraft.world.InteractionHand;
@@ -25,8 +26,6 @@ public class DebugItem extends Item implements Loggable {
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         if (!pLevel.isClientSide) {
-            Map<Integer, List<Float>> map = new HashMap<>();
-            var list = map.computeIfAbsent(0, integer -> new ArrayList<>());
         } else {
         }
         FrameHandler handler = FrameUtil.getFrameHandler(pPlayer);

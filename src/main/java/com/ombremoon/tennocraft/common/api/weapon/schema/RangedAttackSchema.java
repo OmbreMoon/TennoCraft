@@ -9,6 +9,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class RangedAttackSchema extends AttackSchema {
@@ -30,6 +31,10 @@ public class RangedAttackSchema extends AttackSchema {
     public RangedAttackSchema(RangedAttack attack, List<DamageValue> damageValues, float critChance, float critMultiplier, float status, NoiseLevel noise) {
         super(damageValues, critChance, critMultiplier, status, noise);
         this.attack = attack;
+    }
+
+    public RangedAttackSchema(RangedAttack attack, float critChance, float critMultiplier, float status, NoiseLevel noise, DamageValue... values) {
+        this(attack, Arrays.asList(values), critChance, critMultiplier, status, noise);
     }
 
     public RangedAttack getAttack() {

@@ -1,54 +1,42 @@
 {
   "type": "tennocraft:ranged_weapon",
   "attacks": {
-    "auto": [
-      {
-        "attack": {
-          "ammoCost": 0,
-          "fireRate": 0.0,
-          "multiShot": 0,
-          "projectileSpeed": 0.0,
-          "projectileType": {
-            "type": "tennocraft:hitscan",
-            "maxDistance": 300
-          },
-          "punchThrough": 0.0,
-          "spread": {
-            "max_inclusive": 6,
-            "min_inclusive": 2
-          }
+    "held": {
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 8.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:projectile",
+          "bullet": "tennocraft:atomos",
+          "dimensions": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "projectile_speed": 3.0
         },
-        "critChance": 0.0,
-        "critMultiplier": 0.0,
-        "damage": [],
-        "noise": "alarming",
-        "status": 0.0
-      }
-    ],
-    "semi": [
-      {
-        "attack": {
-          "ammoCost": 0,
-          "fireRate": 0.0,
-          "multiShot": 0,
-          "projectileSpeed": 0.0,
-          "projectileType": {
-            "type": "tennocraft:hitscan",
-            "maxDistance": 300
-          },
-          "punchThrough": 0.0,
-          "spread": {
-            "max_inclusive": 6,
-            "min_inclusive": 2
-          }
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire"
         },
-        "critChance": 1.0,
-        "critMultiplier": 0.0,
-        "damage": [],
-        "noise": "alarming",
-        "status": 0.0
-      }
-    ]
+        "spread": {
+          "max_inclusive": 8,
+          "min_inclusive": 8
+        }
+      },
+      "critChance": 0.15,
+      "critMultiplier": 1.7,
+      "damage": [
+        {
+          "type": "tennocraft:heat",
+          "maxFalloff": 29.0
+        }
+      ],
+      "noise": "alarming",
+      "status": 0.21
+    }
   },
   "general": {
     "layout": {
@@ -59,17 +47,16 @@
     "maxRank": 30,
     "slot": "secondary",
     "triggerTypes": [
-      "auto",
-      "semi"
+      "held"
     ]
   },
   "utility": {
-    "accuracy": "medium",
-    "ammoPickup": 0,
-    "fireRate": 0.0,
-    "magSize": 0,
-    "maxAmmo": 0,
-    "reloadTime": 0.0,
-    "rivenDisposition": 1.0
+    "accuracy": 12.5,
+    "ammo_pickup": 20,
+    "fire_rate": 8.0,
+    "mag_size": 70,
+    "max_ammo": 350,
+    "reload_time": 40,
+    "riven_disposition": 0.95
   }
 }

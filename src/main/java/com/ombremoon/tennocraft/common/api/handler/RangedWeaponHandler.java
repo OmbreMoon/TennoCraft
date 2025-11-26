@@ -3,41 +3,36 @@ package com.ombremoon.tennocraft.common.api.handler;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
-import com.ombremoon.tennocraft.common.api.mod.ModContainer;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedAttackSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.common.init.TCAttributes;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.DamageFalloff;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.RangedAttack;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.util.Loggable;
-import com.ombremoon.tennocraft.util.ModHelper;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-public class RangedWeaponHandler implements ModHandler, Loggable {
+public class RangedWeaponHandler implements Loggable {
     public static final Codec<RangedWeaponHandler> CODEC = Codec.withAlternative(
             RecordCodecBuilder.create(
                     instance -> instance.group(
@@ -69,7 +64,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
 
     private final CompoundTag tag;
     private final RangedWeaponSchema schema;
-    private final List<RangedAttackSchema> attacks = new ObjectArrayList<>();
+    private final RangedAttackSchema attack;
     private final WeaponModContainer mods;
     private TriggerType triggerType;
     @Nullable
@@ -86,7 +81,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
 
         Modification.Compatibility compatibility = this.schema.getGeneral().layout().compatibility();
         this.triggerType = this.getTriggerType();
-        this.attacks.addAll(this.schema.getProperties().getAttacks(this.triggerType));
+        this.attack = this.schema.getProperties().getAttack(this.triggerType);
         this.mods = new WeaponModContainer(compatibility, this.schema);
         this.loadFromTag(tag, registries);
     }
@@ -94,9 +89,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
     public void setRegistries(HolderLookup.Provider registries) {
         if (this.registries == null) {
             this.registries = registries;
-            if (this.tag.contains("Mods")) {
-                this.mods.deserializeNBT(registries, this.tag.getCompound("Mods"));
-            }
+            this.loadFromTag(this.tag, registries);
         }
     }
 
@@ -115,7 +108,19 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
         stack.set(TCData.RANGED_WEAPON_HANDLER, mutable.toImmutable());
     }
 
-    public void handleBulletDamage(ItemStack stack, LivingEntity target, WeaponDamageResult.Partial partial) {
+    public void handleBulletDamage(ItemStack stack, LivingEntity attacker, LivingEntity target, WeaponDamageResult.Partial partial) {
+        float damage = partial.getDamage();
+
+        RangedAttack attack = this.attack.getAttack();
+        damage /= attack.multiShot();
+
+
+        Optional<DamageFalloff> optional1 = attack.projectileType().getFalloff();
+        if (optional1.isPresent()) {
+            damage *= optional1.get().calculate(attacker.distanceTo(target));
+        }
+
+        partial.setDamage(damage);
     }
 
     public void confirmModChanges(Player player, ItemStack stack) {
@@ -152,7 +157,7 @@ public class RangedWeaponHandler implements ModHandler, Loggable {
                 .orElse(TriggerType.AUTO);
     }
 
-    private void loadFromTag(CompoundTag tag, Schema schema, HolderLookup.Provider registries) {
+    private void loadFromTag(CompoundTag tag, HolderLookup.Provider registries) {
         if (registries != null && tag.contains("Mods")) {
             this.mods.deserializeNBT(registries, tag.getCompound("Mods"));
         }

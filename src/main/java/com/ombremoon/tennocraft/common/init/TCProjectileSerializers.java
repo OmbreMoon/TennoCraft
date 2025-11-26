@@ -1,9 +1,9 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.api.weapon.schema.data.AreaOfEffect;
-import com.ombremoon.tennocraft.common.api.weapon.schema.data.Hitscan;
-import com.ombremoon.tennocraft.common.api.weapon.schema.data.Projectile;
-import com.ombremoon.tennocraft.common.api.weapon.schema.data.ProjectileSerializer;
+import com.ombremoon.tennocraft.common.api.weapon.projectile.AreaOfEffect;
+import com.ombremoon.tennocraft.common.api.weapon.projectile.Hitscan;
+import com.ombremoon.tennocraft.common.api.weapon.projectile.SolidProjectile;
+import com.ombremoon.tennocraft.common.api.weapon.projectile.ProjectileSerializer;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.Registry;
@@ -20,7 +20,7 @@ public class TCProjectileSerializers {
     public static final DeferredRegister<ProjectileSerializer<?>> PROJECTILE_SERIALIZERS = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
 
     public static final Supplier<ProjectileSerializer<Hitscan>> HITSCAN = PROJECTILE_SERIALIZERS.register("hitscan", Hitscan.Serializer::new);
-    public static final Supplier<ProjectileSerializer<Projectile>> PROJECTILE = PROJECTILE_SERIALIZERS.register("projectile", Projectile.Serializer::new);
+    public static final Supplier<ProjectileSerializer<SolidProjectile>> PROJECTILE = PROJECTILE_SERIALIZERS.register("projectile", SolidProjectile.Serializer::new);
     public static final Supplier<ProjectileSerializer<AreaOfEffect>> AOE = PROJECTILE_SERIALIZERS.register("aoe", AreaOfEffect.Serializer::new);
 
     public static void register(IEventBus modEventBus) {

@@ -4,6 +4,7 @@ import com.ombremoon.tennocraft.common.api.mod.ModLayout;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
+import com.ombremoon.tennocraft.util.ModHelper;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,13 +34,17 @@ public abstract class WeaponSchema implements Schema {
 
     public abstract WeaponDamageResult.Distribution getBaseDamageDistribution(@Nullable TriggerType triggerType);
 
-    public abstract float getModdedTypeDamage(ServerLevel level, ItemStack stack, WorldStatus status, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
+    public abstract float getModdedBaseDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
 
     public abstract float getModdedCritChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
 
     public abstract float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
 
     public abstract float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
+
+    public float getModdedStatusDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 1.0F + Math.max(0.0F, ModHelper.modifyStatusDamage(level, stack, this, attacker, target));
+    }
 
     public abstract float getModdedRivenDisposition(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType);
 }

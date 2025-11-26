@@ -66,8 +66,8 @@ public class MeleeWeaponSchema extends WeaponSchema {
     }
 
     @Override
-    public float getModdedTypeDamage(ServerLevel level, ItemStack stack, WorldStatus status, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return Math.max(0.0F, ModHelper.modifyTypeDamage(level, status, stack, this, attacker, target, 0.0F));
+    public float getModdedBaseDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
+        return 0;
     }
 
     @Override
@@ -78,12 +78,14 @@ public class MeleeWeaponSchema extends WeaponSchema {
 
     @Override
     public float getModdedCritDamage(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 0;
+        float critMultiplier = this.attacks.attack().getCritMultiplier();
+        return critMultiplier * (1.0F + Math.max(0.0F, ModHelper.modifyCritDamage(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override
     public float getModdedStatusChance(ServerLevel level, ItemStack stack, LivingEntity attacker, LivingEntity target, @Nullable TriggerType triggerType) {
-        return 0;
+        float statusChance = this.attacks.attack().getStatus();
+        return statusChance * (1.0F + Math.max(0.0F, ModHelper.modifyStatusChance(level, stack, this, attacker, target, 0.0F)));
     }
 
     @Override

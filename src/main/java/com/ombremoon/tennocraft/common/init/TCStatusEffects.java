@@ -13,8 +13,8 @@ public class TCStatusEffects {
     public static final DeferredRegister<MobEffect> MOB_EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, Constants.MOD_ID);
 
     public static final Holder<MobEffect> KNOCKBACK = MOB_EFFECTS.register("knockback", () -> new KnockbackEffect(MobEffectCategory.HARMFUL, 5, 20, 9154528));
-    public static final Holder<MobEffect> WEAKENED = MOB_EFFECTS.register("weakened", () -> new WeakenedEffect(MobEffectCategory.HARMFUL, 5, 20, 9154528));
-    public static final Holder<MobEffect> BLEED = MOB_EFFECTS.register("bleed", () -> new BleedEffect(MobEffectCategory.HARMFUL, 0, 20, 9154528));
+    public static final Holder<MobEffect> WEAKENED = MOB_EFFECTS.register("weakened", () -> new WeakenedEffect(MobEffectCategory.HARMFUL, 200, 20, 9154528));
+    public static final Holder<MobEffect> BLEED = MOB_EFFECTS.register("bleed", () -> new BleedEffect(MobEffectCategory.HARMFUL, 0, 120, 9154528));
     public static final Holder<MobEffect> IGNITE = MOB_EFFECTS.register("ignite", () -> new IgniteEffect(MobEffectCategory.HARMFUL, 0, 20, 9154528));
     public static final Holder<MobEffect> FREEZE = MOB_EFFECTS.register("freeze", () -> new FreezeEffect(MobEffectCategory.HARMFUL, 10, 20, 9154528));
     public static final Holder<MobEffect> TESLA_CHAIN = MOB_EFFECTS.register("tesla_chain", () -> new TeslaChainEffect(MobEffectCategory.HARMFUL, 0, 20, 9154528));

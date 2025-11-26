@@ -1,5 +1,17 @@
 {
   "values": [
-    "tennocraft:knockback"
+    "tennocraft:knockback",
+    "tennocraft:weakened",
+    "tennocraft:bleed",
+    "tennocraft:ignite",
+    "tennocraft:freeze",
+    "tennocraft:tesla_chain",
+    "tennocraft:poison",
+    "tennocraft:detonate",
+    "tennocraft:corrosion",
+    "tennocraft:disrupt",
+    "tennocraft:gas_cloud",
+    "tennocraft:confusion",
+    "tennocraft:virus"
   ]
 }

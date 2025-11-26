@@ -13,7 +13,6 @@ public record AddValue(RankBasedValue value) implements ModValueEffect {
             ).apply(instance, AddValue::new)
     );
 
-
     @Override
     public float process(int modRank, RandomSource random, float value) {
         return value + this.value.calculate(modRank);

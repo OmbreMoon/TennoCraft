@@ -1,0 +1,32 @@
+{
+  "definition": {
+    "type": "standard",
+    "drain": {
+      "base": 6,
+      "per_rank": 1
+    },
+    "maxRank": 5,
+    "polarity": "naramon",
+    "rarity": "uncommon",
+    "supports": "#tennocraft:rifle"
+  },
+  "description": "",
+  "effects": {
+    "tennocraft:modify_damage_type": [
+      {
+        "type": "tennocraft:cold",
+        "id": "tennocraft:mod.cryo_rounds",
+        "value": {
+          "value": {
+            "type": "tennocraft:linear",
+            "base": 0.15,
+            "per_rank": 0.15
+          }
+        }
+      }
+    ]
+  },
+  "name": {
+    "translate": "modification.tennocraft.cryo_rounds"
+  }
+}

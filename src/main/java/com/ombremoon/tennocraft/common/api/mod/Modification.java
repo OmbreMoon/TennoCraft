@@ -3,14 +3,11 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModConditions;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModValueEffect;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModifyItemEffect;
+import com.ombremoon.tennocraft.common.api.mod.effects.*;
+import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
-import com.ombremoon.tennocraft.common.api.mod.effects.ModAttributeEffect;
 import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
-import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.common.world.level.loot.ModContextParams;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.Util;
@@ -170,16 +167,17 @@ public record Modification(Component name, Component description, ModDefinition 
         this.modifyAttackFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
+    public void modifyFactionDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.FACTION_DAMAGE.get(), level, modRank, schema, attacker, entity, damage);
+    }
+
     public void modifyCritChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
         this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
     public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
         this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, attacker, entity, damage);
-        //modifyWithItemModifiers
     }
-
-    //public void modifyElementalDamage (Data component type from status)
 
     public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
         this.modifyAttackFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
@@ -196,7 +194,7 @@ public record Modification(Component name, Component description, ModDefinition 
     ) {
         applyEffects(
                 this.getEffects(type),
-                moddedAttackContext(level, schema, modRank, attacker, entity),
+                preDamageContext(level, schema, modRank, attacker, entity),
                 valueEffect -> value.setValue(valueEffect.process(modRank, attacker.getRandom(), value.floatValue()))
         );
     }
@@ -212,12 +210,12 @@ public record Modification(Component name, Component description, ModDefinition 
     ) {
         applyEffects(
                 this.getEffects(type),
-                damageContext(level, schema, modRank, entity, source),
+                postDamageContext(level, schema, modRank, entity, source),
                 valueEffect -> value.setValue(valueEffect.process(modRank, entity.getRandom(), value.floatValue()))
         );
     }
 
-    public static LootContext moddedAttackContext(ServerLevel level, Schema schema, int modRank, LivingEntity attacker, Entity entity) {
+    public static LootContext preDamageContext(ServerLevel level, Schema schema, int modRank, LivingEntity attacker, Entity entity) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.ATTACKING_ENTITY, attacker)
                 .withParameter(ModContextParams.MOD_RANK, modRank)
@@ -228,7 +226,7 @@ public record Modification(Component name, Component description, ModDefinition 
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 
-    public static LootContext damageContext(ServerLevel level, Schema schema, int modRank, Entity entity, DamageSource damageSource) {
+    public static LootContext postDamageContext(ServerLevel level, Schema schema, int modRank, Entity entity, DamageSource damageSource) {
         LootParams lootparams = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, entity)
                 .withParameter(ModContextParams.MOD_RANK, modRank)
@@ -326,6 +324,11 @@ public record Modification(Component name, Component description, ModDefinition 
         }
 
         public Builder withItemEffect(DataComponentType<List<ModifyItemEffect>> componentType, ModifyItemEffect effect) {
+            this.getEffectsList(componentType).add(effect);
+            return this;
+        }
+
+        public Builder withDamageEffect(DataComponentType<List<ModDamageEffect>> componentType, ModDamageEffect effect) {
             this.getEffectsList(componentType).add(effect);
             return this;
         }

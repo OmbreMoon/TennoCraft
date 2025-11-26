@@ -1,6 +1,7 @@
 package com.ombremoon.tennocraft.datagen;
 
 import com.ombremoon.tennocraft.common.init.TCDamageTypes;
+import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.init.TCStatusEffects;
 import com.ombremoon.tennocraft.common.init.TCTags;
 import com.ombremoon.tennocraft.common.init.schemas.TCFrames;
@@ -11,15 +12,18 @@ import com.ombremoon.tennocraft.main.Constants;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
@@ -73,7 +77,18 @@ public class ModTagProvider {
 
         @Override
         protected void addTags(HolderLookup.Provider provider) {
+            populateTag(TCTags.EntityTypes.IMMUNE_TO_KNOCKBACK,
+                    EntityType.PLAYER);
+        }
 
+        public void populateTag(TagKey<EntityType<?>> tag, EntityType<?>... entityTypes){
+            for (EntityType<?> entityType : entityTypes) {
+                tag(tag).add(entityType);
+            }
+        }
+
+        public void populateTags(TagKey<EntityType<?>> tag, TagKey<EntityType<?>>... keys){
+            tag(tag).addTags(keys);
         }
     }
 
@@ -102,6 +117,21 @@ public class ModTagProvider {
                     TCDamageTypes.RADIATION,
                     TCDamageTypes.VIRAL
             );
+            populateTags(TCTags.DamageTypes.STATUS_DAMAGE,
+                    TCTags.DamageTypes.PHYSICAL,
+                    TCTags.DamageTypes.ELEMENTAL
+            );
+
+            populateTags(DamageTypeTags.BYPASSES_EFFECTS,
+                    TCTags.DamageTypes.STATUS_DAMAGE
+            );
+            populateTag(DamageTypeTags.BYPASSES_ARMOR,
+                    TCDamageTypes.SLASH,
+                    TCDamageTypes.HEAT,
+                    TCDamageTypes.ELECTRICITY,
+                    TCDamageTypes.TOXIC,
+                    TCDamageTypes.GAS
+            );
         }
 
         public void populateTag(TagKey<DamageType> tag, ResourceKey<DamageType>... schemas){
@@ -123,19 +153,19 @@ public class ModTagProvider {
         @Override
         protected void addTags(HolderLookup.Provider provider) {
             populateTag(TCTags.MobEffects.STATUS_EFFECT,
-                    TCStatusEffects.KNOCKBACK
-//                    TCStatusEffects.WEAKENED,
-//                    TCStatusEffects.BLEED,
-//                    TCStatusEffects.IGNITE,
-//                    TCStatusEffects.FREEZE,
-//                    TCStatusEffects.TESLA_CHAIN,
-//                    TCStatusEffects.POISON,
-//                    TCStatusEffects.DETONATE,
-//                    TCStatusEffects.CORROSION,
-//                    TCStatusEffects.DISRUPT,
-//                    TCStatusEffects.GAS_CLOUD,
-//                    TCStatusEffects.CONFUSION,
-//                    TCStatusEffects.VIRUS
+                    TCStatusEffects.KNOCKBACK,
+                    TCStatusEffects.WEAKENED,
+                    TCStatusEffects.BLEED,
+                    TCStatusEffects.IGNITE,
+                    TCStatusEffects.FREEZE,
+                    TCStatusEffects.TESLA_CHAIN,
+                    TCStatusEffects.POISON,
+                    TCStatusEffects.DETONATE,
+                    TCStatusEffects.CORROSION,
+                    TCStatusEffects.DISRUPT,
+                    TCStatusEffects.GAS_CLOUD,
+                    TCStatusEffects.CONFUSION,
+                    TCStatusEffects.VIRUS
             );
         }
 
@@ -164,8 +194,12 @@ public class ModTagProvider {
                     TCTags.Schemas.RANGED_WEAPON,
                     TCTags.Schemas.MELEE);
 
-            populateTag(TCTags.Schemas.PISTOL, TCSecondaryWeapons.ATOMOS);
+            populateTags(TCTags.Schemas.RANGED_WEAPON,
+                    TCTags.Schemas.PISTOL);
+
             populateTag(TCTags.Schemas.MELEE, TCMeleeWeapons.ORTHOS);
+
+            populateTag(TCTags.Schemas.PISTOL, TCSecondaryWeapons.ATOMOS);
         }
 
         public void populateTag(TagKey<Schema> tag, ResourceKey<Schema>... schemas){

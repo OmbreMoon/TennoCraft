@@ -71,7 +71,7 @@ public class SchemaDirectory extends SimpleJsonResourceReloadListener {
                     case FrameSchema frameSchema -> frameBuilder.put(location, new SchemaHolder<>(schemaKey, frameSchema, type));
                     case RangedWeaponSchema rangedWeaponSchema -> rangedBuilder.put(location, new SchemaHolder<>(schemaKey, rangedWeaponSchema, type));
                     case MeleeWeaponSchema meleeWeaponSchema -> meleeBuilder.put(location, new SchemaHolder<>(schemaKey, meleeWeaponSchema, type));
-                    default -> throw new IllegalStateException("Unexpected schema type: " + schema);
+                    default -> throw new IllegalStateException("Unexpected schema projectileType: " + schema);
                 }
 
                 schemas.add(schema);

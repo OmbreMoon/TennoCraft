@@ -12,10 +12,11 @@
   },
   "description": "",
   "effects": {
-    "tennocraft:heat_damage": [
+    "tennocraft:modify_damage_type": [
       {
-        "effect": {
-          "type": "tennocraft:add",
+        "type": "tennocraft:heat",
+        "id": "tennocraft:mod.hellfire",
+        "value": {
           "value": {
             "type": "tennocraft:linear",
             "base": 0.15,

@@ -15,9 +15,11 @@ public class CommonClass {
         TCAbilities.register(modEventBus);
         TCAttributes.register(modEventBus);
         TCData.register(modEventBus);
+        TCEntities.register(modEventBus);
         TCItems.register(modEventBus);
         TCModEffectComponents.register(modEventBus);
         TCProjectileSerializers.register(modEventBus);
+        TCReloadSerializers.register(modEventBus);
         TCSchemas.register(modEventBus);
         TCStatusEffects.register(modEventBus);
 
@@ -26,7 +28,6 @@ public class CommonClass {
         registerSimple(ModValueEffect.MOD_VALUE_EFFECT_TYPES, modEventBus, ModValueEffect::bootstrap);
         registerSimple(ModEntityEffect.MOD_ENTITY_EFFECT_TYPES, modEventBus, ModEntityEffect::bootstrap);
         registerSimple(ModifyItemEffect.MOD_ITEM_EFFECT_TYPES, modEventBus, ModifyItemEffect::bootstrap);
-        registerSimple(ModifyDamageEffect.MOD_DAMAGE_EFFECT_TYPES, modEventBus, ModifyDamageEffect::bootstrap);
     }
 
     private static <T> void registerSimple(DeferredRegister<T> registry, IEventBus modEventBus, DeferredBootstrap<T> bootstrap) {

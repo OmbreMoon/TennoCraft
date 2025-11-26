@@ -2,6 +2,7 @@ package com.ombremoon.tennocraft.common.api.weapon.schema.data;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -30,12 +31,29 @@ public record ComboValue(ResourceLocation animation, List<AttackMultiplier> mult
         return new ComboValue(animation, Arrays.asList(multipliers));
     }
 
+    public static AttackMultiplier withMultiplier(float multiplier, float bonusStatus, DamageValue... values) {
+        return new AttackMultiplier(multiplier, Optional.of(bonusStatus), Optional.of(Arrays.asList(values)), Optional.empty());
+    }
+
+    @SuppressWarnings("unchecked")
+    public static AttackMultiplier withMultiplier(float multiplier, float bonusStatus, Holder<MobEffect>... mobEffects) {
+        return new AttackMultiplier(multiplier, Optional.of(bonusStatus), Optional.empty(), Optional.of(Arrays.asList(mobEffects)));
+    }
+
+    public static AttackMultiplier withMultiplier(float multiplier, float bonusStatus) {
+        return new AttackMultiplier(multiplier, Optional.of(bonusStatus), Optional.empty(), Optional.empty());
+    }
+
+    public static AttackMultiplier withMultiplier(float multiplier, DamageValue... values) {
+        return new AttackMultiplier(multiplier, Optional.empty(), Optional.of(Arrays.asList(values)), Optional.empty());
+    }
+
     @SuppressWarnings("unchecked")
     public static AttackMultiplier withMultiplier(float multiplier, Holder<MobEffect>... mobEffects) {
-        return new AttackMultiplier(multiplier, Optional.of(Arrays.asList(mobEffects)));
+        return new AttackMultiplier(multiplier, Optional.empty(), Optional.empty(), Optional.of(Arrays.asList(mobEffects)));
     }
 
     public static AttackMultiplier withMultiplier(float multiplier) {
-        return new AttackMultiplier(multiplier, Optional.empty());
+        return new AttackMultiplier(multiplier, Optional.empty(), Optional.empty(), Optional.empty());
     }
 }
