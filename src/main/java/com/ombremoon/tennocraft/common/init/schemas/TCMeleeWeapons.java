@@ -6,7 +6,7 @@ import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
 import com.ombremoon.tennocraft.common.api.weapon.NoiseLevel;
 import com.ombremoon.tennocraft.common.api.weapon.WeaponBuilder;
-import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.AttackProperty;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.SlamAttack;
@@ -49,7 +49,7 @@ public interface TCMeleeWeapons {
                             )
                             .attackProperties(
                                     comboSets.getOrThrow(TCComboSets.STAFF),
-                                    AttackSchema.createAttack(
+                                    AttackProperty.createAttack(
                                             0.06F,
                                             1.5F,
                                             0.18F,

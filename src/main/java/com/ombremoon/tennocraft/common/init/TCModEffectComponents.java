@@ -64,8 +64,16 @@ public class TCModEffectComponents {
             "status_damage",
             builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ATTACK).listOf())
     );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> RELOAD_TIME = register(
+            "reload_time",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ATTACK).listOf())
+    );
     public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> MULTISHOT = register(
             "multishot",
+            builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ATTACK).listOf())
+    );
+    public static final Supplier<DataComponentType<List<ConditionalModEffect<ModValueEffect>>>> PROJECTILE_SPEED = register(
+            "projectile_speed",
             builder -> builder.persistent(ConditionalModEffect.codec(ModValueEffect.CODEC, ModContextParams.MODDED_ATTACK).listOf())
     );
 

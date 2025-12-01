@@ -31,8 +31,9 @@ public class TennoSlots extends HashMap<SlotGroup, IModHolder<?>> {
         if (stack != null && group == SlotGroup.WEAPON && modHolder instanceof IWeaponModHolder<?>) {
             this.selectedWeapon = (WeaponSchema) modHolder.schema(stack);
 
-            WeaponModContainer mods = (WeaponModContainer) modHolder.getMods(stack);
-            mods.collectModifiers(player, stack);
+            WeaponModContainer mods = (WeaponModContainer) modHolder.getMods(player, stack);
+            if (mods != null)
+                mods.collectModifiers(player, stack);
         }
 
         return true;

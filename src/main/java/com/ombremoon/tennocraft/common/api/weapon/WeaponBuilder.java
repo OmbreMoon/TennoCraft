@@ -1,19 +1,17 @@
 package com.ombremoon.tennocraft.common.api.weapon;
 
-import com.ombremoon.tennocraft.common.api.weapon.projectile.ProjectileType;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.ReloadType;
-import com.ombremoon.tennocraft.common.api.weapon.schema.*;
-import com.ombremoon.tennocraft.common.api.mod.ModSlot;
 import com.ombremoon.tennocraft.common.api.mod.ModLayout;
+import com.ombremoon.tennocraft.common.api.mod.ModSlot;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
-import com.ombremoon.tennocraft.common.api.weapon.schema.data.*;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.AutoTrigger;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
+import com.ombremoon.tennocraft.common.api.weapon.schema.*;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ComboSet;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.SlamAttack;
+import com.ombremoon.tennocraft.common.api.weapon.schema.data.ZoomAttributes;
 import com.ombremoon.tennocraft.common.world.item.weapon.WeaponSlot;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 
@@ -31,7 +29,7 @@ public abstract class WeaponBuilder {
         private int mastery;
         private int maxRank = 30;
         private ModLayout layout = new ModLayout(Modification.Compatibility.PRIMARY, List.of());
-        private List<TriggerType> triggerTypes = List.of(TriggerType.AUTO);
+        private List<ResourceLocation> triggerTypes = List.of(AutoTrigger.TYPE);
 
         public General slot(WeaponSlot slot) {
             this.slot = slot;
@@ -53,13 +51,13 @@ public abstract class WeaponBuilder {
             return this;
         }
 
-        public General triggerTypes(TriggerType... triggerTypes) {
+        public General triggerTypes(ResourceLocation... triggerTypes) {
             this.triggerTypes = Arrays.asList(triggerTypes);
             return this;
         }
 
         public Ranged ranged() {
-            GeneralSchema general = new GeneralSchema(
+            GeneralProperties general = new GeneralProperties(
                     this.slot,
                     this.mastery,
                     this.maxRank,
@@ -70,7 +68,7 @@ public abstract class WeaponBuilder {
         }
 
         public Melee melee() {
-            GeneralSchema general = new GeneralSchema(
+            GeneralProperties general = new GeneralProperties(
                     this.slot,
                     this.mastery,
                     this.maxRank,
@@ -82,25 +80,25 @@ public abstract class WeaponBuilder {
     }
 
     public static class Ranged extends WeaponBuilder {
-        private final GeneralSchema general;
-        private RangedUtilitySchema utility;
-        private Map<TriggerType, RangedAttackSchema> properties = new HashMap<>();
+        private final GeneralProperties general;
+        private RangedUtilityProperties utility;
+        private Map<TriggerType<?>, RangedAttackProperty> properties = new HashMap<>();
 
-        Ranged(GeneralSchema general) {
+        Ranged(GeneralProperties general) {
             this.general = general;
         }
 
-        public Ranged utility(float accuracy, float fireRate, int maxAmmo, int magSize, int ammoPickup, int reloadTime, float rivenDisposition) {
-            this.utility = new RangedUtilitySchema(accuracy, fireRate, maxAmmo, magSize, ammoPickup, reloadTime, rivenDisposition);
+        public Ranged utility(int maxAmmo, int magSize, int ammoPickup, float rivenDisposition) {
+            this.utility = new RangedUtilityProperties(maxAmmo, magSize, ammoPickup, rivenDisposition);
             return this;
         }
 
-        public Ranged utility(float accuracy, float fireRate, int maxAmmo, int magSize, int ammoPickup, int reloadTime, float rivenDisposition, SniperInfo info) {
-            this.utility = new RangedUtilitySchema(accuracy, fireRate, maxAmmo, magSize, ammoPickup, reloadTime, rivenDisposition, Optional.of(info));
+        public Ranged utility(int maxAmmo, int magSize, int ammoPickup, float rivenDisposition, ZoomAttributes info) {
+            this.utility = new RangedUtilityProperties(maxAmmo, magSize, ammoPickup, rivenDisposition, Optional.of(info));
             return this;
         }
 
-        public Ranged addAttack(TriggerType triggerType, RangedAttackSchema schema) {
+        public Ranged addAttack(TriggerType<?> triggerType, RangedAttackProperty schema) {
             this.properties.put(triggerType, schema);
             return this;
         }
@@ -117,20 +115,20 @@ public abstract class WeaponBuilder {
     }
 
     public static class Melee extends WeaponBuilder {
-        private final GeneralSchema general;
-        private MeleeUtilitySchema utility;
+        private final GeneralProperties general;
+        private MeleeUtilityProperties utility;
         private MeleeAttackProperties properties;
 
-        Melee(GeneralSchema general) {
+        Melee(GeneralProperties general) {
             this.general = general;
         }
 
         public Melee utility(float attackSpeed, int blockAngle, int comboDuration, float rivenDisposition, float followThrough) {
-            this.utility = new MeleeUtilitySchema(attackSpeed, blockAngle, comboDuration, rivenDisposition, followThrough);
+            this.utility = new MeleeUtilityProperties(attackSpeed, blockAngle, comboDuration, rivenDisposition, followThrough);
             return this;
         }
 
-        public Melee attackProperties(Holder<ComboSet> combo, AttackSchema attack, int windUp, SlamAttack slamAttack, SlamAttack heavySlamAttack) {
+        public Melee attackProperties(Holder<ComboSet> combo, AttackProperty attack, int windUp, SlamAttack slamAttack, SlamAttack heavySlamAttack) {
             this.properties = new MeleeAttackProperties(combo, attack, windUp, slamAttack, heavySlamAttack);
             return this;
         }

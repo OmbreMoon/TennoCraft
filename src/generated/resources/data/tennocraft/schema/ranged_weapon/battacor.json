@@ -1,0 +1,107 @@
+{
+  "type": "tennocraft:ranged_weapon",
+  "attacks": [
+    {
+      "type": "tennocraft:burst",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 2.5,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:projectile",
+          "bullet": "tennocraft:atomos",
+          "dimensions": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "projectile_speed": 120.0
+        },
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 40
+        },
+        "spread": {
+          "max_exclusive": 8.0,
+          "min_inclusive": 0.0
+        }
+      },
+      "auto_fire": true,
+      "burst_count": 2,
+      "critChance": 0.32,
+      "critMultiplier": 2.4,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 24.0
+        },
+        {
+          "type": "tennocraft:magnetic",
+          "maxFalloff": 42.0
+        }
+      ],
+      "delay_ticks": 2,
+      "noise": "alarming",
+      "status": 0.18
+    },
+    {
+      "type": "tennocraft:charge",
+      "attack": {
+        "ammo_cost": 0,
+        "fire_rate": 5.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:hitscan",
+          "bullet": "tennocraft:atomos"
+        },
+        "punch_through": 2.0,
+        "reload_type": {
+          "type": "tennocraft:no_reload"
+        },
+        "spread": {
+          "max_exclusive": 0.01,
+          "min_inclusive": 0.0
+        }
+      },
+      "charge_time": 8,
+      "critChance": 0.34,
+      "critMultiplier": 3.0,
+      "damage": [
+        {
+          "type": "tennocraft:radiation",
+          "maxFalloff": 208.0
+        }
+      ],
+      "noise": "alarming",
+      "quickshot": "auto",
+      "release_delay": 0,
+      "status": 0.08
+    }
+  ],
+  "general": {
+    "layout": {
+      "compatibility": "primary",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "naramon"
+        }
+      ]
+    },
+    "mastery": 10,
+    "maxRank": 30,
+    "slot": "primary",
+    "triggerTypes": [
+      "tennocraft:burst",
+      "tennocraft:charge"
+    ]
+  },
+  "utility": {
+    "ammo_pickup": 80,
+    "mag_size": 60,
+    "max_ammo": 720,
+    "riven_disposition": 2.5
+  }
+}

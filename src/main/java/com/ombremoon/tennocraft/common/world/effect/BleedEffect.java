@@ -47,14 +47,14 @@ public class BleedEffect extends StatusEffect {
 
                 if (schema instanceof WeaponSchema weaponSchema) {
                     var weaponHolder = (IWeaponModHolder<?>) modHolder;
-                    float modifiedCritChance = weaponSchema.getModdedCritChance(serverLevel, weapon, attacker, livingEntity, weaponHolder.getTriggerType(weapon));
+                    float modifiedCritChance = weaponSchema.getModdedCritChance(serverLevel, weapon, attacker, livingEntity, weaponHolder.getTriggerType(attacker, weapon));
                     int tier = Mth.floor(modifiedCritChance);
                     float potentialCrit = modifiedCritChance % 1.0F;
                     if (potentialCrit != 0 && RandomUtil.percentChance(potentialCrit)) {
                         tier++;
                     }
 
-                    float modifiedCritMult = weaponSchema.getModdedCritDamage(serverLevel, weapon, attacker, livingEntity, weaponHolder.getTriggerType(weapon));;
+                    float modifiedCritMult = weaponSchema.getModdedCritDamage(serverLevel, weapon, attacker, livingEntity, weaponHolder.getTriggerType(attacker, weapon));;
                     dotDamage *= 1 + tier * (modifiedCritMult - 1);
                 }
 

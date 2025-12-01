@@ -1,9 +1,7 @@
 package com.ombremoon.tennocraft.main;
 
 import com.ombremoon.tennocraft.common.api.mod.effects.*;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Bullet;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.ReloadSerializer;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.ReloadType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.Bullet;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.*;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
@@ -35,15 +33,13 @@ public class TennoCraft {
     }
 
     private void registerRegistry(NewRegistryEvent event) {
+        event.register(TCModEffectComponents.REGISTRY);
         event.register(ModEntityEffect.ENTITY_REGISTRY);
         event.register(ModLocationEffect.LOCATION_REGISTRY);
         event.register(ModifyItemEffect.ITEM_REGISTRY);
         event.register(ModValueEffect.REGISTRY);
         event.register(RankBasedValue.REGISTRY);
         event.register(TCAbilities.REGISTRY);
-        event.register(TCModEffectComponents.REGISTRY);
-        event.register(TCProjectileSerializers.REGISTRY);
-        event.register(TCReloadSerializers.REGISTRY);
         event.register(TCSchemas.REGISTRY);
     }
 }

@@ -1,29 +1,26 @@
 {
   "type": "tennocraft:ranged_weapon",
-  "attacks": {
-    "held": {
+  "attacks": [
+    {
+      "type": "tennocraft:held",
       "attack": {
         "ammo_cost": 1,
         "fire_rate": 8.0,
         "multishot": 1,
         "projectile_type": {
-          "type": "tennocraft:projectile",
+          "type": "tennocraft:hitscan",
           "bullet": "tennocraft:atomos",
-          "dimensions": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "projectile_speed": 3.0
+          "max_distance": 15.0
         },
         "punch_through": 0.0,
         "reload_type": {
           "type": "tennocraft:ammo",
-          "consume_when": "on_fire"
+          "consume_when": "on_fire",
+          "reload_time": 40
         },
         "spread": {
-          "max_inclusive": 8,
-          "min_inclusive": 8
+          "max_exclusive": 8.01,
+          "min_inclusive": 8.0
         }
       },
       "critChance": 0.15,
@@ -34,29 +31,35 @@
           "maxFalloff": 29.0
         }
       ],
+      "damage_decay_ticks": 40,
+      "damage_ramp_ticks": 12,
+      "decay_delay": 16,
+      "initial_damage": 0.35,
       "noise": "alarming",
       "status": 0.21
     }
-  },
+  ],
   "general": {
     "layout": {
-      "compatibility": "primary",
-      "slots": []
+      "compatibility": "secondary",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "madurai"
+        }
+      ]
     },
     "mastery": 0,
     "maxRank": 30,
     "slot": "secondary",
     "triggerTypes": [
-      "held"
+      "tennocraft:held"
     ]
   },
   "utility": {
-    "accuracy": 12.5,
     "ammo_pickup": 20,
-    "fire_rate": 8.0,
     "mag_size": 70,
     "max_ammo": 350,
-    "reload_time": 40,
     "riven_disposition": 0.95
   }
 }

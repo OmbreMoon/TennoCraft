@@ -1,29 +1,42 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.api.weapon.projectile.AreaOfEffect;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Hitscan;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.SolidProjectile;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.ProjectileSerializer;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.*;
 import com.ombremoon.tennocraft.main.CommonClass;
-import com.ombremoon.tennocraft.main.Constants;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegistryBuilder;
+import com.ombremoon.tennocraft.util.SerializationUtil;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.function.Supplier;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TCProjectileSerializers {
-    public static final ResourceKey<Registry<ProjectileSerializer<?>>> RESOURCE_KEY = ResourceKey.createRegistryKey(CommonClass.customLocation("projectile_type"));
-    public static final Registry<ProjectileSerializer<?>> REGISTRY = new RegistryBuilder<>(RESOURCE_KEY).sync(true).create();
-    public static final DeferredRegister<ProjectileSerializer<?>> PROJECTILE_SERIALIZERS = DeferredRegister.create(REGISTRY, Constants.MOD_ID);
+    private static final Map<ResourceLocation, ProjectileSerializer<?>> REGISTRY = new HashMap<>();
+    public static final Codec<ProjectileSerializer<?>> CODEC = ResourceLocation.CODEC
+            .comapFlatMap(
+                    location -> {
+                        ProjectileSerializer<?> serializer = REGISTRY.get(location);
+                        return serializer != null
+                                ? DataResult.success(serializer)
+                                : DataResult.error(() -> "No ProjectileSerializer with key: " + location);
+                    },
+                    ProjectileSerializer::id
+            );
+    public static final StreamCodec<RegistryFriendlyByteBuf, ProjectileSerializer<?>> STREAM_CODEC = SerializationUtil.REGISTRY_RESOURCE_STREAM_CODEC
+            .map(TCProjectileSerializers::getProjectileFromLocation, ProjectileSerializer::id);
 
-    public static final Supplier<ProjectileSerializer<Hitscan>> HITSCAN = PROJECTILE_SERIALIZERS.register("hitscan", Hitscan.Serializer::new);
-    public static final Supplier<ProjectileSerializer<SolidProjectile>> PROJECTILE = PROJECTILE_SERIALIZERS.register("projectile", SolidProjectile.Serializer::new);
-    public static final Supplier<ProjectileSerializer<AreaOfEffect>> AOE = PROJECTILE_SERIALIZERS.register("aoe", AreaOfEffect.Serializer::new);
+    public static ProjectileSerializer<?> getProjectileFromLocation(ResourceLocation resourceLocation) {
+        return REGISTRY.getOrDefault(resourceLocation, null);
+    }
 
-    public static void register(IEventBus modEventBus) {
-        PROJECTILE_SERIALIZERS.register(modEventBus);
+    public static final ProjectileSerializer<Hitscan> HITSCAN = register("hitscan", new Hitscan.Serializer());
+    public static final ProjectileSerializer<SolidProjectile> PROJECTILE = register("projectile", new SolidProjectile.Serializer());
+    public static final ProjectileSerializer<AreaOfEffect> AOE = register("aoe", new AreaOfEffect.Serializer());
+
+    private static <T extends ProjectileType<T>> ProjectileSerializer<T> register(String name, ProjectileSerializer<T> serializer) {
+        REGISTRY.put(CommonClass.customLocation(name), serializer);
+        return serializer;
     }
 }

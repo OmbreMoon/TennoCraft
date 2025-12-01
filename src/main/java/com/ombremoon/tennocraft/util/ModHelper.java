@@ -43,8 +43,8 @@ public class ModHelper {
         return WorldStatus.byFlag(flag);
     }
 
-    public static void runIterationOnModHolder(ItemStack stack, IModHolder<?> holder, ModInSlotVisitor visitor) {
-        ModContainer container = holder.getMods(stack);
+    public static void runIterationOnModHolder(LivingEntity entity, ItemStack stack, IModHolder<?> holder, ModInSlotVisitor visitor) {
+        ModContainer container = holder.getMods(entity, stack);
 
         for (var mod : container.mods) {
             if (!mod.isEmpty()) {
@@ -53,9 +53,9 @@ public class ModHelper {
         }
     }
 
-    public static void runIterationOnWeapon(ItemStack stack, ModVisitor visitor) {
+    public static void runIterationOnWeapon(LivingEntity entity, ItemStack stack, ModVisitor visitor) {
         if (stack.getItem() instanceof IModHolder<?> holder) {
-            ModContainer container = holder.getMods(stack);
+            ModContainer container = holder.getMods(entity, stack);
 
             for (var mod : container.mods) {
                 if (!mod.isEmpty()) {
@@ -73,7 +73,7 @@ public class ModHelper {
         TennoSlots slots = entity.getData(TCData.TENNO_SLOTS);
         for (var slot : slots.entrySet()) {
             if (group == null || slot.getKey() != group && !slots.isDisabled(group)) {
-                runIterationOnModHolder(stack, slot.getValue(), visitor);
+                runIterationOnModHolder(entity, stack, slot.getValue(), visitor);
             }
         }
     }
@@ -120,7 +120,7 @@ public class ModHelper {
     public static float modifyCritChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
-                stack, (mod, rank) -> mod.value().modifyCritChance(level, rank, schema, attacker, entity, mutableFloat)
+                attacker, stack, (mod, rank) -> mod.value().modifyCritChance(level, rank, schema, attacker, entity, mutableFloat)
         );
         modifyStatWithAdditionalModifiers(
                 TCModEffectComponents.CRIT_CHANCE.get(), level, stack, schema, attacker, entity, mutableFloat
@@ -131,7 +131,7 @@ public class ModHelper {
     public static float modifyCritDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
-                stack, (mod, rank) -> mod.value().modifyCritDamage(level, rank, schema, attacker, entity, mutableFloat)
+                attacker, stack, (mod, rank) -> mod.value().modifyCritDamage(level, rank, schema, attacker, entity, mutableFloat)
         );
         modifyStatWithAdditionalModifiers(
                 TCModEffectComponents.CRIT_MULTIPLIER.get(), level, stack, schema, attacker, entity, mutableFloat
@@ -142,7 +142,7 @@ public class ModHelper {
     public static float modifyStatusChance(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity, float damage) {
         MutableFloat mutableFloat = new MutableFloat(damage);
         runIterationOnWeapon(
-                stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
+                attacker, stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
         );
         modifyStatWithAdditionalModifiers(
                 TCModEffectComponents.STATUS_CHANCE.get(), level, stack, schema, attacker, entity, mutableFloat
@@ -153,10 +153,34 @@ public class ModHelper {
     public static float modifyStatusDamage(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker, LivingEntity entity) {
         MutableFloat mutableFloat = new MutableFloat();
         runIterationOnWeapon(
-                stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
+                attacker, stack, (mod, rank) -> mod.value().modifyStatusChance(level, rank, schema, attacker, entity, mutableFloat)
         );
         modifyStatWithAdditionalModifiers(
                 TCModEffectComponents.STATUS_DAMAGE.get(), level, stack, schema, attacker, entity, mutableFloat
+        );
+        return mutableFloat.floatValue();
+    }
+
+    public static float modifyReloadTime(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker) {
+        MutableFloat mutableFloat = new MutableFloat();
+        runIterationOnWeapon(
+                attacker, stack, (mod, rank) -> mod.value().modifyReloadTime(level, rank, schema, attacker, mutableFloat)
+        );
+        return mutableFloat.floatValue();
+    }
+
+    public static float modifyMultishot(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker) {
+        MutableFloat mutableFloat = new MutableFloat();
+        runIterationOnWeapon(
+                attacker, stack, (mod, rank) -> mod.value().modifyMultishot(level, rank, schema, attacker, mutableFloat)
+        );
+        return mutableFloat.floatValue();
+    }
+
+    public static float modifyProjectileSpeed(ServerLevel level, ItemStack stack, Schema schema, LivingEntity attacker) {
+        MutableFloat mutableFloat = new MutableFloat();
+        runIterationOnWeapon(
+                attacker, stack, (mod, rank) -> mod.value().modifyProjectileSpeed(level, rank, schema, attacker, mutableFloat)
         );
         return mutableFloat.floatValue();
     }
@@ -171,7 +195,7 @@ public class ModHelper {
             MutableFloat value
     ) {
         IWeaponModHolder<?> holder = (IWeaponModHolder<?>) stack.getItem();
-        WeaponModContainer mods = (WeaponModContainer) holder.getMods(stack);
+        WeaponModContainer mods = (WeaponModContainer) holder.getMods(attacker, stack);
         applyDamageModifiers(
                 level, schema, attacker, entity, mods.getDamageModifiers(type), value
         );
@@ -187,7 +211,7 @@ public class ModHelper {
             MutableFloat value
     ) {
         IWeaponModHolder<?> holder = (IWeaponModHolder<?>) stack.getItem();
-        WeaponModContainer mods = (WeaponModContainer) holder.getMods(stack);
+        WeaponModContainer mods = (WeaponModContainer) holder.getMods(attacker, stack);
         applyItemModifiers(
                 level, schema, attacker, entity, mods.getItemModifiers(type), value
         );
@@ -201,15 +225,15 @@ public class ModHelper {
         });
     }*/
 
-    public static void forEachItemModifier(ItemStack stack, BiConsumer<ModifyItemEffect, Integer> modifier) {
-        runIterationOnWeapon(stack, (mod, rank) -> {
+    public static void forEachItemModifier(ItemStack stack, LivingEntity entity, BiConsumer<ModifyItemEffect, Integer> modifier) {
+        runIterationOnWeapon(entity, stack, (mod, rank) -> {
             mod.value().getEffects(TCModEffectComponents.MODIFY_ITEM.get()).forEach(effect -> {
                 modifier.accept(effect, rank);
             });
         });
     }
 
-    public static void forEachItemModifier(ItemStack stack, LivingEntity entity, BiConsumer<ModifyItemEffect, Integer> modifier) {
+    public static void forEachItemModifier(LivingEntity entity, ItemStack stack, BiConsumer<ModifyItemEffect, Integer> modifier) {
         runIterationOnSlots(stack, entity, (mod, rank, modHolder) -> {
             mod.value().getEffects(TCModEffectComponents.MODIFY_ITEM.get()).forEach(effect -> {
                 modifier.accept(effect, rank);
@@ -217,8 +241,8 @@ public class ModHelper {
         });
     }
 
-    public static void forEachDamageModifier(ItemStack stack, BiConsumer<ModDamageEffect, Integer> modifier) {
-        runIterationOnWeapon(stack, (mod, rank) -> {
+    public static void forEachDamageModifier(ItemStack stack, LivingEntity entity, BiConsumer<ModDamageEffect, Integer> modifier) {
+        runIterationOnWeapon(entity, stack, (mod, rank) -> {
             mod.value().getEffects(TCModEffectComponents.MODIFY_DAMAGE_TYPE.get()).forEach(effect -> {
                 modifier.accept(effect, rank);
             });

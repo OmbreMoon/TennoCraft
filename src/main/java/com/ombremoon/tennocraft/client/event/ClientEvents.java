@@ -1,5 +1,6 @@
 package com.ombremoon.tennocraft.client.event;
 
+import com.ombremoon.tennocraft.client.KeyBinds;
 import com.ombremoon.tennocraft.client.renderer.BulletRenderer;
 import com.ombremoon.tennocraft.client.renderer.layer.PlayerFrameLayer;
 import com.ombremoon.tennocraft.common.init.TCEntities;
@@ -15,6 +16,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public class ClientEvents {
@@ -33,6 +35,11 @@ public class ClientEvents {
 
             playerRenderer.addLayer(new PlayerFrameLayer<>(playerRenderer));
         }
+    }
+
+    @SubscribeEvent
+    public static void onKeyRegister(RegisterKeyMappingsEvent event) {
+        event.register(KeyBinds.ALTERNATE_FIRE_BINDING);
     }
 
     @SubscribeEvent

@@ -14,6 +14,7 @@ import java.util.Map;
 public interface TCDamageTypes {
     List<ResourceKey<DamageType>> ELEMENTAL_TYPES = new ArrayList<>();
 
+    ResourceKey<DamageType> GENERIC = key("generic");
     ResourceKey<DamageType> IMPACT = key("impact");
     ResourceKey<DamageType> PUNCTURE = key("puncture");
     ResourceKey<DamageType> SLASH = key("slash");
@@ -29,6 +30,7 @@ public interface TCDamageTypes {
     ResourceKey<DamageType> VIRAL = elementalKey("viral");
 
     static void bootstrap(BootstrapContext<DamageType> context) {
+        register(context, GENERIC);
         register(context, IMPACT);
         register(context, PUNCTURE);
         register(context, SLASH);

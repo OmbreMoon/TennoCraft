@@ -1,0 +1,124 @@
+{
+  "type": "tennocraft:ranged_weapon",
+  "attacks": [
+    {
+      "type": "tennocraft:fallback",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 1.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:projectile",
+          "bullet": "tennocraft:atomos",
+          "dimensions": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "projectile_speed": 70.0
+        },
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 13
+        },
+        "spread": {
+          "max_exclusive": 12.0,
+          "min_inclusive": 0.0
+        }
+      },
+      "critChance": 0.3,
+      "critMultiplier": 2.0,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 8.0
+        },
+        {
+          "type": "tennocraft:puncture",
+          "maxFalloff": 120.0
+        },
+        {
+          "type": "tennocraft:slash",
+          "maxFalloff": 32.0
+        }
+      ],
+      "noise": "silent",
+      "status": 0.1
+    },
+    {
+      "type": "tennocraft:charge",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 1.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:projectile",
+          "bullet": "tennocraft:atomos",
+          "dimensions": [
+            0.5,
+            0.5,
+            0.5
+          ],
+          "projectile_speed": 85.0
+        },
+        "punch_through": 2.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 13
+        },
+        "spread": {
+          "max_exclusive": 12.0,
+          "min_inclusive": 0.0
+        }
+      },
+      "charge_time": 10,
+      "critChance": 0.3,
+      "critMultiplier": 2.0,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 16.0
+        },
+        {
+          "type": "tennocraft:puncture",
+          "maxFalloff": 256.0
+        },
+        {
+          "type": "tennocraft:slash",
+          "maxFalloff": 48.0
+        }
+      ],
+      "noise": "silent",
+      "quickshot": "full_quickShot",
+      "release_delay": -1,
+      "status": 0.1
+    }
+  ],
+  "general": {
+    "layout": {
+      "compatibility": "primary",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "madurai"
+        }
+      ]
+    },
+    "mastery": 0,
+    "maxRank": 30,
+    "slot": "primary",
+    "triggerTypes": [
+      "tennocraft:charge",
+      "tennocraft:fallback"
+    ]
+  },
+  "utility": {
+    "ammo_pickup": 15,
+    "mag_size": 1,
+    "max_ammo": 72,
+    "riven_disposition": 1.0
+  }
+}

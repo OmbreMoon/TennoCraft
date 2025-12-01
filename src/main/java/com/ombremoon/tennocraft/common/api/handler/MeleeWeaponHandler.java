@@ -5,9 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.ombremoon.tennocraft.common.api.IModHolder;
 import com.ombremoon.tennocraft.common.api.mod.Modification;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
-import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
-import com.ombremoon.tennocraft.common.api.weapon.schema.AttackSchema;
-import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeUtilitySchema;
+import com.ombremoon.tennocraft.common.api.weapon.schema.AttackProperty;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.AttackMultiplier;
@@ -20,8 +18,8 @@ import com.ombremoon.tennocraft.util.Loggable;
 import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -29,17 +27,12 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeMap;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.mutable.MutableFloat;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 public class MeleeWeaponHandler implements ModHandler, Loggable {
     public static final Codec<MeleeWeaponHandler> CODEC = Codec.withAlternative(
@@ -73,11 +66,12 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
 
     private final CompoundTag tag;
     private final MeleeWeaponSchema schema;
-    private final AttackSchema attacks;
+    private final AttackProperty attacks;
     private Holder<ComboSet> comboSet;
     private final WeaponModContainer mods;
     @Nullable
     private HolderLookup.Provider registries;
+    public boolean test;
 
     private static MeleeWeaponHandler forCodec(CompoundTag tag, Schema schema) {
         return new MeleeWeaponHandler(tag, schema, null);
@@ -102,12 +96,9 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         }
     }
 
-    public void ensureRegistryAccess() {
+    public void ensureRegistryAccess(RegistryAccess registryAccess) {
         if (this.registries == null) {
-            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            if (server != null) {
-                setRegistries(server.registryAccess());
-            }
+            setRegistries(registryAccess);
         }
     }
 
@@ -144,6 +135,7 @@ public class MeleeWeaponHandler implements ModHandler, Loggable {
         }
 
         partial.setDamage(damage);
+        test = true;
     }
 
     public void confirmModChanges(Player player, ItemStack stack) {

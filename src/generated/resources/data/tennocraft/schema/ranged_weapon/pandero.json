@@ -1,0 +1,112 @@
+{
+  "type": "tennocraft:ranged_weapon",
+  "attacks": [
+    {
+      "type": "tennocraft:semi",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 3.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:hitscan",
+          "bullet": "tennocraft:atomos"
+        },
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 20
+        },
+        "spread": {
+          "max_exclusive": 12.0,
+          "min_inclusive": 0.5
+        }
+      },
+      "critChance": 0.3,
+      "critMultiplier": 2.8,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 18.0
+        },
+        {
+          "type": "tennocraft:puncture",
+          "maxFalloff": 18.0
+        },
+        {
+          "type": "tennocraft:slash",
+          "maxFalloff": 36.0
+        }
+      ],
+      "noise": "alarming",
+      "status": 0.2
+    },
+    {
+      "type": "tennocraft:burst",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 4.17,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:hitscan",
+          "bullet": "tennocraft:atomos"
+        },
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 20
+        },
+        "spread": {
+          "max_exclusive": 18.0,
+          "min_inclusive": 6.5
+        }
+      },
+      "burst_count": 0,
+      "critChance": 0.3,
+      "critMultiplier": 2.8,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 18.0
+        },
+        {
+          "type": "tennocraft:puncture",
+          "maxFalloff": 18.0
+        },
+        {
+          "type": "tennocraft:slash",
+          "maxFalloff": 36.0
+        }
+      ],
+      "delay_ticks": 2,
+      "noise": "alarming",
+      "reload_delay_ticks": 4,
+      "status": 0.1
+    }
+  ],
+  "general": {
+    "layout": {
+      "compatibility": "secondary",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "madurai"
+        }
+      ]
+    },
+    "mastery": 0,
+    "maxRank": 30,
+    "slot": "secondary",
+    "triggerTypes": [
+      "tennocraft:semi",
+      "tennocraft:burst"
+    ]
+  },
+  "utility": {
+    "ammo_pickup": 40,
+    "mag_size": 8,
+    "max_ammo": 210,
+    "riven_disposition": 1.2
+  }
+}

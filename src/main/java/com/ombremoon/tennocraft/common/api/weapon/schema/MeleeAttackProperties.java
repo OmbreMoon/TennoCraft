@@ -7,15 +7,14 @@ import com.ombremoon.tennocraft.common.api.weapon.schema.data.SlamAttack;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 
-public record MeleeAttackProperties(Holder<ComboSet> combo, AttackSchema attack, int windUp, SlamAttack slamAttack, SlamAttack heavySlamAttack) {
+public record MeleeAttackProperties(Holder<ComboSet> combo, AttackProperty attack, int windUp, SlamAttack slamAttack, SlamAttack heavySlamAttack) {
     public static final Codec<MeleeAttackProperties> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     ComboSet.CODEC.fieldOf("combo").forGetter(MeleeAttackProperties::combo),
-                    AttackSchema.CODEC.fieldOf("attack").forGetter(MeleeAttackProperties::attack),
+                    AttackProperty.CODEC.fieldOf("attack").forGetter(MeleeAttackProperties::attack),
                     Codec.INT.fieldOf("windUp").forGetter(MeleeAttackProperties::windUp),
                     SlamAttack.CODEC.fieldOf("slamAttack").forGetter(MeleeAttackProperties::slamAttack),
                     SlamAttack.CODEC.fieldOf("heavySlamAttack").forGetter(MeleeAttackProperties::heavySlamAttack)
@@ -25,7 +24,7 @@ public record MeleeAttackProperties(Holder<ComboSet> combo, AttackSchema attack,
         @Override
         public MeleeAttackProperties decode(RegistryFriendlyByteBuf buffer) {
             ResourceKey<ComboSet> key = ResourceKey.streamCodec(Keys.COMBO_SET).decode(buffer);
-            AttackSchema attacks = AttackSchema.STREAM_CODEC.decode(buffer);
+            AttackProperty attacks = AttackProperty.STREAM_CODEC.decode(buffer);
             int windUp = buffer.readVarInt();
             SlamAttack slamAttack = SlamAttack.STREAM_CODEC.decode(buffer);
             SlamAttack heavySlamAttack = SlamAttack.STREAM_CODEC.decode(buffer);
@@ -37,7 +36,7 @@ public record MeleeAttackProperties(Holder<ComboSet> combo, AttackSchema attack,
         public void encode(RegistryFriendlyByteBuf buffer, MeleeAttackProperties value) {
             ResourceKey<ComboSet> key = value.combo.unwrapKey().orElseThrow();
             ResourceKey.streamCodec(Keys.COMBO_SET).encode(buffer, key);
-            AttackSchema.STREAM_CODEC.encode(buffer, value.attack);
+            AttackProperty.STREAM_CODEC.encode(buffer, value.attack);
             buffer.writeVarInt(value.windUp);
             SlamAttack.STREAM_CODEC.encode(buffer, value.slamAttack);
             SlamAttack.STREAM_CODEC.encode(buffer, value.heavySlamAttack);

@@ -1,6 +1,6 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Bullet;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.Bullet;
 import com.ombremoon.tennocraft.main.CommonClass;
 import com.ombremoon.tennocraft.main.Keys;
 import net.minecraft.data.worldgen.BootstrapContext;

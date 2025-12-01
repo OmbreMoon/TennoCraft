@@ -1,8 +1,14 @@
 package com.ombremoon.tennocraft.common.event;
 
 import com.ombremoon.tennocraft.common.api.IModHolder;
+import com.ombremoon.tennocraft.common.api.IRangedModHolder;
 import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
+import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.reload.DurationReloadType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.reload.ReloadType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
 import com.ombremoon.tennocraft.common.init.TCData;
+import com.ombremoon.tennocraft.common.networking.PayloadHandler;
 import com.ombremoon.tennocraft.common.world.PlayerCombo;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.common.world.TennoSlots;
@@ -49,6 +55,23 @@ public class TCEvents {
             if (stack.getItem() instanceof IModHolder<?> modHolder) {
                 PlayerCombo combo = player.getData(TCData.PLAYER_COMBO);
                 combo.tick(player, stack);
+
+                RangedWeaponHandler rangedHandler = stack.get(TCData.RANGED_WEAPON_HANDLER);
+                if (modHolder instanceof IRangedModHolder rangedModHolder && rangedHandler != null) {
+                    TriggerType<?> triggerType = rangedHandler.getTriggerType();
+                    ReloadType<?> reloadType = rangedModHolder.schema(stack).getAttack(triggerType).reloadType();
+                    if (reloadType instanceof DurationReloadType duration) {
+                        if (player.tickCount >= rangedHandler.lastShotTick + duration.initialDelay() && player.tickCount % 20 == 0) {
+                            duration.reload(player, stack, 0);
+                        }
+                    } else if (rangedHandler.isReloading() && rangedHandler.reloadTick != 0 && player.tickCount >= rangedHandler.reloadTick + triggerType.getReloadDelay()) {
+                        int reloadAmount = Math.min(stack.getOrDefault(TCData.MAG_COUNT, 0), stack.getOrDefault(TCData.AMMO_COUNT, 0));
+                        reloadType.reload(player, stack, reloadAmount);
+                        rangedHandler.setReloading(false);
+                    }
+
+                    //ADD CHARGE LOGIC HERE
+                }
             }
         }
     }
@@ -64,12 +87,20 @@ public class TCEvents {
                 ItemStack fromStack = event.getFrom();
                 if (toStack.getItem() instanceof IWeaponModHolder<?> modHolder) {
                     slots.switchSlots(player, SlotGroup.WEAPON, modHolder, toStack);
-                } else if (fromStack.getItem() instanceof IModHolder<?>) {
+                }
+
+                if (fromStack.getItem() instanceof IModHolder<?> modHolder) {
                     if (!(toStack.getItem() instanceof IModHolder<?>))
                         slots.unequipFromSlot(SlotGroup.WEAPON);
 
                     PlayerCombo combo = player.getData(TCData.PLAYER_COMBO);
                     combo.resetCombo(player, fromStack);
+
+                    RangedWeaponHandler handler = fromStack.get(TCData.RANGED_WEAPON_HANDLER);
+                    if (modHolder instanceof IRangedModHolder && handler != null && handler.isFiring) {
+                        handler.stopShooting();
+                        PayloadHandler.stopShooting();
+                    }
                 }
             }
         }

@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.common.init;
 
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Bullet;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.SolidProjectile;
+import com.mojang.serialization.Codec;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.SolidProjectile;
 import com.ombremoon.tennocraft.common.world.PlayerCombo;
 import com.ombremoon.tennocraft.common.world.TennoSlots;
 import com.ombremoon.tennocraft.common.api.handler.FrameHandler;
@@ -11,12 +11,10 @@ import com.ombremoon.tennocraft.common.api.mod.ModInstance;
 import com.ombremoon.tennocraft.common.world.SchemaHolder;
 import com.ombremoon.tennocraft.common.world.effect.StatusEffect;
 import com.ombremoon.tennocraft.main.Constants;
-import com.ombremoon.tennocraft.main.Keys;
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentSyncHandler;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -26,6 +24,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class TCData {
@@ -51,10 +50,12 @@ public class TCData {
 
     public static final Supplier<AttachmentType<SolidProjectile>> PROJECTILE = ATTACHMENT_TYPES.register(
             "projectile", () -> AttachmentType.builder(() -> (SolidProjectile) null)
+                    .serialize(SolidProjectile.Serializer.CODEC.codec())
                     .sync(new AttachmentSyncHandler<>() {
                         @Override
                         public void write(RegistryFriendlyByteBuf buf, SolidProjectile attachment, boolean initialSync) {
-                            SolidProjectile.Serializer.STREAM_CODEC.encode(buf, attachment);
+                            if (attachment != null)
+                                SolidProjectile.Serializer.STREAM_CODEC.encode(buf, attachment);
                         }
 
                         @Override
@@ -78,6 +79,15 @@ public class TCData {
 
     public static final Supplier<DataComponentType<ModInstance>> MOD = COMPONENT_TYPES.registerComponentType("mod",
             builder -> builder.persistent(ModInstance.CODEC).networkSynchronized(ModInstance.STREAM_CODEC));
+
+    public static final Supplier<DataComponentType<Integer>> AMMO_COUNT = COMPONENT_TYPES.registerComponentType("ammo_count",
+            builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    public static final Supplier<DataComponentType<Integer>> MAG_COUNT = COMPONENT_TYPES.registerComponentType("mag_count",
+            builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    public static final Supplier<DataComponentType<List<Integer>>> ACTIVE_DEPLOYABLES = COMPONENT_TYPES.registerComponentType("active_deployables",
+            builder -> builder.persistent(Codec.INT.listOf()).networkSynchronized(ByteBufCodecs.VAR_INT.apply(ByteBufCodecs.list())));
 
     public static void register(IEventBus modEventBus) {
         TCData.ATTACHMENT_TYPES.register(modEventBus);

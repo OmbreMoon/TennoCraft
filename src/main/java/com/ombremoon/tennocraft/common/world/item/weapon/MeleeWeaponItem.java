@@ -52,13 +52,12 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
         if (!level.isClientSide) {
             MeleeWeaponHandler handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
             if (handler != null) {
-                ModContainer mods = this.getMods(stack);
+                ModContainer mods = this.getMods(player, stack);
                 Holder<Modification> mod = level.registryAccess().holderOrThrow(TCPrimaryWeaponMods.CRYO_ROUNDS);
 //                mods.loadCache();
 //                mods.modCache.setMod(2, new ModInstance(mod, 3));
 //                this.confirmModChanges(player, stack);
-                log(mods);
-                log(handler.getComboSet().value().combos().get(ComboType.NEUTRAL));
+                log(handler.test);
                 log(handler.getTag());
             }
         }
@@ -75,10 +74,10 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
     }
 
     @Override
-    public ModContainer getMods(ItemStack stack) {
+    public ModContainer getMods(LivingEntity entity, ItemStack stack) {
         var handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
         if (handler != null) {
-            handler.ensureRegistryAccess();
+            handler.ensureRegistryAccess(entity.registryAccess());
             return handler.getMods();
         }
         return null;
@@ -88,7 +87,7 @@ public class MeleeWeaponItem extends AbstractWeaponItem<MeleeWeaponSchema> {
     public void confirmModChanges(Player player, ItemStack stack) {
         var handler = stack.get(TCData.MELEE_WEAPON_HANDLER);
         if (handler != null) {
-            handler.ensureRegistryAccess();
+            handler.ensureRegistryAccess(player.registryAccess());
             handler.confirmModChanges(player, stack);
         }
     }

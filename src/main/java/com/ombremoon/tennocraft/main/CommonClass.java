@@ -18,8 +18,6 @@ public class CommonClass {
         TCEntities.register(modEventBus);
         TCItems.register(modEventBus);
         TCModEffectComponents.register(modEventBus);
-        TCProjectileSerializers.register(modEventBus);
-        TCReloadSerializers.register(modEventBus);
         TCSchemas.register(modEventBus);
         TCStatusEffects.register(modEventBus);
 

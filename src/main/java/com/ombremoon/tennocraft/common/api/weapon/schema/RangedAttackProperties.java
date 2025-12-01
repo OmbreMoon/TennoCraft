@@ -1,22 +1,66 @@
 package com.ombremoon.tennocraft.common.api.weapon.schema;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.mojang.serialization.DataResult;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.Hitscan;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.ProjectileType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.SolidProjectile;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.ActiveTrigger;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.HeldTrigger;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public record RangedAttackProperties(Map<TriggerType, RangedAttackSchema> attacks) {
-    public static final Codec<RangedAttackProperties> CODEC = Codec.unboundedMap(TriggerType.CODEC, RangedAttackSchema.CODEC).xmap(RangedAttackProperties::new, RangedAttackProperties::attacks);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Map<TriggerType, RangedAttackSchema>> PROPERTIES_STREAM_CODEC = ByteBufCodecs.map(HashMap::new, NeoForgeStreamCodecs.enumCodec(TriggerType.class), RangedAttackSchema.STREAM_CODEC);
+public record RangedAttackProperties(Map<TriggerType<?>, RangedAttackProperty> attacks) {
+    public static final Codec<RangedAttackProperties> CODEC = Codec.pair(TriggerType.CODEC, RangedAttackProperty.CODEC).listOf()
+            .xmap(pairs -> {
+                Map<TriggerType<?>, RangedAttackProperty> map = new HashMap<>();
+                for (var pair : pairs) {
+                    map.put(pair.getFirst(), pair.getSecond());
+                }
+                return new RangedAttackProperties(map);
+            }, properties -> {
+                List<Pair<TriggerType<?>, RangedAttackProperty>> list = new ArrayList<>();
+                for (var entry : properties.attacks.entrySet()) {
+                    list.add(new Pair<>(entry.getKey(), entry.getValue()));
+                }
+                return list;
+            })
+            .validate(RangedAttackProperties::validate);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Map<TriggerType<?>, RangedAttackProperty>> PROPERTIES_STREAM_CODEC = ByteBufCodecs.map(HashMap::new, TriggerType.STREAM_CODEC, RangedAttackProperty.STREAM_CODEC);
     public static final StreamCodec<RegistryFriendlyByteBuf, RangedAttackProperties> STREAM_CODEC = PROPERTIES_STREAM_CODEC.map(RangedAttackProperties::new, RangedAttackProperties::attacks);
+
+    private static DataResult<RangedAttackProperties> validate(RangedAttackProperties properties) {
+        List<TriggerType<?>> heldList = new ArrayList<>();
+        properties.attacks.forEach((triggerType, schema) ->  {
+            ProjectileType<?> projectileType = schema.getAttack().projectileType();
+            if (triggerType.is(HeldTrigger.TYPE) && !(projectileType instanceof Hitscan)) {
+                heldList.add(triggerType);
+            }
+        });
+
+        if (!heldList.isEmpty()) {
+            return DataResult.error(() -> "Encountered non-hitscan projectile type mapped to held trigger type");
+        }
+
+        List<TriggerType<?>> activeList = new ArrayList<>();
+        properties.attacks.forEach((triggerType, schema) ->  {
+            ProjectileType<?> projectileType = schema.getAttack().projectileType();
+            if (triggerType.is(ActiveTrigger.TYPE) && !(projectileType instanceof SolidProjectile)) {
+                activeList.add(triggerType);
+            }
+        });
+
+        if (!activeList.isEmpty()) {
+            return DataResult.error(() -> "Encountered non-solid projectile type mapped to active trigger type");
+        }
+
+        return DataResult.success(properties);
+    }
 
     public int size() {
         return this.attacks.size();
@@ -26,15 +70,11 @@ public record RangedAttackProperties(Map<TriggerType, RangedAttackSchema> attack
         return this.attacks.isEmpty();
     }
 
-    public void addProperty(TriggerType type, RangedAttackSchema attacks) {
-        this.attacks.put(type, attacks);
-    }
-
-    public RangedAttackSchema getAttack(TriggerType type) {
+    public RangedAttackProperty getAttack(TriggerType<?> type) {
         return this.attacks.get(type);
     }
 
-    public Set<TriggerType> triggers() {
+    public Set<TriggerType<?>> triggers() {
         return this.attacks.keySet();
     }
 }

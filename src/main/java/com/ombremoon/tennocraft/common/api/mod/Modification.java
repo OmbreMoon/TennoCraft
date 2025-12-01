@@ -3,8 +3,9 @@ package com.ombremoon.tennocraft.common.api.mod;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
+import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
 import com.ombremoon.tennocraft.common.api.mod.effects.*;
-import com.ombremoon.tennocraft.common.api.mod.effects.value.AddValue;
 import com.ombremoon.tennocraft.common.api.weapon.schema.Schema;
 import com.ombremoon.tennocraft.common.init.TCModEffectComponents;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
@@ -27,6 +28,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -167,20 +169,32 @@ public record Modification(Component name, Component description, ModDefinition 
         this.modifyAttackFilteredValue(TCModEffectComponents.DAMAGE.get(), level, modRank, schema, attacker, entity, damage);
     }
 
-    public void modifyFactionDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
-        this.modifyAttackFilteredValue(TCModEffectComponents.FACTION_DAMAGE.get(), level, modRank, schema, attacker, entity, damage);
+    public void modifyFactionDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat factionDamage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.FACTION_DAMAGE.get(), level, modRank, schema, attacker, entity, factionDamage);
     }
 
-    public void modifyCritChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
-        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
+    public void modifyCritChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat critChance) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_CHANCE.get(), level, modRank, schema, attacker, entity, critChance);
     }
 
-    public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
-        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, attacker, entity, damage);
+    public void modifyCritDamage(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat critDamage) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.CRIT_MULTIPLIER.get(), level, modRank, schema, attacker, entity, critDamage);
     }
 
-    public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat damage) {
-        this.modifyAttackFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, attacker, entity, damage);
+    public void modifyStatusChance(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, Entity entity, MutableFloat statusChance) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.STATUS_CHANCE.get(), level, modRank, schema, attacker, entity, statusChance);
+    }
+
+    public void modifyReloadTime(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, MutableFloat reloadTime) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.RELOAD_TIME.get(), level, modRank, schema, attacker, null, reloadTime);
+    }
+
+    public void modifyMultishot(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, MutableFloat multishot) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.MULTISHOT.get(), level, modRank, schema, attacker, null, multishot);
+    }
+
+    public void modifyProjectileSpeed(ServerLevel level, int modRank, Schema schema, LivingEntity attacker, MutableFloat projectileSpeed) {
+        this.modifyAttackFilteredValue(TCModEffectComponents.PROJECTILE_SPEED.get(), level, modRank, schema, attacker, null, projectileSpeed);
     }
 
     public void modifyAttackFilteredValue(
@@ -236,6 +250,24 @@ public record Modification(Component name, Component description, ModDefinition 
                 .withOptionalParameter(LootContextParams.DIRECT_ATTACKING_ENTITY, damageSource.getDirectEntity())
                 .withOptionalParameter(ModContextParams.SCHEMA, schema)
                 .create(ModContextParams.MODDED_DAMAGE);
+        return new LootContext.Builder(lootparams).create(Optional.empty());
+    }
+
+    public static LootContext rangedWeaponContext(ServerLevel level, ItemStack weapon, WeaponModContainer mods, RangedWeaponHandler handler) {
+        LootParams lootparams = new LootParams.Builder(level)
+                .withParameter(ModContextParams.WEAPON, weapon)
+                .withParameter(ModContextParams.MODS, mods)
+                .withOptionalParameter(ModContextParams.RANGED_DATA, handler)
+                .create(ModContextParams.MODDED_ITEM);
+        return new LootContext.Builder(lootparams).create(Optional.empty());
+    }
+
+    public static LootContext meleeWeaponContext(ServerLevel level, ItemStack weapon, WeaponModContainer mods, MeleeWeaponHandler handler) {
+        LootParams lootparams = new LootParams.Builder(level)
+                .withParameter(ModContextParams.WEAPON, weapon)
+                .withParameter(ModContextParams.MODS, mods)
+                .withOptionalParameter(ModContextParams.MELEE_DATA, handler)
+                .create(ModContextParams.MODDED_ITEM);
         return new LootContext.Builder(lootparams).create(Optional.empty());
     }
 

@@ -11,6 +11,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeMap;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -63,6 +66,16 @@ public class MineFrame implements IEntityModHolder<FrameSchema>, INBTSerializabl
         this.health = health;
     }
 
+    public boolean hurt(DamageSource source, float amount) {
+        boolean flag2 = amount > 0;
+        this.setHealth(Mth.clamp(this.health - amount, 0.0F, this.getMaxHealth()));
+        return flag2;
+    }
+
+    public float getMaxHealth() {
+        return (float) this.getStats().getValue(Attributes.MAX_HEALTH);
+    }
+
     @Override
     public Modification.Compatibility getModType() {
         return Modification.Compatibility.FRAME;
@@ -79,7 +92,7 @@ public class MineFrame implements IEntityModHolder<FrameSchema>, INBTSerializabl
     }
 
     @Override
-    public ModContainer getMods(ItemStack stack) {
+    public ModContainer getMods(LivingEntity entity, ItemStack stack) {
         return this.mods;
     }
 

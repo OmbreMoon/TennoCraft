@@ -6,7 +6,7 @@ import com.ombremoon.tennocraft.common.api.handler.MeleeWeaponHandler;
 import com.ombremoon.tennocraft.common.api.handler.RangedWeaponHandler;
 import com.ombremoon.tennocraft.common.api.mod.WeaponModContainer;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
-import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.MeleeWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
@@ -60,7 +60,7 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         return null;
     }
 
-    private static WeaponDamageResult resultFromPartial(ItemStack stack, LivingEntity attacker, LivingEntity target, Partial partial, WeaponSchema schema, @Nullable TriggerType type, PartialOutput output) {
+    private static WeaponDamageResult resultFromPartial(ItemStack stack, LivingEntity attacker, LivingEntity target, Partial partial, WeaponSchema schema, @Nullable TriggerType<?> type, PartialOutput output) {
         output.accept(stack, attacker, target, partial);
         float f = partial.damage;
 
@@ -98,7 +98,7 @@ public record WeaponDamageResult(DamageValue value, List<Holder<DamageType>> pro
         return new WeaponDamageResult(damageValue, procs);
     }
 
-    private static Partial quantizeAndNormalize(ItemStack stack, LivingEntity attacker, LivingEntity target, WeaponSchema schema, @Nullable TriggerType type, WeaponModContainer mods) {
+    private static Partial quantizeAndNormalize(ItemStack stack, LivingEntity attacker, LivingEntity target, WeaponSchema schema, @Nullable TriggerType<?> type, WeaponModContainer mods) {
         ServerLevel level = (ServerLevel) target.level();
         Distribution distribution = schema.getBaseDamageDistribution(type);
         int baseDamage = schema.getBaseDamage(type);

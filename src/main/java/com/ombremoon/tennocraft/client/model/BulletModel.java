@@ -1,7 +1,7 @@
 package com.ombremoon.tennocraft.client.model;
 
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Bullet;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.SolidProjectile;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.Bullet;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.SolidProjectile;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.world.entity.BulletProjectile;
 import com.ombremoon.tennocraft.main.CommonClass;

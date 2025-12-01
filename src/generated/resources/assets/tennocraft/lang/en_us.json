@@ -18,5 +18,14 @@
   "tennocraft.frame.missing_description": "Missing Description",
   "tennocraft.frame.volt": "Volt",
   "tennocraft.melee_weapon.orthos": "Orthos",
-  "tennocraft.ranged_weapon.atomos": "Atomos"
+  "tennocraft.ranged_weapon.angstrum": "Angstrum",
+  "tennocraft.ranged_weapon.atomos": "Atomos",
+  "tennocraft.ranged_weapon.battacor": "Battacor",
+  "tennocraft.ranged_weapon.braton": "Braton",
+  "tennocraft.ranged_weapon.burston": "Burston",
+  "tennocraft.ranged_weapon.lato": "Lato",
+  "tennocraft.ranged_weapon.pandero": "Pandero",
+  "tennocraft.ranged_weapon.paris": "Paris",
+  "tennocraft.ranged_weapon.penta": "Penta",
+  "tennocraft.ranged_weapon.tigris": "Tigris"
 }

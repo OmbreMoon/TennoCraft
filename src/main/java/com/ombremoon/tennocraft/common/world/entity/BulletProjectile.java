@@ -1,15 +1,16 @@
 package com.ombremoon.tennocraft.common.world.entity;
 
-import com.ombremoon.tennocraft.common.api.IRangedModHolder;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.Bullet;
-import com.ombremoon.tennocraft.common.api.weapon.projectile.SolidProjectile;
-import com.ombremoon.tennocraft.common.api.weapon.schema.RangedWeaponSchema;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.Bullet;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.ProjectileType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.projectile.SolidProjectile;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.data.RangedAttack;
 import com.ombremoon.tennocraft.common.init.TCData;
 import com.ombremoon.tennocraft.common.init.TCEntities;
 import com.ombremoon.tennocraft.main.Constants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -17,7 +18,9 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileDeflection;
@@ -29,6 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -39,13 +43,14 @@ import javax.annotation.Nullable;
 
 public class BulletProjectile extends Projectile implements GeoEntity {
     private static final Logger LOGGER = Constants.LOG;
+    private static final EntityDataAccessor<Vector3f> ORIGIN = SynchedEntityData.defineId(BulletProjectile.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Float> PUNCH_THROUGH = SynchedEntityData.defineId(BulletProjectile.class, EntityDataSerializers.FLOAT);
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     protected boolean inGround;
     private int life;
     private RangedAttack attackData;
     private ItemStack firedFromWeapon;
-    private IRangedModHolder modHolder;
+    private TriggerType<?> triggerType;
     private Holder<Bullet> bullet;
 
     public BulletProjectile(EntityType<? extends Projectile> entityType, Level level) {
@@ -58,11 +63,11 @@ public class BulletProjectile extends Projectile implements GeoEntity {
             RangedAttack attackData,
             SolidProjectile projectile,
             ItemStack firedFromWeapon,
-            IRangedModHolder modHolder
+            TriggerType<?> triggerType
     ) {
         super(TCEntities.BULLET_PROJECTILE.get(), level);
         this.attackData = attackData;
-        this.modHolder = modHolder;
+        this.triggerType = triggerType;
         this.bullet = projectile.bullet();
         if (level instanceof ServerLevel serverLevel) {
             if (firedFromWeapon.isEmpty())
@@ -74,11 +79,13 @@ public class BulletProjectile extends Projectile implements GeoEntity {
         this.setOwner(shooter);
         this.setData(TCData.PROJECTILE, projectile);
         this.setPos(shooter.position());
+        this.setOrigin(shooter.position());
         this.setPunchThrough(attackData.punchThrough());
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(ORIGIN, new Vector3f());
         builder.define(PUNCH_THROUGH, 0.0F);
     }
 
@@ -123,9 +130,28 @@ public class BulletProjectile extends Projectile implements GeoEntity {
         }
 
         SolidProjectile projectile = this.getData(TCData.PROJECTILE);
-        boolean flag = projectile.lifetime().isPresent();
-        if (flag && !this.level().isClientSide) {
-            this.tickDespawn(projectile.lifetime().get());
+        Vec3 origin = this.getOrigin();
+        double distToOrigin = this.distanceToSqr(origin);
+        if (projectile != null) {
+            boolean flag = projectile.lifetime().isPresent();
+            if (!this.level().isClientSide) {
+                this.tickDespawn(projectile);
+            }
+
+            if (projectile.range().isPresent()) {
+                float range = projectile.range().get();
+                if (distToOrigin >= range * range) {
+                    if (flag) {
+                        //Stop moving
+                    } else if (!this.level().isClientSide) {
+                        this.discard();
+                    }
+                }
+            }
+        }
+
+        if (distToOrigin >= 64 * 64 && !this.level().isClientSide) {
+            this.discard();
         }
 
         if (this.inGround) {
@@ -154,7 +180,7 @@ public class BulletProjectile extends Projectile implements GeoEntity {
                     }
                 }
 
-                if (hitResult != null && hitResult.getType() != HitResult.Type.MISS && !flag) {
+                if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
                     if (EventHooks.onProjectileImpact(this, hitResult))
                         break;
                     ProjectileDeflection projectiledeflection = this.hitTargetOrDeflectSelf(hitResult);
@@ -164,7 +190,7 @@ public class BulletProjectile extends Projectile implements GeoEntity {
                     }
                 }
 
-                if (entityhitresult == null /*|| this.getPunchThrough() <= 0*/) {
+                if (entityhitresult == null || this.getPunchThrough() <= 0) {
                     break;
                 }
 
@@ -179,13 +205,38 @@ public class BulletProjectile extends Projectile implements GeoEntity {
             double d4 = this.getY() + d1;
             double d5 = this.getZ() + d2;
             double d6 = vec3.horizontalDistance();
+            this.setYRot((float)(Mth.atan2(d0, d2) * 180.0F / (float)Math.PI));
+            this.setXRot((float)(Mth.atan2(d1, d6) * 180.0F / (float)Math.PI));
+            this.setXRot(lerpRotation(this.xRotO, this.getXRot()));
+            this.setYRot(lerpRotation(this.yRotO, this.getYRot()));
+            float f = 0.99F;
+            if (this.isInWater()) {
+                for (int j = 0; j < 4; j++) {
+                    float f1 = 0.25F;
+                    this.level().addParticle(ParticleTypes.BUBBLE, d3 - d0 * f1, d4 - d1 * f1, d5 - d2 * f1, d0, d1, d2);
+                }
+
+                f = this.getWaterInertia();
+                this.setDeltaMovement(vec3.scale(f));
+            }
+
+            this.setDeltaMovement(vec3.scale(f));
+            this.applyGravity();
+            this.setPos(d3, d4, d5);
+            this.checkInsideBlocks();
         }
+    }
+
+    @Override
+    protected double getDefaultGravity() {
+        SolidProjectile projectile = this.getData(TCData.PROJECTILE);
+        return projectile != null && projectile.gravity().isPresent() ? projectile.gravity().get() : super.getDefaultGravity();
     }
 
     @Override
     protected AABB makeBoundingBox() {
         SolidProjectile projectile = this.getData(TCData.PROJECTILE);
-        return this.makeBoundingBox(projectile, this.position());
+        return projectile != null ? this.makeBoundingBox(projectile, this.position()) : super.makeBoundingBox();
     }
 
     public AABB makeBoundingBox(SolidProjectile projectile, Vec3 pos) {
@@ -200,14 +251,25 @@ public class BulletProjectile extends Projectile implements GeoEntity {
         return new AABB(x - f, y - f1, z - f2, x + f, y + f1, z + f2);
     }
 
-    protected void tickDespawn(int lifetime) {
-        if (lifetime > 0) {
-            this.life++;
-            if (this.life <= lifetime) {
-                this.discard();
+    protected void tickDespawn(SolidProjectile projectile) {
+        var optional = projectile.lifetime();
+        if (optional.isPresent()) {
+            int lifetime = optional.get();
+            if (lifetime > 0) {
+                if (this.life >= lifetime) {
+                    this.discard();
+                }
+            } else {
+                Entity owner = this.getOwner();
+                if (owner instanceof LivingEntity livingEntity) {
+//                    this.modHolder.onReload(livingEntity, livingEntity.level(), this, (byte) 0);
+
+                    //On reload, check component for a list of persistent projectiles
+                    //If not empty, iterate and call ^^
+                }
             }
-        } else {
-            //Wait for reload
+
+            this.life++;
         }
     }
 
@@ -237,24 +299,39 @@ public class BulletProjectile extends Projectile implements GeoEntity {
     protected void addAdditionalSaveData(CompoundTag compound) {
         super.addAdditionalSaveData(compound);
         SolidProjectile projectile = this.getData(TCData.PROJECTILE);
-        SolidProjectile.CODEC.codec()
-                .encodeStart(this.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), projectile)
+        if (projectile != null)
+            projectile.save(compound);
+
+        RangedAttack.CODEC
+                .encodeStart(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), this.attackData)
                 .resultOrPartial(LOGGER::error)
-                .ifPresent(tag -> compound.put("Projectile", tag));
+                .ifPresent(tag -> compound.put("Attack Data", tag));
+        compound.put("Weapon", this.firedFromWeapon.save(this.registryAccess(), new CompoundTag()));
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
         super.readAdditionalSaveData(compound);
-        SolidProjectile.CODEC.codec()
-                .parse(this.level().registryAccess().createSerializationContext(NbtOps.INSTANCE), compound.get("Projectile"))
-                .resultOrPartial(LOGGER::error)
+        ProjectileType.parse(compound)
                 .ifPresent(projectileType -> this.setData(TCData.PROJECTILE, (SolidProjectile) projectileType));
+        RangedAttack.CODEC
+                .parse(this.registryAccess().createSerializationContext(NbtOps.INSTANCE), compound.get("Attack Data"))
+                .resultOrPartial(LOGGER::error)
+                .ifPresent(attack -> this.attackData = attack);
+        this.firedFromWeapon = ItemStack.parseOptional(this.registryAccess(), compound.getCompound("Weapon"));
     }
 
     @Override
     protected MovementEmission getMovementEmission() {
         return MovementEmission.NONE;
+    }
+
+    private void setOrigin(Vec3 origin) {
+        this.entityData.set(ORIGIN, new Vector3f((float) origin.x, (float) origin.y, (float) origin.z));
+    }
+
+    public Vec3 getOrigin() {
+        return new Vec3(this.entityData.get(ORIGIN));
     }
 
     private void setPunchThrough(float punchThrough) {
@@ -263,6 +340,10 @@ public class BulletProjectile extends Projectile implements GeoEntity {
 
     public float getPunchThrough() {
         return this.entityData.get(PUNCH_THROUGH);
+    }
+
+    protected float getWaterInertia() {
+        return 0.6F;
     }
 
     @Override

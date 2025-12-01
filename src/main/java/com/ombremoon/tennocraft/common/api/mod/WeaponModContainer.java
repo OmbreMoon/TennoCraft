@@ -6,13 +6,12 @@ import com.ombremoon.tennocraft.common.api.IWeaponModHolder;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.DamageModifiers;
 import com.ombremoon.tennocraft.common.api.mod.effects.item.ItemModifiers;
 import com.ombremoon.tennocraft.common.api.weapon.DamageValue;
-import com.ombremoon.tennocraft.common.api.weapon.TriggerType;
+import com.ombremoon.tennocraft.common.api.weapon.ranged.trigger.TriggerType;
 import com.ombremoon.tennocraft.common.api.weapon.schema.WeaponSchema;
 import com.ombremoon.tennocraft.common.world.SlotGroup;
 import com.ombremoon.tennocraft.common.world.WorldStatus;
 import com.ombremoon.tennocraft.common.world.effect.StatusEffect;
 import com.ombremoon.tennocraft.util.ModHelper;
-import com.ombremoon.tennocraft.util.WeaponDamageResult;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.Holder;
@@ -109,7 +108,7 @@ public class WeaponModContainer extends ModContainer {
     public void collectDamageModifiers(Player player, ItemStack stack) {
         List<DamageValue> orderedValues = new ArrayList<>();
         IWeaponModHolder<?> modHolder = (IWeaponModHolder<?>) stack.getItem();
-        ModHelper.forEachDamageModifier(stack, (effect, modRank) -> {
+        ModHelper.forEachDamageModifier(stack, player, (effect, modRank) -> {
             Holder<DamageType> damageType = effect.damageType();
             if (effect.conditions().isPresent()) {
                 DamageModifiers modifiers = this.getDamageModifiers(damageType);
@@ -121,7 +120,7 @@ public class WeaponModContainer extends ModContainer {
             }
         });
 
-        TriggerType triggerType = modHolder instanceof IRangedModHolder rangedModHolder ? rangedModHolder.getTriggerType(stack) : null;
+        TriggerType<?> triggerType = modHolder instanceof IRangedModHolder rangedModHolder ? rangedModHolder.getTriggerType(player, stack) : null;
         var distribution = this.schema.getBaseDamageDistribution(triggerType);
         distribution.ifElementalPresent((damageType, amount) -> addOrMergeType(orderedValues, new DamageValue(damageType, amount)));
 

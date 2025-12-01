@@ -1,0 +1,70 @@
+{
+  "type": "tennocraft:ranged_weapon",
+  "attacks": [
+    {
+      "type": "tennocraft:burst",
+      "attack": {
+        "ammo_cost": 1,
+        "fire_rate": 5.0,
+        "multishot": 1,
+        "projectile_type": {
+          "type": "tennocraft:hitscan",
+          "bullet": "tennocraft:atomos"
+        },
+        "punch_through": 0.0,
+        "reload_type": {
+          "type": "tennocraft:ammo",
+          "consume_when": "on_fire",
+          "reload_time": 40
+        },
+        "spread": {
+          "max_exclusive": 8.0,
+          "min_inclusive": 0.0
+        }
+      },
+      "burst_count": 3,
+      "critChance": 0.06,
+      "critMultiplier": 1.6,
+      "damage": [
+        {
+          "type": "tennocraft:impact",
+          "maxFalloff": 10.0
+        },
+        {
+          "type": "tennocraft:puncture",
+          "maxFalloff": 10.0
+        },
+        {
+          "type": "tennocraft:slash",
+          "maxFalloff": 10.0
+        }
+      ],
+      "delay_ticks": 1,
+      "noise": "alarming",
+      "status": 0.18
+    }
+  ],
+  "general": {
+    "layout": {
+      "compatibility": "primary",
+      "slots": [
+        {
+          "index": 0,
+          "polarity": "madurai"
+        }
+      ]
+    },
+    "mastery": 0,
+    "maxRank": 30,
+    "slot": "primary",
+    "triggerTypes": [
+      "tennocraft:burst"
+    ]
+  },
+  "utility": {
+    "ammo_pickup": 60,
+    "mag_size": 45,
+    "max_ammo": 540,
+    "riven_disposition": 1.45
+  }
+}
